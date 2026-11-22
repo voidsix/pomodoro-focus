@@ -1,0 +1,158 @@
+/*
+VOICE: calm, encouraging, focused — a tool that gets out of the way.
+IDEA: the tomato kitchen timer: a wound dial on a bold tomato-red field.
+PICTURE: a large ring dial with minute ticks that drains as time passes.
+COLOUR and TYPE: tomato red for focus, deep teal for breaks, white ink; Rubik with rounded heavy digits.
+LAYOUT: dial first, task + controls under it, then rhythm, distractions and progress panels.
+*/
+:root {
+  color-scheme: light dark;
+  --field: #d9412b;
+  --field-deep: #b8301d;
+  --ink: #fff;
+  --soft: rgba(255,255,255,.72);
+  --line: rgba(255,255,255,.22);
+  --bg: light-dark(#fbf7f4, #15110f);
+  --text: light-dark(#231a16, #f2ebe7);
+  --muted: light-dark(#6f625b, #b3a69f);
+  --card: light-dark(#fff, #211a17);
+  --border: light-dark(#eadfd8, #3a2f2a);
+  --accent: var(--field);
+}
+:root[data-theme=light] { color-scheme: light; }
+:root[data-theme=dark] { color-scheme: dark; }
+body { --accent: var(--field); }
+body[data-mode=short], body[data-mode=long] { --field: #17766f; --field-deep: #0f5a54; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme=light]) body { --field-deep: #8f2414; } }
+
+* { box-sizing: border-box; min-width: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.55 Rubik, system-ui, sans-serif; overflow-x: clip;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; }
+:focus-visible { outline: 3px solid #ffd84a; outline-offset: 2px; }
+
+.band { padding: clamp(18px, 4vw, 40px) max(5vw, 16px); }
+.top, .hero { background: var(--field); color: var(--ink); transition: background .6s; }
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding-top: max(env(safe-area-inset-top), 16px); padding-bottom: 0;
+}
+h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+.modes { display: flex; gap: 4px; background: rgba(0,0,0,.16); padding: 4px; border-radius: 999px; }
+.modes button { min-height: 40px; padding: 0 14px; border-radius: 999px; color: var(--soft); font-weight: 500; font-size: 15px; }
+.modes button[aria-pressed=true] { background: var(--ink); color: var(--field-deep); }
+
+.hero { display: grid; justify-items: center; gap: 22px; padding-bottom: 36px; }
+.dial { position: relative; width: min(78vw, 360px); aspect-ratio: 1; }
+.dial svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.track { fill: rgba(0,0,0,.12); stroke: rgba(255,255,255,.14); stroke-width: 10; }
+.prog {
+  fill: none; stroke: var(--ink); stroke-width: 10; stroke-linecap: round;
+  stroke-dasharray: 552.92; stroke-dashoffset: 0; transition: stroke-dashoffset .3s linear;
+}
+#ticks line { stroke: rgba(255,255,255,.35); stroke-width: 1.4; }
+#ticks line.big { stroke: rgba(255,255,255,.7); stroke-width: 2.4; }
+.readout { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 4px; }
+.time {
+  font-size: clamp(56px, 19vw, 92px); font-weight: 800; line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: -.03em;
+}
+.label { color: var(--soft); font-size: 15px; }
+.dots { display: flex; gap: 7px; justify-content: center; margin-top: 8px; min-height: 10px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink); opacity: .8; }
+.dots i.on { background: var(--ink); }
+
+.task {
+  width: min(100%, 440px); min-height: 50px; padding: 0 18px; border-radius: 14px;
+  border: 2px solid var(--line); background: rgba(0,0,0,.12); color: var(--ink);
+  text-align: center; font-size: 17px;
+}
+.task::placeholder { color: var(--soft); }
+.controls { display: flex; align-items: center; gap: 18px; }
+.main {
+  min-width: 170px; min-height: 60px; border-radius: 999px; background: var(--ink);
+  color: var(--field-deep); font-size: 20px; font-weight: 700; box-shadow: 0 6px 0 rgba(0,0,0,.18);
+  transition: transform .1s;
+}
+.main:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,.18); }
+.round { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.16); }
+.round svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+#skip svg path:first-child { fill: var(--ink); }
+
+main { max-width: 100%; }
+.panel { max-width: 720px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+h2 { margin: 0 0 12px; font-size: 22px; font-weight: 700; }
+h3 { margin: 22px 0 8px; font-size: 16px; font-weight: 600; }
+.hint { margin: -6px 0 12px; color: var(--muted); font-size: 15px; }
+
+.chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.chip {
+  text-align: left; padding: 12px 14px; border-radius: 14px; background: var(--card);
+  border: 2px solid var(--border); min-height: 64px;
+}
+.chip b { display: block; font-size: 16px; }
+.chip span { color: var(--muted); font-size: 14px; }
+.chip[aria-pressed=true] { border-color: var(--accent); }
+.chip[aria-pressed=true] b { color: var(--accent); }
+
+.custom { margin-top: 14px; }
+.custom summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--accent); font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 8px; }
+.grid label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.grid input[type=number], .row input {
+  min-height: 46px; padding: 0 12px; border-radius: 12px; border: 2px solid var(--border);
+  background: var(--card); color: var(--text); font-size: 16px; width: 100%;
+}
+.grid .check { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; color: var(--text); font-size: 16px; min-height: 40px; }
+.check input { width: 22px; height: 22px; accent-color: var(--accent); }
+
+.row { display: flex; gap: 8px; }
+.row input { flex: 1; }
+.add { min-height: 46px; padding: 0 18px; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 600; }
+.ghost { min-height: 46px; padding: 0 18px; border-radius: 12px; border: 2px solid var(--border); }
+.end { justify-content: flex-end; margin-top: 16px; }
+
+.notes, .history { list-style: none; margin: 12px 0 0; padding: 0; }
+.notes li, .history li {
+  display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border);
+}
+.notes li span, .history li span { flex: 1; overflow-wrap: anywhere; }
+.notes li button { width: 40px; height: 40px; border-radius: 10px; color: var(--muted); font-size: 22px; line-height: 1; }
+.history time, .history em { color: var(--muted); font-size: 14px; font-style: normal; white-space: nowrap; }
+.empty { color: var(--muted); font-size: 15px; border: 0 !important; }
+
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stats div { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
+.stats b { display: block; font-size: clamp(26px, 7vw, 36px); font-weight: 800; color: var(--accent); line-height: 1.1; }
+.stats span { font-size: 13px; color: var(--muted); }
+
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; align-items: end; height: 120px; margin-top: 20px; }
+.week .col { display: grid; grid-template-rows: auto 1fr auto; height: 100%; text-align: center; gap: 4px; }
+.week .bar-wrap { display: flex; align-items: flex-end; }
+.week .bar { width: 100%; background: var(--accent); border-radius: 6px 6px 2px 2px; min-height: 3px; opacity: .85; }
+.week .col.today .bar { opacity: 1; }
+.week small { font-size: 13px; color: var(--muted); }
+.week .n { font-size: 13px; font-weight: 600; }
+
+.foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 14px; max-width: 720px; margin: 0 auto; padding-bottom: max(env(safe-area-inset-bottom), 24px); }
+.link { color: var(--muted); text-decoration: underline; min-height: 44px; }
+
+.dialog { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: grid; place-items: center; padding: 16px; z-index: 10; }
+.dialog[hidden] { display: none; }
+.box { background: var(--card); color: var(--text); border-radius: 18px; padding: 20px; width: min(100%, 380px); }
+.box p { margin: 0; font-size: 17px; }
+
+body.done .dial { animation: pulse .9s ease 2; }
+@keyframes pulse { 50% { transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+@media (max-width: 420px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .modes button { padding: 0 11px; }
+  .controls { gap: 12px; }
+}

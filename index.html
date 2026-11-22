@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d9412b">
+<meta name="description" content="Pomodoros personalizados para mejorar la concentración">
+<title>Foco Pomodoro</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-mode="focus">
+
+<header class="top band">
+  <h1>Foco</h1>
+  <nav class="modes" aria-label="Modo">
+    <button data-mode-btn="focus" aria-pressed="true">Foco</button>
+    <button data-mode-btn="short" aria-pressed="false">Descanso</button>
+    <button data-mode-btn="long" aria-pressed="false">Largo</button>
+  </nav>
+</header>
+
+<main>
+  <section class="hero band">
+    <div class="dial">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="track" cx="100" cy="100" r="88"/>
+        <g id="ticks"></g>
+        <circle class="prog" id="prog" cx="100" cy="100" r="88"/>
+      </svg>
+      <div class="readout">
+        <div id="time" class="time" role="timer" aria-live="off">25:00</div>
+        <div id="label" class="label">Tiempo de foco</div>
+        <div id="dots" class="dots" aria-label="Progreso del ciclo"></div>
+      </div>
+    </div>
+
+    <input id="task" class="task" type="text" maxlength="80" placeholder="¿En qué te vas a concentrar?" autocomplete="off" aria-label="Tarea actual">
+
+    <div class="controls">
+      <button id="reset" class="round" aria-label="Reiniciar">
+        <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" /></svg>
+      </button>
+      <button id="toggle" class="main">Empezar</button>
+      <button id="skip" class="round" aria-label="Saltar">
+        <svg viewBox="0 0 24 24"><path d="M6 5l9 7-9 7zM18 5v14" /></svg>
+      </button>
+    </div>
+  </section>
+
+  <section class="panel band" id="presets-sec">
+    <h2>Ritmo</h2>
+    <div id="presets" class="chips"></div>
+    <details class="custom">
+      <summary>Personalizar tiempos</summary>
+      <form id="settings" class="grid">
+        <label>Foco (min)<input type="number" name="focus" min="1" max="180" inputmode="numeric"></label>
+        <label>Descanso (min)<input type="number" name="short" min="1" max="60" inputmode="numeric"></label>
+        <label>Descanso largo (min)<input type="number" name="long" min="1" max="90" inputmode="numeric"></label>
+        <label>Largo cada (pomodoros)<input type="number" name="every" min="1" max="12" inputmode="numeric"></label>
+        <label class="check"><input type="checkbox" name="autoStart"> Encadenar automáticamente</label>
+        <label class="check"><input type="checkbox" name="sound"> Sonido al terminar</label>
+        <label class="check"><input type="checkbox" name="notify"> Notificaciones</label>
+      </form>
+    </details>
+  </section>
+
+  <section class="panel band">
+    <h2>Distracciones</h2>
+    <p class="hint">¿Se te cruzó algo? Anotalo y seguí. Lo revisás en el descanso.</p>
+    <form id="note-form" class="row">
+      <input id="note" type="text" maxlength="120" placeholder="Ej: responder a Juli" autocomplete="off" aria-label="Nueva distracción">
+      <button class="add" type="submit">Anotar</button>
+    </form>
+    <ul id="notes" class="notes"></ul>
+  </section>
+
+  <section class="panel band">
+    <h2>Tu progreso</h2>
+    <div class="stats">
+      <div><b id="s-today">0</b><span>pomodoros hoy</span></div>
+      <div><b id="s-min">0</b><span>min de foco hoy</span></div>
+      <div><b id="s-streak">0</b><span>días seguidos</span></div>
+    </div>
+    <div id="week" class="week" aria-label="Últimos 7 días"></div>
+    <h3>Últimas sesiones</h3>
+    <ul id="history" class="history"></ul>
+  </section>
+</main>
+
+<footer class="band foot">
+  <span>Atajo: barra espaciadora para empezar o pausar.</span>
+  <button id="clear" class="link">Borrar historial</button>
+</footer>
+
+<div id="dialog" class="dialog" hidden>
+  <div class="box">
+    <p id="dialog-msg"></p>
+    <div class="row end">
+      <button id="dialog-no" class="ghost">Cancelar</button>
+      <button id="dialog-yes" class="add">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
