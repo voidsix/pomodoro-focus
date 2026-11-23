@@ -196,10 +196,11 @@
     { id: 'brown', name: 'Ruido marrón', desc: 'grave, tapa voces' },
     { id: 'white', name: 'Ruido blanco', desc: 'tapa todo' },
     { id: 'clock', name: 'Tic-tac', desc: 'reloj de estudio' },
-    { id: 'cafe', name: 'Café', desc: 'murmullo y tazas', pro: true },
-    { id: 'storm', name: 'Tormenta', desc: 'lluvia y truenos lejanos', pro: true },
-    { id: 'stream', name: 'Arroyo', desc: 'agua que corre', pro: true },
-    { id: 'night', name: 'Noche de campo', desc: 'grillos y brisa', pro: true }
+    // Pro: grabaciones reales (archivos en /sonidos, armados como bucles sin corte)
+    { id: 'cafe', name: 'Café', desc: 'murmullo y tazas', pro: true, file: 'sonidos/cafe.mp3' },
+    { id: 'storm', name: 'Tormenta', desc: 'lluvia y truenos', pro: true, file: 'sonidos/tormenta.mp3' },
+    { id: 'stream', name: 'Arroyo', desc: 'agua que corre', pro: true, file: 'sonidos/arroyo.mp3' },
+    { id: 'night', name: 'Noche de campo', desc: 'grillos y brisa', pro: true, file: 'sonidos/noche.mp3' }
   ];
   const FADE = 1.5;
   const LOOPS = { clock: [16], waves: [29, 41] }; // el resto usa [23, 31]
@@ -367,8 +368,25 @@
     for (let i = 0; i < n; i++) d[i] *= k;
     return out;
   }
+  // Grabación real: se descarga una vez (queda guardada para usar sin internet) y se iguala el volumen
+  async function loadRecording(file) {
+    const res = await fetch(file);
+    if (!res.ok) throw new Error('no se pudo cargar el sonido');
+    const buf = await ctx.decodeAudioData(await res.arrayBuffer());
+    let sum = 0, n = 0, peak = 0;
+    for (let ch = 0; ch < buf.numberOfChannels; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < d.length; i += 4) { sum += d[i] * d[i]; n++; peak = Math.max(peak, Math.abs(d[i])); }
+    }
+    const k = Math.min(0.15 / Math.sqrt(sum / n || 1), 0.95 / (peak || 1));
+    for (let ch = 0; ch < buf.numberOfChannels; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < d.length; i++) d[i] *= k; }
+    return [buf];
+  }
   async function ambBuffers(id) {
-    if (!ambCache[id]) ambCache[id] = Promise.all((LOOPS[id] || [23, 31]).map((l) => renderLoop(id, l)));
+    const rec = AMBIENTS.find((a) => a.id === id && a.file);
+    if (!ambCache[id]) ambCache[id] = rec
+      ? loadRecording(rec.file).catch(() => Promise.all([23, 31].map((l) => renderLoop(id, l)))) // sin internet: versión sintetizada
+      : Promise.all((LOOPS[id] || [23, 31]).map((l) => renderLoop(id, l)));
     try { return await ambCache[id]; } catch (e) { delete ambCache[id]; throw e; }
   }
 
