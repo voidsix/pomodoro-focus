@@ -71,7 +71,7 @@
     el.prog.style.strokeDasharray = CIRC;
     el.prog.style.strokeDashoffset = CIRC * (1 - frac);
     el.toggle.textContent = timer ? 'Pausar' : (remaining < total() ? 'Seguir' : 'Empezar');
-    document.title = timer ? `${t} · ${mode === 'focus' ? 'Foco' : 'Descanso'}` : 'Foco Pomodoro';
+    document.title = timer ? `${t} · ${mode === 'focus' ? 'Foco' : 'Descanso'}` : 'Pleamar · Pomodoros para estudiar';
     document.body.dataset.mode = mode;
     document.body.classList.toggle('running', !!timer);
     document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modeBtn === mode));
@@ -349,7 +349,7 @@
     try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch {}
     try {
       if (settings.notify && 'Notification' in window && Notification.permission === 'granted') {
-        new Notification('Foco Pomodoro', { body: msg, icon: 'icon.svg' });
+        new Notification('Pleamar', { body: msg, icon: 'icon.svg' });
       }
     } catch {}
   }
