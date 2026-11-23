@@ -14,5 +14,5 @@ export const firebaseConfig = {
 // El precio que vale es el del servidor; este es el que se muestra.
 export const proConfig = {
   price: 5000,
-  api: ''
+  api: 'https://foco-pro-a5lrhs73aa-uc.a.run.app'
 };

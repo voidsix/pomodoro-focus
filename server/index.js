@@ -1,4 +1,4 @@
-// Servidor de cobro de Foco Pro (Google Cloud Functions, Node 20).
+// Servidor de cobro de Foco Pro (Google Cloud Functions, Node 24).
 //   POST /checkout  → crea el pago en Mercado Pago para el usuario logueado y devuelve el link
 //   POST /confirm   → al volver de Mercado Pago, consulta la última orden del usuario y activa la Pro
 //   POST /webhook   → aviso de Mercado Pago (tema "Order"); consulta la orden y activa la Pro

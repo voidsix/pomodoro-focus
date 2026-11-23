@@ -7,7 +7,7 @@
 #        gcloud secrets create mp-access-token --data-file="$env:TEMP\mp.txt" --project foco-estudio-1b47c
 #        Remove-Item $env:TEMP\mp.txt
 # Para cambiar el precio: editá PRICE acá abajo y price en firebase-config.js, y volvé a correr este script.
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Continue'  # gcloud escribe su progreso en stderr
 $project = 'foco-estudio-1b47c'
 $price = 5000
 
@@ -16,7 +16,7 @@ gcloud services enable cloudfunctions.googleapis.com cloudbuild.googleapis.com r
 $sa = (gcloud projects describe $project --format='value(projectNumber)') + '-compute@developer.gserviceaccount.com'
 gcloud secrets add-iam-policy-binding mp-access-token --member="serviceAccount:$sa" --role='roles/secretmanager.secretAccessor' --project $project | Out-Null
 
-gcloud functions deploy foco-pro --gen2 --runtime=nodejs20 --region=us-central1 --project $project `
+gcloud functions deploy foco-pro --gen2 --runtime=nodejs24 --region=us-central1 --project $project `
   --source="$PSScriptRoot" --entry-point=api --trigger-http --allow-unauthenticated `
   --memory=256Mi --max-instances=3 `
   --set-env-vars="PRICE=$price,SITE_URL=https://focoestudio.app,DATABASE_URL=https://foco-estudio-1b47c-default-rtdb.firebaseio.com" `
