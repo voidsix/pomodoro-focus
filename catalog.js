@@ -5,8 +5,8 @@ window.FOCO_CATALOG = [
   {
     id: 'uba-cbc-fisica-03',
     name: 'Física (03)',
-    inst: 'UBA · CBC y UBA XXI',
-    keys: 'fisica 03 cbc uba xxi ubaxxi ciclo basico comun mecanica',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'fisica 03 cbc uba xxi ubaxxi ciclo basico comun presencial normal regular sede mecanica',
     source: 'Programa oficial CBC · Cód. 03',
     units: [
       { name: 'Magnitudes físicas', topics: [

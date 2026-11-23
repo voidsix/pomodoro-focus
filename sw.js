@@ -1,6 +1,6 @@
 // Service worker: la app siempre busca la versión nueva en internet y guarda una copia
 // para cuando no hay conexión. Así las actualizaciones llegan solas y sigue andando offline.
-const CACHE = 'foco-v15';
+const CACHE = 'foco-v16';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'catalog.js', 'rooms.js', 'firebase-config.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', (e) => {
