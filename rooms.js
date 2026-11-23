@@ -1,8 +1,8 @@
 // Salas de estudio con amigos (Firebase Realtime Database + login anónimo).
 // Cada persona usa su propio temporizador; la sala muestra en vivo en qué está cada uno.
 import { firebaseConfig } from './firebase-config.js';
+import { firebase, ensureUser } from './fb.js';
 
-const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const box = document.getElementById('room');
 const store = {
   get(k, d) { try { const v = localStorage.getItem('pf:' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
@@ -119,18 +119,29 @@ async function share(link) {
 
 // ---------- Firebase ----------
 async function connect() {
+  const user = await ensureUser();
+  uid = user.uid;
   if (fb) return fb;
-  const [{ initializeApp }, auth, db] = await Promise.all([
-    import(SDK + 'firebase-app.js'), import(SDK + 'firebase-auth.js'), import(SDK + 'firebase-database.js')
-  ]);
-  const app = initializeApp(firebaseConfig);
-  const a = auth.getAuth(app), d = db.getDatabase(app);
-  const cred = await auth.signInAnonymously(a);
-  uid = cred.user.uid;
-  db.onValue(db.ref(d, '.info/serverTimeOffset'), (s) => { offset = s.val() || 0; });
-  fb = { db: d, api: db };
+  const { db, api } = await firebase();
+  api.onValue(api.ref(db, '.info/serverTimeOffset'), (s) => { offset = s.val() || 0; });
+  fb = { db, api };
   return fb;
 }
+
+// Al entrar o salir de la cuenta cambia el usuario: salir de la sala antes y volver a entrar después
+window.__focoRoomPause = async () => {
+  if (!room || !fb) return null;
+  const keep = room; const { api } = fb;
+  unsub.forEach((u) => u()); unsub = []; clearInterval(tick);
+  try { await api.onDisconnect(memberRef).cancel(); await api.remove(memberRef); } catch {}
+  room = null; memberRef = null; members = {};
+  view('<p class="hint">Cambiando de cuenta…</p>');
+  return keep;
+};
+window.__focoRoomResume = async (keep) => {
+  if (!keep) return;
+  try { await join(keep.code, keep.name); } catch { store.set('room', null); renderLobby(); }
+};
 
 function snapshotState() {
   const s = window.__focoState || {};

@@ -1,9 +1,24 @@
 {
   // ---------- Almacenamiento seguro ----------
+  // Lo que se sincroniza con la cuenta Pro: se anota cuándo cambió y se avisa a account.js
+  const SYNC_KEYS = ['settings', 'log', 'subjects', 'notes'];
   const store = {
     get(k, d) { try { const v = localStorage.getItem('pf:' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
-    set(k, v) { try { localStorage.setItem('pf:' + k, JSON.stringify(v)); } catch {} }
+    set(k, v) {
+      try {
+        localStorage.setItem('pf:' + k, JSON.stringify(v));
+        if (SYNC_KEYS.includes(k)) {
+          const m = JSON.parse(localStorage.getItem('pf:mtime') || '{}'); m[k] = Date.now();
+          localStorage.setItem('pf:mtime', JSON.stringify(m));
+          window.dispatchEvent(new CustomEvent('foco:saved', { detail: k }));
+        }
+      } catch {}
+    }
   };
+  // Foco Pro: lo confirma account.js (con la cuenta); mientras tanto se usa lo último conocido
+  let pro = !!store.get('pro', null);
+  const isPro = () => pro;
+  const paywall = (why) => window.dispatchEvent(new CustomEvent('foco:paywall', { detail: why }));
 
   const PRESETS = [
     { id: 'clasico', name: 'Clásico', focus: 25, short: 5, long: 15, every: 4 },
@@ -180,7 +195,11 @@
     { id: 'fire', name: 'Chimenea', desc: 'crepitar cálido' },
     { id: 'brown', name: 'Ruido marrón', desc: 'grave, tapa voces' },
     { id: 'white', name: 'Ruido blanco', desc: 'tapa todo' },
-    { id: 'clock', name: 'Tic-tac', desc: 'reloj de estudio' }
+    { id: 'clock', name: 'Tic-tac', desc: 'reloj de estudio' },
+    { id: 'cafe', name: 'Café', desc: 'murmullo y tazas', pro: true },
+    { id: 'storm', name: 'Tormenta', desc: 'lluvia y truenos lejanos', pro: true },
+    { id: 'stream', name: 'Arroyo', desc: 'agua que corre', pro: true },
+    { id: 'night', name: 'Noche de campo', desc: 'grillos y brisa', pro: true }
   ];
   const FADE = 1.5;
   const LOOPS = { clock: [16], waves: [29, 41] }; // el resto usa [23, 31]
@@ -265,6 +284,68 @@
         blip(c, k, k % 2 ? 1900 : 2400, 0.02, 0.3);
         burst(c, white, k, 0.012, 0.25, 3000);
       }
+    },
+    // ---- Pro ----
+    cafe: (c, T) => {
+      // Murmullo: varias "voces" de ruido filtrado en la zona del habla que suben y bajan sin entenderse
+      layer(c, noise(c, 'brown', T), 0.35, [['lowpass', 260]]);
+      for (let v = 0; v < 5; v++) {
+        const s = c.createBufferSource(); s.buffer = noise(c, 'pink', T);
+        const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 350 + v * 170; bp.Q.value = 1.6;
+        const g = c.createGain(); s.connect(bp).connect(g).connect(c.destination); s.start(0);
+        g.gain.setValueAtTime(0.05, 0);
+        for (let t = Math.random(); t < T; t += 0.15 + Math.random() * 0.35) g.gain.setTargetAtTime(0.03 + Math.random() * 0.22, t, 0.06);
+      }
+      // Tazas y cucharitas, de vez en cuando
+      for (let t = 1 + Math.random() * 3; t < T; t += 2.5 + Math.random() * 6) {
+        const f = 2600 + Math.random() * 1800, n = 1 + Math.floor(Math.random() * 3);
+        for (let k = 0; k < n; k++) { blip(c, t + k * 0.11, f, 0.35, 0.025 + Math.random() * 0.03); blip(c, t + k * 0.11, f * 2.7, 0.18, 0.01); }
+      }
+    },
+    storm: (c, T) => {
+      layer(c, noise(c, 'pink', T), 0.75, [['highpass', 300], ['lowpass', 6000]]);
+      layer(c, noise(c, 'brown', T), 0.55, [['lowpass', 600]]);
+      for (let t = 0; t < T; t += 0.015 + Math.random() * 0.06) blip(c, t, 1500 + Math.random() * 3000, 0.03, 0.01 + Math.random() * 0.035);
+      // Truenos lejanos: retumbe grave que crece y se apaga despacio
+      const s = c.createBufferSource(); s.buffer = noise(c, 'brown', T);
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 140;
+      const g = c.createGain(); s.connect(lp).connect(g).connect(c.destination); s.start(0);
+      g.gain.setValueAtTime(0.05, 0);
+      for (let t = 2 + Math.random() * 5; t < T - 4; t += 9 + Math.random() * 12) {
+        const peak = 0.9 + Math.random() * 1.1;
+        g.gain.setTargetAtTime(peak, t, 0.35 + Math.random() * 0.4);
+        g.gain.setTargetAtTime(0.05, t + 1.2 + Math.random() * 1.2, 1.2 + Math.random());
+      }
+    },
+    stream: (c, T) => {
+      layer(c, noise(c, 'brown', T), 0.45, [['lowpass', 380]]);
+      // Agua que corre: borboteo rápido en medios y agudos
+      for (const [f, q, base] of [[900, 1.2, 0.18], [1700, 1.5, 0.12], [3200, 1.1, 0.06]]) {
+        const s = c.createBufferSource(); s.buffer = noise(c, 'white', T);
+        const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = q;
+        const g = c.createGain(); s.connect(bp).connect(g).connect(c.destination); s.start(0);
+        g.gain.setValueAtTime(base, 0);
+        for (let t = 0; t < T; t += 0.04 + Math.random() * 0.12) {
+          g.gain.setTargetAtTime(base * (0.45 + Math.random() * 1.1), t, 0.03);
+          bp.frequency.setTargetAtTime(f * (0.8 + Math.random() * 0.45), t, 0.05);
+        }
+      }
+      for (let t = 0; t < T; t += 0.08 + Math.random() * 0.5) blip(c, t, 500 + Math.random() * 900, 0.06, 0.01 + Math.random() * 0.02);
+    },
+    night: (c, T) => {
+      // Brisa suave que va y viene
+      const s = c.createBufferSource(); s.buffer = noise(c, 'pink', T);
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700;
+      const g = c.createGain(); s.connect(lp).connect(g).connect(c.destination); s.start(0);
+      g.gain.setValueAtTime(0.25, 0);
+      for (let t = 0; t < T; t += 3 + Math.random() * 4) { g.gain.setTargetAtTime(0.15 + Math.random() * 0.3, t, 1.2); lp.frequency.setTargetAtTime(450 + Math.random() * 600, t, 1.5); }
+      // Grillos: trinos cortos en grupos, dos "grillos" con tonos y ritmos distintos
+      for (const [f, gap, vol] of [[4300, 0.9, 0.035], [4900, 1.35, 0.022]]) {
+        for (let t = Math.random() * gap; t < T; t += gap * (0.85 + Math.random() * 0.3)) {
+          if (Math.random() < 0.12) continue; // pausas naturales
+          for (let k = 0; k < 3 + Math.floor(Math.random() * 2); k++) blip(c, t + k * 0.055, f + Math.random() * 60, 0.04, vol);
+        }
+      }
     }
   };
   const ambCache = {};
@@ -303,7 +384,10 @@
     { id: 'bin14', name: 'Binaural beta 14 Hz', desc: 'foco · con auriculares' },
     { id: 'alpha10', name: 'Pulso alfa 10 Hz', desc: 'calma · descansos' },
     { id: 'binAlpha10', name: 'Binaural alfa 10 Hz', desc: 'calma · con auriculares' },
-    { id: 'theta6', name: 'Binaural theta 6 Hz', desc: 'relajación profunda' }
+    { id: 'theta6', name: 'Binaural theta 6 Hz', desc: 'relajación profunda' },
+    { id: 'smr12', name: 'Pulso SMR 12 Hz', desc: 'foco relajado', pro: true },
+    { id: 'pulse18', name: 'Beta alta 18 Hz', desc: 'tareas exigentes', pro: true },
+    { id: 'bin40', name: 'Binaural gamma 40 Hz', desc: 'foco intenso · auriculares', pro: true }
   ];
   const FREQ_SPEC = {
     pulse16: { kind: 'pulse', rate: 16, depth: 0.38 },
@@ -312,6 +396,9 @@
     bin14: { kind: 'bin', base: 200, beat: 14 },
     binAlpha10: { kind: 'bin', base: 200, beat: 10 },
     theta6: { kind: 'bin', base: 180, beat: 6 },
+    smr12: { kind: 'pulse', rate: 12, depth: 0.36 },
+    pulse18: { kind: 'pulse', rate: 18, depth: 0.34, bright: true },
+    bin40: { kind: 'bin', base: 220, beat: 40 },
     mod16: { kind: 'mod', rate: 16, depth: 0.32 }
   };
 
@@ -476,12 +563,16 @@
     renderSounds();
   }
 
+  // Los sonidos Pro solo suenan con Pro (sin Pro se pueden escuchar 6 s de muestra)
+  const locked = (list, id) => !pro && !!(list.find((x) => x.id === id) || {}).pro;
+  const allowed = (list, id) => (locked(list, id) ? 'none' : id);
   function wantsSound() { return !!timer && (mode === 'focus' || settings.ambientBreaks); }
   function updateAmbient() {
     if (wantsSound()) {
       clearTimeout(previewTimer); previewTimer = null;
-      if (settings.ambient !== 'none') playAmbient(settings.ambient); else { ambToken++; stopAmbient(); }
-      if (settings.freq !== 'none') playFreq(settings.freq); else stopFreq();
+      const a = allowed(AMBIENTS, settings.ambient), f = allowed(FREQS, settings.freq);
+      if (a !== 'none') playAmbient(a); else { ambToken++; stopAmbient(); }
+      if (f !== 'none') playFreq(f); else stopFreq();
     } else if (!previewTimer) { ambToken++; stopAmbient(); stopFreq(); }
   }
   function preview(kind, id) {
@@ -492,8 +583,16 @@
     previewTimer = setTimeout(() => { previewTimer = null; if (!wantsSound()) { ambToken++; stopAmbient(1.5); stopFreq(1.5); } }, 6000);
   }
 
+  function lockedPreview(kind, id) {
+    if (!wantsSound()) {
+      clearTimeout(previewTimer); previewTimer = null;
+      if (kind === 'amb') playAmbient(id); else playFreq(id);
+      previewTimer = setTimeout(() => { previewTimer = null; if (!wantsSound()) { ambToken++; stopAmbient(1.5); stopFreq(1.5); } else updateAmbient(); }, 6000);
+    }
+    paywall(kind === 'amb' ? 'sounds' : 'freqs');
+  }
   function renderSounds() {
-    const chip = (x, on, playing) => `<button class="chip${playing ? ' playing' : ''}" data-id="${x.id}" aria-pressed="${on}"><b>${x.name}</b><span>${x.desc}</span></button>`;
+    const chip = (x, on, playing) => `<button class="chip${playing ? ' playing' : ''}${x.pro ? ' pro' : ''}${x.pro && !pro ? ' locked' : ''}" data-id="${x.id}" aria-pressed="${on && !(x.pro && !pro)}"><b>${x.name}${x.pro ? '<i class="pro-tag">PRO</i>' : ''}</b><span>${x.desc}</span></button>`;
     $('#ambients').innerHTML = AMBIENTS.map((a) => chip(a, a.id === settings.ambient, a.id === amb.id)).join('');
     $('#freqs').innerHTML = FREQS.map((a) => chip(a, a.id === settings.freq, a.id === freq.id)).join('');
     $('#alarms').innerHTML = ALARMS.map((a) => chip(a, a.id === settings.alarm, false)).join('');
@@ -503,11 +602,13 @@
   }
   $('#ambients').addEventListener('click', (e) => {
     const b = e.target.closest('[data-id]'); if (!b) return;
+    if (locked(AMBIENTS, b.dataset.id)) { lockedPreview('amb', b.dataset.id); return; }
     settings.ambient = b.dataset.id; store.set('settings', settings);
     renderSounds(); preview('amb', settings.ambient);
   });
   $('#freqs').addEventListener('click', (e) => {
     const b = e.target.closest('[data-id]'); if (!b) return;
+    if (locked(FREQS, b.dataset.id)) { lockedPreview('freq', b.dataset.id); return; }
     settings.freq = b.dataset.id; store.set('settings', settings);
     renderSounds(); preview('freq', settings.freq);
   });
@@ -753,6 +854,7 @@
     const { c } = catResults[k]; const idx = catChecked(k);
     const n = idx.reduce((sum, i) => sum + c.units[i].topics.length, 0);
     const b = catBox.querySelector(`[data-cat-add="${k}"]`);
+    if (!pro) { b.textContent = n ? `Agregar ${n} temas · Pro` : 'Elegí al menos una unidad'; b.disabled = !n; b.classList.add('locked'); return; }
     b.textContent = n ? `Agregar ${n} temas` : 'Elegí al menos una unidad';
     b.disabled = !n;
   }
@@ -791,6 +893,7 @@
     if (all) { const k = all.dataset.catAll; catBox.querySelectorAll(`[data-cat-unit^="${k}|"]`).forEach((x) => (x.checked = true)); updateCatButton(Number(k)); return; }
     const add = e.target.closest('[data-cat-add]'); if (!add) return;
     const k = Number(add.dataset.catAdd), idx = catChecked(k);
+    if (!pro) { paywall('catalog'); return; }
     if (idx.length) addFromCatalog(catResults[k].c, idx);
   });
 
@@ -961,6 +1064,7 @@
   $('#plan').addEventListener('click', (e) => {
     const addU = e.target.closest('[data-add-unit]');
     if (addU) {
+      if (!pro) { paywall('catalog'); return; }
       const [sid, i] = addU.dataset.addUnit.split('|'); const s = subById(sid); const c = s && catById(s.cat);
       if (c) { const keep = el.subDate.value; el.subDate.value = ''; addFromCatalog(c, [Number(i)], { scroll: false }); el.subDate.value = keep; }
       return;
@@ -1098,7 +1202,97 @@
           return `<li><span>${what}</span><em>${s.min} min</em><time>${when}</time></li>`;
         }).join('')
       : '<li class="empty">Todavía no completaste pomodoros. El primero es el más difícil.</li>';
+    renderProStats(byDay, hm);
   }
+
+  // ---------- Estadísticas Pro ----------
+  function renderProStats(byDay, hm) {
+    const box = $('#pro-stats'); if (!box) return;
+    if (!pro) {
+      const fake = Array.from({ length: 26 * 7 }, (_, i) => `<i class="l${(i * 7 + (i % 5) * 3) % 5}"></i>`).join('');
+      box.innerHTML = `
+        <div class="pro-lock">
+          <div class="heat fake" aria-hidden="true">${fake}</div>
+          <div class="pro-lock-txt">
+            <b>Mirá cómo estudiás de verdad</b>
+            <span>Mapa de tus últimos 6 meses, horas por materia, temas terminados y tu mejor horario para concentrarte.</span>
+            <button class="add" data-paywall="stats">Ver con Foco Pro</button>
+          </div>
+        </div>`;
+      return;
+    }
+    const totalMin = log.reduce((n, s) => n + s.min, 0);
+    const now = new Date(), monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    const monthMin = log.filter((s) => s.ts >= monthStart).reduce((n, s) => n + s.min, 0);
+    const activeDays = Object.keys(byDay).length;
+    // Mejor racha de días seguidos
+    const dayNums = [...new Set(log.map((s) => { const d = new Date(s.ts); return Math.round(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() / 86400000); }))].sort((a, b) => a - b);
+    let best = 0, run = 0;
+    dayNums.forEach((d, i) => { run = i && d === dayNums[i - 1] + 1 ? run + 1 : 1; best = Math.max(best, run); });
+
+    // Mapa de calor: 26 semanas, columnas = semanas, filas = días
+    const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - start.getDay() - 25 * 7);
+    const cells = [];
+    for (let i = 0; i < 26 * 7; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i);
+      if (d > now) { cells.push('<i class="out"></i>'); continue; }
+      const m = (byDay[dayKey(d)] || { min: 0 }).min;
+      const l = m === 0 ? 0 : m <= 25 ? 1 : m <= 75 ? 2 : m <= 150 ? 3 : 4;
+      cells.push(`<i class="l${l}" title="${d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })} · ${m ? hm(m) : 'sin estudio'}"></i>`);
+    }
+
+    // Minutos según la hora en que empezó cada pomodoro
+    const hours = Array(24).fill(0);
+    for (const s of log) hours[new Date(s.ts - s.min * 60000).getHours()] += s.min;
+    const hmax = Math.max(1, ...hours);
+    let bestH = -1, bestSum = 0;
+    for (let h = 0; h < 24; h++) { const sum = hours[h] + hours[(h + 1) % 24]; if (sum > bestSum) { bestSum = sum; bestH = h; } }
+    const bestTxt = bestH < 0 ? 'Completá algunos pomodoros y te digo a qué hora rendís más.'
+      : `Rendís más <b>de ${bestH} a ${(bestH + 2) % 24} h</b>. Guardá ese horario para lo más difícil.`;
+
+    // Materias: horas totales y temas terminados
+    const per = {};
+    for (const s of log) { const k = subById(s.sub) ? s.sub : ''; per[k] = (per[k] || 0) + s.min; }
+    const rows = subjects.map((s) => ({ s, m: per[s.id] || 0, t: topicsOf(s) })).sort((a, b) => b.m - a.m);
+    const top = Math.max(1, ...rows.map((r) => r.m));
+
+    box.innerHTML = `
+      <div class="pro-sum">
+        <div><b>${Math.round(totalMin / 6) / 10}</b><span>horas en total</span></div>
+        <div><b>${Math.round(monthMin / 6) / 10}</b><span>horas este mes</span></div>
+        <div><b>${activeDays ? Math.round(totalMin / activeDays) : 0}</b><span>min por día activo</span></div>
+        <div><b>${best}</b><span>mejor racha</span></div>
+      </div>
+      <p class="pro-cap">Últimos 6 meses</p>
+      <div class="heat" role="img" aria-label="Minutos de estudio por día en los últimos 6 meses">${cells.join('')}</div>
+      <div class="heat-legend"><span>Menos</span><i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><span>Más</span></div>
+      <p class="pro-cap">Tu horario</p>
+      <div class="hours" aria-hidden="true">${hours.map((m, h) => `<i style="height:${Math.max(3, (m / hmax) * 100)}%" class="${bestH >= 0 && (h === bestH || h === (bestH + 1) % 24) ? 'best' : ''}" title="${h} h · ${hm(m)}"></i>`).join('')}</div>
+      <div class="hours-axis"><span>0 h</span><span>6</span><span>12</span><span>18</span><span>23</span></div>
+      <p class="pro-best">${bestTxt}</p>
+      ${rows.length ? `<p class="pro-cap">Materias · desde siempre</p>
+      <ul class="by-subject">${rows.map(({ s, m, t }) => `<li><span class="name"><span class="dot" style="background:${subColor(s.id)}"></span>${esc(s.name)}</span>
+        <em>${hm(m)}${t.length ? ` · ${t.filter((x) => x.done).length}/${t.length} temas` : ''}</em>
+        <span class="track-h"><i style="width:${(m / top) * 100}%;background:${subColor(s.id)}"></i></span></li>`).join('')}</ul>` : ''}`;
+  }
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-paywall]'); if (b) paywall(b.dataset.paywall); });
+
+  // ---------- Pro y sincronización (los maneja account.js) ----------
+  window.addEventListener('foco:pro', (e) => {
+    const was = pro; pro = !!e.detail;
+    if (was === pro) return;
+    renderSounds(); renderStats(); if (el.subName.value) renderCatPick();
+    if (!pro && wantsSound()) updateAmbient();
+  });
+  // Llegaron datos de otro dispositivo: volver a leer todo y redibujar
+  window.__focoReload = () => {
+    Object.keys(settings).forEach((k) => delete settings[k]);
+    Object.assign(settings, DEFAULTS, store.get('settings', {}));
+    log = store.get('log', []); notes = store.get('notes', []); subjects = store.get('subjects', []);
+    if (!subjects.some((s) => s.id === currentSub)) currentSub = '';
+    fillForm(); renderPresets(); renderSkins(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
+    if (wantsSound()) updateAmbient();
+  };
 
   // ---------- Diálogo propio (sin confirm()) ----------
   function ask(msg) {

@@ -1,0 +1,14 @@
+{
+  "name": "foco-pro-server",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "engines": { "node": "20" },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.4.2",
+    "firebase-admin": "^12.7.0"
+  },
+  "scripts": {
+    "start": "functions-framework --target=api --port=8090"
+  }
+}

@@ -18,7 +18,7 @@
 <body data-mode="focus">
 
 <header class="top band">
-  <h1>Foco</h1>
+  <div class="brand"><h1>Foco</h1><button id="pro-btn" class="pro-btn" aria-haspopup="dialog">Pro</button></div>
   <nav class="modes" aria-label="Modo">
     <button data-mode-btn="focus" aria-pressed="true">Foco</button>
     <button data-mode-btn="short" aria-pressed="false">Descanso</button>
@@ -173,6 +173,8 @@
     <ul id="by-subject" class="by-subject"></ul>
     <h3>Últimas sesiones</h3>
     <ul id="history" class="history"></ul>
+    <h3>Estadísticas <span class="pro-tag">PRO</span></h3>
+    <div id="pro-stats" class="pro-stats"></div>
   </section>
 </main>
 
@@ -191,8 +193,13 @@
   </div>
 </div>
 
+<div id="sheet" class="dialog sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+  <div class="box sheet-box" id="sheet-box"></div>
+</div>
+
 <script src="catalog.js"></script>
 <script src="app.js"></script>
 <script type="module" src="rooms.js"></script>
+<script type="module" src="account.js"></script>
 </body>
 </html>

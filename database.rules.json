@@ -37,6 +37,23 @@
           }
         }
       }
-    }
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "pro": { ".write": false },
+        "data": {
+          ".write": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous' && root.child('users').child($uid).child('pro').exists()",
+          "$k": {
+            ".validate": "($k === 'settings' || $k === 'log' || $k === 'subjects' || $k === 'notes') && newData.hasChildren(['v', 't'])",
+            "v": { ".validate": "newData.isString() && newData.val().length <= 900000" },
+            "t": { ".validate": "newData.isNumber() && newData.val() <= now + 600000" },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".write": false }
+      }
+    },
+    "payments": { ".write": false }
   }
 }

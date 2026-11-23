@@ -9,3 +9,10 @@ export const firebaseConfig = {
   messagingSenderId: '80899739270',
   appId: '1:80899739270:web:fba05468439915be464b07'
 };
+
+// Foco Pro: precio del pago único (en pesos) y dirección del servidor de cobro (Mercado Pago).
+// El precio que vale es el del servidor; este es el que se muestra.
+export const proConfig = {
+  price: 5000,
+  api: ''
+};
