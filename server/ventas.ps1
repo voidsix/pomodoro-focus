@@ -17,7 +17,7 @@ function Set-Pro($uid, $payId, $amount) {
 if ($Activar) { Set-Pro $Activar 'manual' 0; "Pro activada a mano para $Activar."; return }
 
 $res = Invoke-RestMethod -Headers $mp "https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&limit=100"
-$pagos = @($res.results | Where-Object { $_.metadata.app -eq 'foco-pro' })
+$pagos = @($res.results | Where-Object { $_.metadata.app -eq 'foco-pro' -or "$($_.description)".StartsWith('Foco Pro') })
 if ($pagos.Count -eq 0) { 'Todavía no hay pagos de Foco Pro.'; return }
 
 $aprobados = 0; $problemas = 0

@@ -40,7 +40,9 @@ const UID_RE = /^[A-Za-z0-9]{10,64}$/;
 async function grant(p) {
   const db = admin.database();
   const uid = String(p.external_reference || '');
-  if (p.metadata?.app !== 'foco-pro' || !UID_RE.test(uid)) return { pro: false, status: 'ajeno' };
+  // Es de Foco si trae nuestra marca o si la descripción es la del producto (algunos pagos llegan sin metadata)
+  const isFoco = p.metadata?.app === 'foco-pro' || String(p.description || '').startsWith('Foco Pro');
+  if (!isFoco || !UID_RE.test(uid)) return { pro: false, status: 'ajeno' };
   const id = String(p.id);
   // Pago devuelto (total o parcial) o contracargo: se quita la Pro que dio ese mismo pago
   if (['refunded', 'charged_back'].includes(p.status) || Number(p.transaction_amount_refunded || 0) > 0) {
@@ -49,10 +51,12 @@ async function grant(p) {
     if (cur && cur.pay === id) { await proRef.remove(); await db.ref(`payments/${id}`).update({ refundedAt: Date.now() }); }
     return { pro: false, status: 'refunded' };
   }
-  const expected = Number(p.metadata?.price) || PRICE;
+  // Precio esperado: el de la marca del pago o, si no vino, el último que el servidor le cotizó a esa cuenta
+  const last = (await db.ref(`checkouts/${uid}`).get()).val();
+  const expected = Number(p.metadata?.price) || Number(last?.price) || PRICE;
   const amount = Number(p.transaction_amount || 0);
   if (!(p.status === 'approved' && p.currency_id === 'ARS' && amount >= expected)) return { pro: false, status: p.status };
-  const code = p.metadata?.code || null;
+  const code = p.metadata?.code || last?.code || null;
   const first = await db.ref(`payments/${id}`).transaction((cur) => (cur ? undefined : { uid, amount, at: Date.now(), code }));
   if (first.committed && code) await db.ref(`promo/${code}/used`).transaction((n) => (n || 0) + 1);
   const proRef = db.ref(`users/${uid}/pro`);
@@ -117,6 +121,7 @@ functions.http('api', async (req, res) => {
           payment_methods: { installments: 1 }
         })
       });
+      await admin.database().ref(`checkouts/${u.uid}`).set({ price, code: promo?.code || null, pref: pref.id, at: Date.now() });
       return res.json({ url: pref.init_point });
     }
 
