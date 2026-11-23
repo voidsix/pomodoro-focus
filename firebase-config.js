@@ -2,7 +2,7 @@
 // reglas de la base de datos, ver database.rules.json).
 export const firebaseConfig = {
   apiKey: 'AIzaSyB_-XOYQfOp8Q3iLY-CWrcODloFcZEpMyE',
-  authDomain: 'foco-estudio-1b47c.firebaseapp.com',
+  authDomain: 'focoestudio.app',
   databaseURL: 'https://foco-estudio-1b47c-default-rtdb.firebaseio.com',
   projectId: 'foco-estudio-1b47c',
   storageBucket: 'foco-estudio-1b47c.firebasestorage.app',
