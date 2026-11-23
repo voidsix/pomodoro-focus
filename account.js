@@ -141,7 +141,9 @@ function onUser(u) {
   render();
 }
 function setPro(p) {
+  const was = !!pro;
   pro = p || null;
+  if (pro && !was && store.get('paying', null)) { store.set('paying', null); if (!sheet.hidden) note = '¡Listo! Ya sos Pro. Gracias por bancar Foco 💙'; }
   store.set('pro', pro ? { at: pro.at || Date.now() } : null);
   window.dispatchEvent(new CustomEvent('foco:pro', { detail: !!pro }));
   updateBtn();
@@ -210,33 +212,45 @@ async function api(path, body) {
 async function buy() {
   if (!user || user.isAnonymous) throw new Error('Primero entrá con Google.');
   const { url } = await api('/checkout', promo ? { code: promo.code } : {});
+  store.set('paying', Date.now()); // si vuelve sin la Pro, la app sigue revisando sola
   location.href = url;
 }
-// Al volver de Mercado Pago: confirmar el pago enseguida (el aviso del servidor también lo hace solo)
+
+// Revisa si hay un pago acreditado de esta cuenta y activa la Pro. Reintenta con calma: nunca da un "error" al usuario.
+const PENDING_CASH = 'Tu pago está pendiente. Si elegiste efectivo, pagá el cupón en Rapipago o Pago Fácil: la Pro se activa sola cuando se acredite (puede tardar unas horas). Podés cerrar esta ventana.';
+const WAITING = 'Mercado Pago todavía está acreditando tu pago. No hace falta que hagas nada: la Pro se activa sola en unos minutos, aunque cierres Foco.';
+let checking = null;
+function checkPayment({ tries = 20, every = 3000, quiet = false } = {}) {
+  if (checking) return checking;
+  return (checking = (async () => {
+    let r = { pro: false };
+    for (let i = 0; i < tries && !pro; i++) {
+      try { r = await api('/confirm', {}); } catch { r = { pro: false }; }
+      if (r.pro) break;
+      if (!quiet && i === 2) { note = r.status === 'pending' ? PENDING_CASH : WAITING; render(); }
+      await new Promise((res) => setTimeout(res, every));
+    }
+    checking = null;
+    return r.pro || !!pro;
+  })());
+}
+// Al volver de Mercado Pago
 async function returnFromPayment() {
   const q = new URLSearchParams(location.search);
   if (!q.has('pro')) return;
-  const payment = q.get('payment_id') || q.get('collection_id');
   const status = q.get('pro');
   history.replaceState(null, '', location.pathname + location.hash);
   open();
-  if (status === 'fail') { note = 'El pago no se completó. No se te cobró nada.'; render(); return; }
-  note = 'Confirmando tu pago…'; render();
+  if (status === 'fail') { note = 'El pago no se completó. No se te cobró nada.'; store.set('paying', null); render(); return; }
+  note = '<span class="spin"></span> Confirmando tu pago con Mercado Pago…'; render();
   try {
     await boot();
     await new Promise((res) => { const t = setInterval(() => { if (user) { clearInterval(t); res(); } }, 100); setTimeout(() => { clearInterval(t); res(); }, 5000); });
-    if (user && !user.isAnonymous) {
-      // El servidor recuerda la última orden de esta cuenta; reintenta unos segundos por si la acreditación demora
-      let r = { pro: false };
-      for (let i = 0; i < 4 && !r.pro; i++) {
-        r = await api('/confirm', { payment_id: payment || '' });
-        if (!r.pro && i < 3) await new Promise((res) => setTimeout(res, 2500));
-      }
-      note = r.pro ? '¡Listo! Ya sos Pro. Gracias por bancar Foco 💙' : r.status === 'pending' || r.status === 'processing' || status === 'pending'
-        ? 'Tu pago está pendiente. Si elegiste efectivo, pagá el cupón en Rapipago o Pago Fácil: la Pro se activa sola cuando se acredite (puede tardar unas horas).' : 'El pago no figura aprobado todavía. Si te lo cobraron, se activa solo en unos minutos.';
-    } else note = status === 'pending' ? 'Tu pago está pendiente. Si elegiste efectivo, pagá el cupón en Rapipago o Pago Fácil: la Pro se activa sola cuando se acredite (puede tardar unas horas).' : '';
-  } catch (e) { note = esc(e.message); }
-  render();
+    if (!user || user.isAnonymous) { note = WAITING; render(); return; }
+    if (status === 'pending') { note = PENDING_CASH; render(); checkPayment({ tries: 40, every: 15000, quiet: true }); return; }
+    const ok = await checkPayment({ tries: 20, every: 3000 });
+    if (!ok) checkPayment({ tries: 40, every: 15000, quiet: true }); // sigue revisando 10 minutos más, en silencio
+  } catch { note = WAITING; render(); }
 }
 
 // ---------- Sincronización ----------
@@ -313,4 +327,8 @@ else {
   // Solo se carga Firebase al abrir si ya habías entrado con tu cuenta o volvés de pagar
   if (store.get('acct', false) || new URLSearchParams(location.search).has('pro')) boot().catch(() => {});
   returnFromPayment();
+  const paying = store.get('paying', null);
+  if (paying && Date.now() - paying < 7 * 864e5 && !new URLSearchParams(location.search).has('pro')) {
+    boot().then(() => setTimeout(() => { if (user && !user.isAnonymous && !pro) checkPayment({ tries: 6, every: 10000, quiet: true }); }, 1500)).catch(() => {});
+  }
 }

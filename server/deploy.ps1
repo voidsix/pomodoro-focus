@@ -14,7 +14,7 @@ $price = 1200
 gcloud services enable cloudfunctions.googleapis.com cloudbuild.googleapis.com run.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com --project $project
 
 $sa = (gcloud projects describe $project --format='value(projectNumber)') + '-compute@developer.gserviceaccount.com'
-gcloud secrets add-iam-policy-binding mp-access-token --member="serviceAccount:$sa" --role='roles/secretmanager.secretAccessor' --project $project | Out-Null
+foreach ($s in @('mp-access-token')) { gcloud secrets add-iam-policy-binding $s --member="serviceAccount:$sa" --role='roles/secretmanager.secretAccessor' --project $project | Out-Null }
 
 gcloud functions deploy foco-pro --gen2 --runtime=nodejs24 --region=us-central1 --project $project `
   --source="$PSScriptRoot" --entry-point=api --trigger-http --allow-unauthenticated `

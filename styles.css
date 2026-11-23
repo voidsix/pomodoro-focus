@@ -635,3 +635,5 @@ body.sheet-open { overflow: hidden; }
 .promo-ok .link { min-height: 0; margin-left: 6px; font-size: 13px; }
 .pay-fine { margin: 8px 0 0 !important; }
 .cat-src { font-size: 11px !important; opacity: .8; }
+.spin { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
