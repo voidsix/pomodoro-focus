@@ -74,7 +74,8 @@ h1::before {
 .modes button[aria-pressed=true] { background: var(--text); color: var(--bg); }
 
 /* ---------- Temporizador ---------- */
-.hero { position: relative; display: grid; justify-items: center; gap: 22px; padding-bottom: 96px; overflow: hidden; }
+/* Solo se recorta a los costados (sin scroll horizontal); arriba y abajo la luz se desvanece libre */
+.hero { position: relative; display: grid; justify-items: center; gap: 22px; padding-bottom: 96px; overflow-x: clip; overflow-y: visible; }
 .hero > * { position: relative; z-index: 1; }
 .wave { position: absolute !important; z-index: 0 !important; left: 0; right: 0; top: 20%; height: 200px; overflow: hidden; opacity: .22; pointer-events: none;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
