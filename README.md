@@ -1,8 +1,8 @@
-# Pleamar 🌊
+# Foco Pomodoro 🍅
 
 App web instalable (PWA) para hacer pomodoros personalizados y mejorar la concentración. Funciona en el celular y la computadora, y también sin conexión.
 
-**Online:** https://pleamar.me
+**Online:** https://focoestudio.app
 
 ## Funciones
 

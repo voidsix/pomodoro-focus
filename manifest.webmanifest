@@ -1,7 +1,7 @@
 {
-  "name": "Pleamar",
-  "short_name": "Pleamar",
-  "description": "Pomodoros para estudiar con materias, cuenta regresiva a finales y sonidos de fondo",
+  "name": "Foco Pomodoro",
+  "short_name": "Foco",
+  "description": "Pomodoros personalizados para mejorar la concentración",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
