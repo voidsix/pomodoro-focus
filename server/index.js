@@ -9,7 +9,7 @@ import crypto from 'node:crypto';
 
 admin.initializeApp({ databaseURL: process.env.DATABASE_URL || 'https://foco-estudio-1b47c-default-rtdb.firebaseio.com' });
 
-const PRICE = Number(process.env.PRICE || 5000);           // pesos, pago único
+const PRICE = Number(process.env.PRICE || 1200);           // pesos, pago único
 const MP_TOKEN = process.env.MP_ACCESS_TOKEN;               // secreto (Secret Manager)
 const MP_WEBHOOK_SECRET = process.env.MP_WEBHOOK_SECRET;    // opcional: firma de los avisos
 const SITE = (process.env.SITE_URL || 'https://focoestudio.app').replace(/\/$/, '');

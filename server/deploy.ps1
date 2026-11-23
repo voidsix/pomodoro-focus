@@ -9,7 +9,7 @@
 # Para cambiar el precio: editá PRICE acá abajo y price en firebase-config.js, y volvé a correr este script.
 $ErrorActionPreference = 'Continue'  # gcloud escribe su progreso en stderr
 $project = 'foco-estudio-1b47c'
-$price = 5000
+$price = 1200
 
 gcloud services enable cloudfunctions.googleapis.com cloudbuild.googleapis.com run.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com --project $project
 

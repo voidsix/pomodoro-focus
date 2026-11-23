@@ -8,7 +8,7 @@ const btn = document.getElementById('pro-btn');
 const sheet = document.getElementById('sheet');
 const box = document.getElementById('sheet-box');
 const SYNC = ['settings', 'log', 'subjects', 'notes'];
-const PRICE = proConfig?.price || 5000;
+const PRICE = proConfig?.price || 1200;
 const money = (n) => '$' + Number(n).toLocaleString('es-AR');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const store = {

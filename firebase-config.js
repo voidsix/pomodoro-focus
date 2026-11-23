@@ -13,6 +13,6 @@ export const firebaseConfig = {
 // Foco Pro: precio del pago único (en pesos) y dirección del servidor de cobro (Mercado Pago).
 // El precio que vale es el del servidor; este es el que se muestra.
 export const proConfig = {
-  price: 5000,
+  price: 1200,
   api: 'https://foco-pro-a5lrhs73aa-uc.a.run.app'
 };
