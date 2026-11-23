@@ -23,7 +23,7 @@
   let subjects = store.get('subjects', []); // [{id, name, exam: 'YYYY-MM-DD' | ''}]
   let currentSub = store.get('subject', '');
   if (!subjects.some((s) => s.id === currentSub)) currentSub = '';
-  const SUB_COLORS = ['#d9412b', '#17766f', '#7a4fd1', '#d98a1b', '#2a6fd6', '#c23c7d', '#4f8a2b', '#6b5a50'];
+  const SUB_COLORS = ['#5b8bd6', '#4fa387', '#9a82d6', '#d0a05a', '#5aaec0', '#cf7f9f', '#8aab58', '#9a8f86'];
   const saved = store.get('state', {});
   let mode = saved.mode || 'focus';
   let cycle = saved.cycle || 0;         // pomodoros completados en el ciclo actual
@@ -68,10 +68,11 @@
     el.toggle.textContent = timer ? 'Pausar' : (remaining < total() ? 'Seguir' : 'Empezar');
     document.title = timer ? `${t} · ${mode === 'focus' ? 'Foco' : 'Descanso'}` : 'Foco Pomodoro';
     document.body.dataset.mode = mode;
+    document.body.classList.toggle('running', !!timer);
     document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modeBtn === mode));
     el.dots.innerHTML = Array.from({ length: settings.every }, (_, i) => `<i class="${i < cycle ? 'on' : ''}"></i>`).join('');
     const meta = document.querySelector('meta[name=theme-color]');
-    if (meta) meta.content = mode === 'focus' ? '#d9412b' : '#17766f';
+    if (meta) meta.content = { focus: '#34557f', short: '#3a7560', long: '#36687a' }[mode];
   }
 
   function persist() {
