@@ -16,7 +16,8 @@ App web instalable (PWA) para hacer pomodoros personalizados y mejorar la concen
 - **Anotador de distracciones**: anotás lo que se te cruza y seguís.
 - **Progreso**: pomodoros y minutos del día, racha de días seguidos, gráfico de 7 días e historial.
 - **Sonidos de fondo**: lluvia, olas, chimenea, ruido marrón, ruido blanco y tic-tac, con volumen. Cada uno suena en dos bucles de distinto largo para que no se note la repetición. Suenan mientras corre el pomodoro (opcional también en descansos). Se generan con Web Audio, sin archivos, así que funcionan sin conexión.
-- **Frecuencias de concentración**: pulso beta 16 Hz (sin auriculares), binaural beta 14 Hz (con auriculares) y alfa 10 Hz para descansos.
+- **Frecuencias de concentración**: fondo modulado a 16 Hz (como brain.fm), pulso beta 16 Hz, gamma 40 Hz, pulso alfa 10 Hz y binaurales beta 14 Hz, alfa 10 Hz y theta 6 Hz (con auriculares).
+- **Sonido procesado**: ecualizador relajante, reverb suave, estéreo envolvente, compresor y limitador para que nunca distorsione.
 - **Modo zen**: pantalla completa con solo el reloj; los controles se esconden solos y la pantalla no se apaga (tecla Z).
 - **Avisos**: cuatro sonidos a elegir (campanitas, gong, digital, suave), vibración y notificaciones al terminar cada bloque.
 - **Encadenado automático** opcional entre foco y descanso.

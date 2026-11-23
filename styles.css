@@ -504,3 +504,5 @@ body.zen.idle .controls { opacity: 0; transform: translateY(8px); pointer-events
   .room-list li .cheer { grid-column: 3; grid-row: 1; }
   .room-list li .room-today { display: none; }
 }
+
+[hidden] { display: none !important; }

@@ -25,7 +25,9 @@ const hashCode = () => cleanCode((location.hash.match(/sala=([A-Za-z0-9]+)/) || 
 // ---------- Interfaz ----------
 function view(html) { box.innerHTML = html; }
 function renderOff() {
-  view(`<p class="hint">Las salas de estudio todavía no están activadas en esta versión.</p>`);
+  // Sin proyecto de Firebase configurado, la sección no se muestra
+  const sec = document.getElementById('room-sec');
+  if (sec) sec.hidden = true;
 }
 function renderLobby(msg = '') {
   const saved = store.get('room-name', '');

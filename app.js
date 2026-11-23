@@ -14,7 +14,7 @@
   const LABELS = { focus: 'Tiempo de foco', short: 'Descanso corto', long: 'Descanso largo' };
   const DEFAULTS = {
     focus: 25, short: 5, long: 15, every: 4, autoStart: false, sound: true, notify: false,
-    ambient: 'none', ambientVol: 50, ambientBreaks: false, freq: 'none', freqVol: 40, alarm: 'bell', skin: 'mar'
+    ambient: 'none', ambientVol: 50, ambientBreaks: false, freq: 'none', freqVol: 60, alarm: 'bell', skin: 'mar'
   };
   const SKINS = [
     { id: 'mar', name: 'Mar', desc: 'verde agua', bg: '#04141a', a: ['#1fcab5', '#2a9fd8'] },
@@ -291,19 +291,88 @@
     try { return await ambCache[id]; } catch (e) { delete ambCache[id]; throw e; }
   }
 
-  // Frecuencias de concentración (en vivo, sin bucles): un acorde suave modulado en amplitud
-  // o un binaural (dos tonos apenas distintos en cada oído, requiere auriculares).
+  // Frecuencias de concentración (en vivo, sin bucles). Tres tipos:
+  //  · pulso: acorde cálido cuyo volumen late al ritmo elegido (no necesita auriculares)
+  //  · binaural: un tono distinto en cada oído, el cerebro percibe la diferencia (con auriculares)
+  //  · fondo modulado: hace latir el propio sonido de fondo, como la música de brain.fm
   const FREQS = [
     { id: 'none', name: 'Sin frecuencias', desc: 'solo el fondo' },
-    { id: 'pulse16', name: 'Pulso 16 Hz', desc: 'beta · sin auriculares' },
-    { id: 'bin14', name: 'Binaural 14 Hz', desc: 'beta · con auriculares' },
-    { id: 'alpha10', name: 'Alfa 10 Hz', desc: 'calma · descansos' }
+    { id: 'mod16', name: 'Fondo modulado', desc: 'el fondo late a 16 Hz' },
+    { id: 'pulse16', name: 'Pulso beta 16 Hz', desc: 'foco · sin auriculares' },
+    { id: 'gamma40', name: 'Gamma 40 Hz', desc: 'foco intenso · sin auriculares' },
+    { id: 'bin14', name: 'Binaural beta 14 Hz', desc: 'foco · con auriculares' },
+    { id: 'alpha10', name: 'Pulso alfa 10 Hz', desc: 'calma · descansos' },
+    { id: 'binAlpha10', name: 'Binaural alfa 10 Hz', desc: 'calma · con auriculares' },
+    { id: 'theta6', name: 'Binaural theta 6 Hz', desc: 'relajación profunda' }
   ];
+  const FREQ_SPEC = {
+    pulse16: { kind: 'pulse', rate: 16, depth: 0.38 },
+    gamma40: { kind: 'pulse', rate: 40, depth: 0.3, bright: true },
+    alpha10: { kind: 'pulse', rate: 10, depth: 0.38 },
+    bin14: { kind: 'bin', base: 200, beat: 14 },
+    binAlpha10: { kind: 'bin', base: 200, beat: 10 },
+    theta6: { kind: 'bin', base: 180, beat: 6 },
+    mod16: { kind: 'mod', rate: 16, depth: 0.32 }
+  };
+
+  // ---------- Cadena de audio ----------
+  // fondo → modulador → ecualizador "relajante" → compresor ─┬─ seco ──────────┐
+  //                                                          └─ reverb suave ──┼→ limitador → parlantes
+  // frecuencias → ecualizador suave ─────────────────────────┴─ (y algo de reverb)
+  let bus = null;
+  function impulse(c, secs = 2.6) {
+    const n = Math.floor(c.sampleRate * secs), b = c.createBuffer(2, n, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = b.getChannelData(ch); let lp = 0;
+      for (let i = 0; i < n; i++) {
+        const t = i / n;
+        lp = lp * 0.6 + (Math.random() * 2 - 1) * 0.4;            // cola algo opaca: suena cálida, no metálica
+        d[i] = lp * Math.pow(1 - t, 2.6) * (i < c.sampleRate * 0.012 ? i / (c.sampleRate * 0.012) : 1);
+      }
+    }
+    return b;
+  }
+  function getBus() {
+    if (bus) return bus;
+    const c = unlockAudio(); if (!c) return null;
+    const biq = (type, f, gain = 0, q = 0.7) => { const n = c.createBiquadFilter(); n.type = type; n.frequency.value = f; n.gain.value = gain; n.Q.value = q; return n; };
+    // Limitador final: nada distorsiona aunque todo esté al máximo
+    const limiter = c.createDynamicsCompressor();
+    limiter.threshold.value = -3; limiter.knee.value = 0; limiter.ratio.value = 20; limiter.attack.value = 0.003; limiter.release.value = 0.25;
+    const trim = c.createGain(); trim.gain.value = 0.88; // margen para que los picos nunca lleguen al tope
+    limiter.connect(trim).connect(c.destination);
+    const reverb = c.createConvolver(); reverb.buffer = impulse(c);
+    const wet = c.createGain(); wet.gain.value = 0.22; reverb.connect(wet).connect(limiter);
+    // Fondo
+    const ambIn = c.createGain();
+    const ambMod = c.createGain(); ambMod.gain.value = 1;
+    const eq = [
+      biq('highpass', 35, 0, 0.7),       // fuera retumbe que no se oye pero cansa
+      biq('lowshelf', 180, 2.5),         // graves cálidos
+      biq('peaking', 2900, -3.5, 0.9),   // zona más sensible y fatigante del oído
+      biq('highshelf', 7500, -5),        // agudos ásperos más suaves
+      biq('lowpass', 14000, 0, 0.5)
+    ];
+    const comp = c.createDynamicsCompressor();
+    comp.threshold.value = -22; comp.knee.value = 12; comp.ratio.value = 2.5; comp.attack.value = 0.03; comp.release.value = 0.4;
+    let node = ambIn.connect(ambMod);
+    for (const f of eq) node = node.connect(f);
+    node.connect(comp);
+    const ambDry = c.createGain(); ambDry.gain.value = 1;
+    comp.connect(ambDry).connect(limiter);
+    const ambSend = c.createGain(); ambSend.gain.value = 0.55; comp.connect(ambSend).connect(reverb);
+    // Frecuencias
+    const fIn = c.createGain();
+    const fEq = biq('highshelf', 5000, -4);
+    fIn.connect(fEq).connect(limiter);
+    const fSend = c.createGain(); fSend.gain.value = 0.35; fEq.connect(fSend).connect(reverb);
+    return (bus = { ambIn, ambMod, fIn });
+  }
 
   let amb = { id: null, srcs: [], gain: null }, ambToken = 0, previewTimer = null;
   let freq = { id: null, nodes: [], out: null };
-  const ambLevel = () => Math.pow(settings.ambientVol / 100, 2);
-  const freqLevel = () => Math.pow(settings.freqVol / 100, 2) * 0.5;
+  const ambLevel = () => Math.pow(settings.ambientVol / 100, 2) * 1.15;
+  const freqLevel = () => Math.pow(settings.freqVol / 100, 1.6) * 1.5;
   function stopAmbient(fade = 0.8) {
     if (!amb.gain) return;
     const { srcs, gain } = amb;
@@ -315,6 +384,7 @@
     if (amb.id === id) return;
     const token = ++ambToken;
     const c = unlockAudio(); if (!c) return;
+    const b = getBus(); if (!b) return;
     let bufs;
     try { bufs = await ambBuffers(id); } catch { return; }
     if (token !== ambToken) return; // otro cambio llegó mientras se generaba
@@ -322,12 +392,16 @@
     const gain = c.createGain();
     gain.gain.setValueAtTime(0, c.currentTime);
     gain.gain.setTargetAtTime(ambLevel(), c.currentTime, 0.4);
-    gain.connect(c.destination);
+    gain.connect(b.ambIn);
     const each = 1 / Math.sqrt(bufs.length);
-    const srcs = bufs.map((buf) => {
+    // Cada bucle va hacia un lado: sonido envolvente y menos repetitivo
+    const pans = bufs.length > 1 ? [-0.55, 0.55] : [0];
+    const srcs = bufs.map((buf, i) => {
       const s = c.createBufferSource(), g = c.createGain();
       s.buffer = buf; s.loop = true; g.gain.value = each;
-      s.connect(g).connect(gain); s.start(c.currentTime, Math.random() * buf.duration);
+      let tail = s.connect(g);
+      if (c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.value = pans[i] || 0; tail = tail.connect(p); }
+      tail.connect(gain); s.start(c.currentTime, Math.random() * buf.duration);
       return s;
     });
     amb = { id, srcs, gain };
@@ -336,36 +410,67 @@
 
   function stopFreq(fade = 0.8) {
     if (!freq.out) return;
-    const { nodes, out } = freq;
-    try { out.gain.cancelScheduledValues(ctx.currentTime); out.gain.setTargetAtTime(0, ctx.currentTime, fade / 4); nodes.forEach((n) => n.stop(ctx.currentTime + fade)); } catch {}
+    const { nodes, out, id } = freq;
+    try {
+      const t = ctx.currentTime;
+      out.gain.cancelScheduledValues(t); out.gain.setTargetAtTime(0, t, fade / 4);
+      nodes.forEach((n) => n.stop(t + fade));
+      if (id === 'mod16' && bus) { bus.ambMod.gain.cancelScheduledValues(t); bus.ambMod.gain.setTargetAtTime(1, t, fade / 4); }
+    } catch {}
     freq = { id: null, nodes: [], out: null };
     renderSounds();
+  }
+  function pad(c, dest, nodes, { bright = false, level = 1 } = {}) {
+    // Acorde cálido (La mayor abierto con 9na), apenas desafinado para que "respire"
+    const osc = (f, type, detune) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = detune; o.start(); nodes.push(o); return o; };
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = bright ? 1600 : 900; lp.Q.value = 0.4;
+    lp.connect(dest);
+    [55, 110, 164.81, 220, 277.18, 329.63, 493.88].forEach((f, i) => {
+      for (const det of [-6, 6]) {
+        const g = c.createGain(); g.gain.value = (i === 0 ? 0.16 : 0.2 / (1 + i * 0.4)) * level;
+        osc(f, i % 2 ? 'triangle' : 'sine', det).connect(g).connect(lp);
+      }
+    });
+    const sweep = c.createGain(); sweep.gain.value = bright ? 500 : 300;
+    const o = c.createOscillator(); o.frequency.value = 0.035; o.start(); nodes.push(o); o.connect(sweep).connect(lp.frequency);
   }
   function playFreq(id) {
     if (freq.id === id) return;
     stopFreq();
     const c = unlockAudio(); if (!c) return;
+    const b = getBus(); if (!b) return;
+    const spec = FREQ_SPEC[id]; if (!spec) return;
     const out = c.createGain(), nodes = [];
     out.gain.setValueAtTime(0, c.currentTime);
     out.gain.setTargetAtTime(freqLevel(), c.currentTime, 0.6);
-    out.connect(c.destination);
-    const osc = (f, type = 'sine', detune = 0) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = detune; o.start(); nodes.push(o); return o; };
-    if (id === 'bin14') {
-      // 200 Hz en el oído izquierdo y 214 Hz en el derecho: el cerebro percibe un latido de 14 Hz
+    out.connect(b.fIn);
+    const lfo = (rate, depth, param) => {
+      const o = c.createOscillator(); o.frequency.value = rate; o.start(); nodes.push(o);
+      const g = c.createGain(); g.gain.value = depth; o.connect(g).connect(param);
+    };
+    if (spec.kind === 'bin') {
+      // Tono base en el oído izquierdo y base + latido en el derecho, sobre un acorde suave sin pulso
       const merger = c.createChannelMerger(2); merger.connect(out);
-      [[200, 0], [214, 1]].forEach(([f, ch]) => { const g = c.createGain(); g.gain.value = 0.5; osc(f).connect(g).connect(merger, 0, ch); });
-    } else {
-      // Acorde cálido (La mayor abierto), apenas desafinado para que "respire", con filtro que se mueve lento
-      const rate = id === 'alpha10' ? 10 : 16;
-      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850; lp.Q.value = 0.4;
-      const am = c.createGain(); am.gain.value = 0.62;
-      lp.connect(am).connect(out);
-      [110, 164.81, 220, 277.18, 329.63].forEach((f, i) => {
-        for (const det of [-5, 5]) { const g = c.createGain(); g.gain.value = 0.11 / (1 + i * 0.45); osc(f, i % 2 ? 'triangle' : 'sine', det).connect(g).connect(lp); }
+      [[spec.base, 0], [spec.base + spec.beat, 1]].forEach(([f, ch]) => {
+        const o = c.createOscillator(); o.frequency.value = f; o.start(); nodes.push(o);
+        const g = c.createGain(); g.gain.value = 0.42; o.connect(g).connect(merger, 0, ch);
       });
-      // Modulación de amplitud: el volumen late entre 24 % y 100 %, nunca hasta el silencio
-      const depth = c.createGain(); depth.gain.value = 0.38; osc(rate).connect(depth).connect(am.gain);
-      const sweep = c.createGain(); sweep.gain.value = 260; osc(0.035).connect(sweep).connect(lp.frequency);
+      const soft = c.createGain(); soft.gain.value = 0.35; soft.connect(out);
+      pad(c, soft, nodes);
+    } else if (spec.kind === 'pulse') {
+      // El volumen del acorde late entre ~25 % y 100 %, nunca hasta el silencio
+      const am = c.createGain(); am.gain.value = 1 - spec.depth; am.connect(out);
+      lfo(spec.rate, spec.depth, am.gain);
+      pad(c, am, nodes, { bright: spec.bright });
+    } else if (spec.kind === 'mod') {
+      // Hace latir el sonido de fondo; si no hay fondo elegido, late un acorde suave
+      b.ambMod.gain.setValueAtTime(1 - spec.depth, c.currentTime);
+      lfo(spec.rate, spec.depth, b.ambMod.gain);
+      if (settings.ambient === 'none') {
+        const am = c.createGain(); am.gain.value = 1 - spec.depth; am.connect(out);
+        lfo(spec.rate, spec.depth, am.gain);
+        pad(c, am, nodes);
+      }
     }
     freq = { id, nodes, out };
     renderSounds();
