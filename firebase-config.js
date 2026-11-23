@@ -1,4 +1,11 @@
 // Configuración pública del proyecto de Firebase (no es secreta: la seguridad está en las
-// reglas de la base de datos, ver database.rules.json). Mientras sea null, las salas se
-// muestran como "no activadas".
-export const firebaseConfig = null;
+// reglas de la base de datos, ver database.rules.json).
+export const firebaseConfig = {
+  apiKey: 'AIzaSyB_-XOYQfOp8Q3iLY-CWrcODloFcZEpMyE',
+  authDomain: 'foco-estudio-1b47c.firebaseapp.com',
+  databaseURL: 'https://foco-estudio-1b47c-default-rtdb.firebaseio.com',
+  projectId: 'foco-estudio-1b47c',
+  storageBucket: 'foco-estudio-1b47c.firebasestorage.app',
+  messagingSenderId: '80899739270',
+  appId: '1:80899739270:web:fba05468439915be464b07'
+};
