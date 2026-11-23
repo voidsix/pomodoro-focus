@@ -699,6 +699,101 @@
     el.subName.value = ''; el.subDate.value = '';
     setSubject(id); renderStats();
   });
+  // ---------- Catálogo: materias con el programa oficial separado en temas ----------
+  const CATALOG = Array.isArray(window.FOCO_CATALOG) ? window.FOCO_CATALOG : [];
+  const norm = (x) => String(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const words = (x) => norm(x).split(/[^a-z0-9]+/).filter(Boolean);
+  const catById = (id) => CATALOG.find((c) => c.id === id);
+  const newTopicId = () => 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  // Busca en nombre, institución y unidades. Si escribís una unidad ("cinemática"), queda preseleccionada.
+  function searchCatalog(q) {
+    const toks = words(q).filter((t) => t.length >= 2 || /\d/.test(t));
+    if (!toks.length || norm(q).replace(/\s/g, '').length < 3) return [];
+    const hit = (ws, t) => ws.some((w) => w === t || (t.length >= 3 && w.startsWith(t)));
+    const out = [];
+    for (const c of CATALOG) {
+      const own = words(`${c.name} ${c.inst} ${c.keys || ''}`);
+      const unitWords = c.units.map((u) => words(u.name));
+      let ok = true; const picked = new Set();
+      for (const t of toks) {
+        const inOwn = hit(own, t);
+        const inUnits = unitWords.map((ws, i) => (hit(ws, t) ? i : -1)).filter((i) => i >= 0);
+        if (!inOwn && !inUnits.length) { ok = false; break; }
+        if (!inOwn) inUnits.forEach((i) => picked.add(i));
+      }
+      if (ok) out.push({ c, picked: picked.size ? picked : new Set(c.units.map((_, i) => i)) });
+    }
+    return out.slice(0, 3);
+  }
+  const catBox = $('#cat-pick');
+  let catResults = [];
+  function renderCatPick() {
+    catResults = searchCatalog(el.subName.value);
+    catBox.hidden = !catResults.length;
+    catBox.innerHTML = catResults.map(({ c, picked }, k) => {
+      const existing = subjects.find((s) => s.cat === c.id);
+      const units = c.units.map((u, i) => `
+        <label class="cat-unit"><input type="checkbox" data-cat-unit="${k}|${i}" ${picked.has(i) ? 'checked' : ''}>
+          <span><b>${i + 1}. ${esc(u.name)}</b><small>${u.topics.length} temas</small></span></label>`).join('');
+      return `<article class="cat-card" data-cat="${k}">
+          <header><span class="cat-badge">Programa oficial</span><b>${esc(c.name)}</b><small>${esc(c.inst)}</small></header>
+          <p class="cat-q">¿Qué unidades entran?</p>
+          <div class="cat-units">${units}</div>
+          <div class="cat-actions">
+            <button type="button" class="link" data-cat-all="${k}">Todas</button>
+            <button type="button" class="add" data-cat-add="${k}"></button>
+          </div>
+          ${existing ? `<p class="cat-note">Ya tenés ${esc(existing.name)}: las unidades nuevas se suman a esa materia.</p>` : ''}
+        </article>`;
+    }).join('');
+    catResults.forEach((_, k) => updateCatButton(k));
+  }
+  function catChecked(k) { return [...catBox.querySelectorAll(`[data-cat-unit^="${k}|"]`)].filter((x) => x.checked).map((x) => Number(x.dataset.catUnit.split('|')[1])); }
+  function updateCatButton(k) {
+    const { c } = catResults[k]; const idx = catChecked(k);
+    const n = idx.reduce((sum, i) => sum + c.units[i].topics.length, 0);
+    const b = catBox.querySelector(`[data-cat-add="${k}"]`);
+    b.textContent = n ? `Agregar ${n} temas` : 'Elegí al menos una unidad';
+    b.disabled = !n;
+  }
+  // Suma las unidades elegidas a la materia (la crea si no existe); no duplica temas ya cargados
+  function addFromCatalog(c, unitIdx, { scroll = true } = {}) {
+    let s = subjects.find((x) => x.cat === c.id);
+    if (!s) {
+      if (subjects.length >= 20) { el.subName.setCustomValidity('Máximo 20 materias.'); el.subName.reportValidity(); el.subName.setCustomValidity(''); return; }
+      let id;
+      do { id = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); } while (subById(id));
+      s = { id, name: c.name, exam: '', cat: c.id, topics: [] };
+      subjects.push(s);
+    }
+    if (el.subDate.value) s.exam = el.subDate.value;
+    const list = topicsOf(s), have = new Set(list.map((t) => `${t.unit || ''}|${norm(t.name)}`));
+    for (const i of unitIdx) {
+      const u = c.units[i];
+      for (const name of u.topics) {
+        if (list.length >= 120) break;
+        if (have.has(`${u.name}|${norm(name)}`)) continue;
+        list.push({ id: newTopicId(), name, unit: u.name, done: false });
+      }
+    }
+    // Mantener el orden del programa
+    const order = new Map(c.units.map((u, i) => [u.name, i]));
+    s.topics = list.map((t, i) => ({ t, i })).sort((a, b) => ((order.get(a.t.unit) ?? 99) - (order.get(b.t.unit) ?? 99)) || a.i - b.i).map((x) => x.t);
+    if (scroll) { el.subName.value = ''; el.subDate.value = ''; catBox.hidden = true; catBox.innerHTML = ''; }
+    openPlans.add(s.id);
+    setSubject(s.id); renderStats();
+    if (scroll) document.getElementById('plan-sec').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  el.subName.addEventListener('input', renderCatPick);
+  catBox.addEventListener('change', (e) => { const u = e.target.dataset.catUnit; if (u) updateCatButton(Number(u.split('|')[0])); });
+  catBox.addEventListener('click', (e) => {
+    const all = e.target.closest('[data-cat-all]');
+    if (all) { const k = all.dataset.catAll; catBox.querySelectorAll(`[data-cat-unit^="${k}|"]`).forEach((x) => (x.checked = true)); updateCatButton(Number(k)); return; }
+    const add = e.target.closest('[data-cat-add]'); if (!add) return;
+    const k = Number(add.dataset.catAdd), idx = catChecked(k);
+    if (idx.length) addFromCatalog(catResults[k].c, idx);
+  });
+
   el.subjects.addEventListener('click', async (e) => {
     const pick = e.target.closest('[data-pick]');
     if (pick) { setSubject(pick.dataset.pick); return; }
@@ -770,11 +865,28 @@
         ? `<div class="plan-next"><span>Próximo tema</span><b>${esc(p.next.name)}</b>
              <button class="add sm" data-study="${s.id}|${p.next.id}">Estudiar</button></div>`
         : '';
-      const topics = topicsOf(s).map((t) => `
+      const all = topicsOf(s);
+      let lastUnit = null;
+      const topics = all.map((t) => {
+        let head = '';
+        if (lastUnit === null || (t.unit || '') !== lastUnit) {
+          lastUnit = t.unit || '';
+          if (t.unit || all.some((x) => x.unit)) {
+            const inUnit = all.filter((x) => (x.unit || '') === lastUnit);
+            head = `<li class="unit-h"><b>${esc(t.unit || 'Otros temas')}</b><small>${inUnit.filter((x) => x.done).length}/${inUnit.length}</small></li>`;
+          }
+        }
+        return `${head}
         <li class="${t.done ? 'done' : ''}">
           <label><input type="checkbox" data-toggle="${s.id}|${t.id}" ${t.done ? 'checked' : ''}><span>${esc(t.name)}</span></label>
           <button class="del" data-del-topic="${s.id}|${t.id}" aria-label="Quitar tema">×</button>
-        </li>`).join('');
+        </li>`;
+      }).join('');
+      const cat = s.cat && catById(s.cat);
+      const missing = cat ? cat.units.map((u, i) => ({ u, i })).filter(({ u }) => !all.some((t) => t.unit === u.name)) : [];
+      const more = missing.length
+        ? `<div class="unit-add"><span>Sumar del programa</span>${missing.map(({ u, i }) => `<button type="button" class="chip-sm" data-add-unit="${s.id}|${i}">+ ${esc(u.name)}</button>`).join('')}</div>`
+        : '';
       const open = openPlans.has(s.id) || p.kind === 'notopics' || p.kind === 'nodate';
       return `
         <article class="plan-card st-${cls}" data-plan="${s.id}">
@@ -789,6 +901,7 @@
           <details ${open ? 'open' : ''} data-details="${s.id}">
             <summary>Temas y ajustes</summary>
             <ul class="topics">${topics || '<li class="empty">Sin temas todavía.</li>'}</ul>
+            ${more}
             <form class="row topic-form" data-add-topic="${s.id}">
               <input type="text" maxlength="400" placeholder="Ej: Límites, Derivadas, Integrales" aria-label="Nuevos temas (separalos con coma)">
               <button class="add" type="submit">Agregar</button>
@@ -846,6 +959,12 @@
     }
   });
   $('#plan').addEventListener('click', (e) => {
+    const addU = e.target.closest('[data-add-unit]');
+    if (addU) {
+      const [sid, i] = addU.dataset.addUnit.split('|'); const s = subById(sid); const c = s && catById(s.cat);
+      if (c) { const keep = el.subDate.value; el.subDate.value = ''; addFromCatalog(c, [Number(i)], { scroll: false }); el.subDate.value = keep; }
+      return;
+    }
     const del = e.target.closest('[data-del-topic]');
     if (del) {
       const { s, t } = findTopic(del.dataset.delTopic);

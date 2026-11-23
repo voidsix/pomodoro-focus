@@ -100,12 +100,13 @@
 
   <section class="panel band" id="subjects-sec">
     <h2>Materias</h2>
-    <p class="hint">Cargá tus materias y la fecha del final. Cada pomodoro se guarda en la materia que elijas arriba.</p>
+    <p class="hint">Cargá tus materias y la fecha del final. Cada pomodoro se guarda en la materia que elijas arriba. Si la materia está en el catálogo (probá "Física 03"), te la separo en unidades y temas del programa oficial.</p>
     <form id="subject-form" class="subj-form">
       <input id="subject-name" type="text" maxlength="40" placeholder="Ej: Análisis II" autocomplete="off" aria-label="Nombre de la materia" required>
       <label class="date-field">Fecha del final (opcional)<input id="subject-date" type="date" aria-label="Fecha del final"></label>
       <button class="add" type="submit">Agregar</button>
     </form>
+    <div id="cat-pick" class="cat-pick" hidden></div>
     <ul id="subjects" class="subjects"></ul>
   </section>
 
@@ -190,6 +191,7 @@
   </div>
 </div>
 
+<script src="catalog.js"></script>
 <script src="app.js"></script>
 <script type="module" src="rooms.js"></script>
 </body>

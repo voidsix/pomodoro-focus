@@ -506,3 +506,30 @@ body.zen.idle .controls { opacity: 0; transform: translateY(8px); pointer-events
 }
 
 [hidden] { display: none !important; }
+
+/* ---------- Catálogo de materias ---------- */
+.cat-pick { margin-top: 12px; display: grid; gap: 10px; }
+.cat-card { border: 1px solid var(--border-2); border-radius: 18px; padding: 16px; background: var(--surface); animation: fade .3s var(--ease); }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } }
+.cat-card header { display: grid; gap: 2px; }
+.cat-card header b { font-size: 17px; font-weight: 800; }
+.cat-card header small { color: var(--muted); font-size: 13px; }
+.cat-badge { justify-self: start; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); padding: 3px 8px; border-radius: 999px; margin-bottom: 4px; }
+.cat-q { margin: 12px 0 6px; color: var(--muted); font-size: 13px; font-weight: 700; }
+.cat-units { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 6px; }
+.cat-unit { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; }
+.cat-unit:has(input:checked) { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.cat-unit input { width: 18px; height: 18px; accent-color: var(--a1); flex: none; }
+.cat-unit span { display: grid; }
+.cat-unit b { font-size: 14px; font-weight: 700; }
+.cat-unit small { color: var(--muted); font-size: 12px; }
+.cat-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 12px; }
+.cat-actions .add:disabled { opacity: .5; cursor: default; }
+.cat-note { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+.topics li.unit-h { justify-content: space-between; border-top: 0; padding: 14px 0 4px; }
+.topics li.unit-h b { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.topics li.unit-h small { color: var(--muted); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.unit-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 12px; }
+.unit-add span { width: 100%; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.chip-sm { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--border-2); color: var(--text); font-size: 13px; font-weight: 600; background: transparent; }
+.chip-sm:hover { border-color: var(--accent); color: var(--accent); }
