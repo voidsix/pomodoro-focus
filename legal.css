@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
+:root { --bg: #04141a; --surface: #0a2027; --text: #e9f7f6; --muted: #8fb4b5; --accent: #82e8dc; --border: rgba(170,240,235,.1); }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: radial-gradient(120% 60% at 50% -10%, #0d3a40 0%, transparent 60%), var(--bg); color: var(--text);
+  font: 16px/1.65 Manrope, system-ui, sans-serif; min-height: 100vh;
+}
+main { max-width: 720px; margin: 0 auto; padding: max(env(safe-area-inset-top), 28px) 16px 60px; }
+h1 { font-size: clamp(28px, 6vw, 38px); letter-spacing: -.03em; line-height: 1.15; margin: 18px 0 4px; }
+h2 { font-size: 18px; margin: 30px 0 8px; letter-spacing: -.01em; }
+p, li { color: color-mix(in srgb, var(--text) 88%, var(--muted)); }
+ul { padding-left: 20px; }
+li { margin: 6px 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+.meta { color: var(--muted); font-size: 14px; margin: 0 0 24px; }
+.back { display: inline-block; font-weight: 700; text-decoration: none; padding: 8px 0; }
+.foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }

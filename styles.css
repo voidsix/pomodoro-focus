@@ -619,3 +619,6 @@ body.sheet-open { overflow: hidden; }
 }
 .pro-lock-txt b { font-size: 17px; }
 .pro-lock-txt span { color: var(--muted); font-size: 13px; max-width: 360px; }
+.foot-links { display: inline-flex; align-items: center; gap: 6px; }
+.foot-links .link { display: inline-flex; align-items: center; }
+.sheet-fine a { color: var(--accent); }
