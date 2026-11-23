@@ -822,9 +822,9 @@
         if (!inOwn && !inUnits.length) { ok = false; break; }
         if (!inOwn) inUnits.forEach((i) => picked.add(i));
       }
-      if (ok) out.push({ c, picked: picked.size ? picked : new Set(c.units.map((_, i) => i)) });
+      if (ok) out.push({ c, picked: picked.size ? picked : new Set(c.units.map((_, i) => i)), score: toks.filter((t) => hit(words(c.name), t)).length });
     }
-    return out.slice(0, 3);
+    return out.sort((a, b) => b.score - a.score).slice(0, 4);
   }
   const catBox = $('#cat-pick');
   let catResults = [];
@@ -837,7 +837,7 @@
         <label class="cat-unit"><input type="checkbox" data-cat-unit="${k}|${i}" ${picked.has(i) ? 'checked' : ''}>
           <span><b>${i + 1}. ${esc(u.name)}</b><small>${u.topics.length} temas</small></span></label>`).join('');
       return `<article class="cat-card" data-cat="${k}">
-          <header><span class="cat-badge">Programa oficial</span><b>${esc(c.name)}</b><small>${esc(c.inst)}</small></header>
+          <header><span class="cat-badge">Programa oficial</span><b>${esc(c.name)}</b><small>${esc(c.inst)}</small>${c.source ? `<small class="cat-src">${esc(c.source)}</small>` : ''}</header>
           <p class="cat-q">¿Qué unidades entran?</p>
           <div class="cat-units">${units}</div>
           <div class="cat-actions">

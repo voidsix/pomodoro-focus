@@ -30,7 +30,7 @@ const REASONS = {
 };
 const PERKS = [
   ['Sincronización', 'Materias, plan e historial iguales en el celu y la compu.'],
-  ['Catálogo de materias', 'Programas oficiales separados en unidades y temas (Física 03 del CBC y UBA XXI, y vamos sumando).'],
+  ['Catálogo de materias', 'Programas oficiales separados en unidades y temas: CBC y UBA XXI, UTN, UNC y UNS (y vamos sumando).'],
   ['Estadísticas', 'Mapa de tus últimos 6 meses, tu mejor horario y horas por materia.'],
   ['Más sonidos', 'Café, tormenta, arroyo y noche de campo, y 3 frecuencias nuevas.']
 ];
