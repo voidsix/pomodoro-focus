@@ -467,7 +467,7 @@
           </li>`;
         }).join('')
       : '<li class="empty">Todavía no cargaste materias. Empezá por la que tenés más cerca.</li>';
-    renderSubjectBar();
+    renderSubjectBar(); renderPlan();
   }
 
   function setSubject(id) {
@@ -498,6 +498,154 @@
   });
   el.subject.addEventListener('change', () => setSubject(el.subject.value));
 
+  // ---------- Plan de estudio ----------
+  // Para cada materia con final: temas que faltan × pomodoros por tema, repartidos en los días
+  // que quedan. El día antes del final queda libre para repasar (si hay 3 días o más).
+  const openPlans = new Set();
+  const topicsOf = (s) => (Array.isArray(s.topics) ? s.topics : (s.topics = []));
+  const perTopicOf = (s) => s.perTopic || 3;
+  const doneToday = (subId) => { const k = dayKey(Date.now()); return log.filter((x) => x.sub === subId && dayKey(x.ts) === k).length; };
+  function planFor(s) {
+    const d = daysUntil(s.exam);
+    const topics = topicsOf(s), total = topics.length, left = topics.filter((t) => !t.done).length;
+    const done = doneToday(s.id);
+    const base = { d, total, left, done, next: topics.find((t) => !t.done) || null };
+    if (d === null) return { ...base, kind: 'nodate', target: 0 };
+    if (d < 0) return { ...base, kind: 'past', target: 0 };
+    if (d === 0) return { ...base, kind: 'exam', target: 0 };
+    if (!total) return { ...base, kind: 'notopics', target: 0 };
+    if (!left) return { ...base, kind: 'ready', target: 0 };
+    const studyDays = d >= 3 ? d - 1 : d;
+    const target = Math.ceil((left * perTopicOf(s)) / studyDays);
+    const kind = target <= 6 ? 'ok' : target <= 10 ? 'warn' : 'bad';
+    return { ...base, kind, target, studyDays };
+  }
+  const STATUS = {
+    ok: ['ok', 'En ritmo'], warn: ['warn', 'Exigente'], bad: ['bad', 'Muy ajustado'],
+    ready: ['ok', 'Temas listos · repasá'],
+    exam: ['ok', '¡Hoy es el final!'], notopics: ['muted', 'Faltan los temas'], nodate: ['muted', 'Sin fecha'], past: ['muted', 'Final pasado']
+  };
+
+  function renderPlan() {
+    const box = $('#plan'), top = $('#plan-today'); if (!box) return;
+    if (!subjects.length) {
+      top.innerHTML = '';
+      box.innerHTML = '<p class="empty">Primero cargá tus materias (más abajo, en "Materias") con la fecha del final.</p>';
+      return;
+    }
+    const order = (p) => (p.d === null ? 1e6 : p.d < 0 ? 2e6 : p.d);
+    const plans = subjects.map((s) => ({ s, p: planFor(s) })).sort((a, b) => order(a.p) - order(b.p));
+    const active = plans.filter(({ p }) => p.target > 0);
+    const goal = active.reduce((n, { p }) => n + p.target, 0);
+    const got = active.reduce((n, { p }) => n + Math.min(p.done, p.target), 0);
+    top.innerHTML = goal
+      ? `<div class="plan-goal"><b>${got}</b><span>/ ${goal}</span></div>
+         <div class="plan-goal-txt"><strong>${got >= goal ? '¡Plan de hoy cumplido!' : 'pomodoros del plan de hoy'}</strong>
+         <span class="track-h"><i style="width:${Math.min(100, (got / goal) * 100)}%"></i></span></div>`
+      : '';
+
+    box.innerHTML = plans.map(({ s, p }) => {
+      const [cls, label] = STATUS[p.kind];
+      const color = subColor(s.id);
+      const pct = p.total ? Math.round(((p.total - p.left) / p.total) * 100) : 0;
+      const when = p.d === null ? 'Sin fecha de final' : examText(s.exam);
+      const todayLine = p.target
+        ? `<div class="plan-today-row"><b>${Math.min(p.done, 99)}</b><span>/ ${p.target} hoy</span>${p.done >= p.target ? '<em class="st ok">Hoy cumplido ✓</em>' : ''}</div>`
+        : '';
+      const next = p.next && p.kind !== 'past'
+        ? `<div class="plan-next"><span>Próximo tema</span><b>${esc(p.next.name)}</b>
+             <button class="add sm" data-study="${s.id}|${p.next.id}">Estudiar</button></div>`
+        : '';
+      const topics = topicsOf(s).map((t) => `
+        <li class="${t.done ? 'done' : ''}">
+          <label><input type="checkbox" data-toggle="${s.id}|${t.id}" ${t.done ? 'checked' : ''}><span>${esc(t.name)}</span></label>
+          <button class="del" data-del-topic="${s.id}|${t.id}" aria-label="Quitar tema">×</button>
+        </li>`).join('');
+      const open = openPlans.has(s.id) || p.kind === 'notopics' || p.kind === 'nodate';
+      return `
+        <article class="plan-card st-${cls}" data-plan="${s.id}">
+          <header>
+            <span class="dot" style="background:${color}"></span>
+            <div class="plan-title"><b>${esc(s.name)}</b><small>${when}</small></div>
+            <em class="st ${cls}">${label}</em>
+          </header>
+          ${todayLine}
+          ${p.total ? `<div class="plan-progress"><span class="track-h"><i style="width:${pct}%;background:${color}"></i></span><small>${p.total - p.left} de ${p.total} temas listos</small></div>` : ''}
+          ${next}
+          <details ${open ? 'open' : ''} data-details="${s.id}">
+            <summary>Temas y ajustes</summary>
+            <ul class="topics">${topics || '<li class="empty">Sin temas todavía.</li>'}</ul>
+            <form class="row topic-form" data-add-topic="${s.id}">
+              <input type="text" maxlength="400" placeholder="Ej: Límites, Derivadas, Integrales" aria-label="Nuevos temas (separalos con coma)">
+              <button class="add" type="submit">Agregar</button>
+            </form>
+            <div class="plan-settings">
+              <label>Pomodoros por tema<input type="number" min="1" max="12" value="${perTopicOf(s)}" data-per="${s.id}"></label>
+              <label>Fecha del final<input type="date" value="${s.exam || ''}" min="${isoToday()}" data-exam="${s.id}"></label>
+            </div>
+          </details>
+        </article>`;
+    }).join('');
+  }
+
+  function findTopic(ref) {
+    const [sid, tid] = ref.split('|'); const s = subById(sid);
+    return s ? { s, t: topicsOf(s).find((x) => x.id === tid) } : {};
+  }
+  $('#plan').addEventListener('toggle', (e) => {
+    const d = e.target.closest('[data-details]'); if (!d) return;
+    d.open ? openPlans.add(d.dataset.details) : openPlans.delete(d.dataset.details);
+  }, true);
+  $('#plan').addEventListener('submit', (e) => {
+    const f = e.target.closest('[data-add-topic]'); if (!f) return;
+    e.preventDefault();
+    const s = subById(f.dataset.addTopic); const input = f.querySelector('input');
+    const names = input.value.split(/[,\n;]+/).map((x) => x.trim()).filter(Boolean).slice(0, 50);
+    if (!s || !names.length) return;
+    const list = topicsOf(s);
+    for (const name of names) {
+      if (list.length >= 80) break;
+      list.push({ id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: name.slice(0, 80), done: false });
+    }
+    openPlans.add(s.id); saveSubjects(); renderPlan();
+    const again = document.querySelector(`[data-add-topic="${s.id}"] input`); if (again) again.focus();
+  });
+  // Pegar una lista (un tema por renglón) en el campo: los renglones pasan a ser comas
+  $('#plan').addEventListener('paste', (e) => {
+    const input = e.target.closest('[data-add-topic] input'); if (!input) return;
+    const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+    if (!/[\r\n]/.test(text)) return;
+    e.preventDefault();
+    const items = text.split(/\r?\n/).map((x) => x.replace(/^\s*(?:[-•*·]|\d+[.)])\s*/, '').trim()).filter(Boolean).join(', ');
+    const { selectionStart: a, selectionEnd: b, value } = input;
+    input.value = (value.slice(0, a) + (value.slice(0, a).trim() ? ', ' : '') + items + value.slice(b)).slice(0, 400);
+  });
+  $('#plan').addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.dataset.toggle) { const { t: topic } = findTopic(t.dataset.toggle); if (topic) { topic.done = t.checked; saveSubjects(); renderPlan(); } }
+    else if (t.dataset.per) {
+      const s = subById(t.dataset.per); if (!s) return;
+      s.perTopic = Math.min(12, Math.max(1, Math.round(Number(t.value)) || 3)); saveSubjects(); renderPlan();
+    } else if (t.dataset.exam !== undefined) {
+      const s = subById(t.dataset.exam); if (!s) return;
+      s.exam = t.value || ''; saveSubjects(); renderSubjects();
+    }
+  });
+  $('#plan').addEventListener('click', (e) => {
+    const del = e.target.closest('[data-del-topic]');
+    if (del) {
+      const { s, t } = findTopic(del.dataset.delTopic);
+      if (s && t) { s.topics = topicsOf(s).filter((x) => x !== t); saveSubjects(); renderPlan(); }
+      return;
+    }
+    const study = e.target.closest('[data-study]'); if (!study) return;
+    const { s, t } = findTopic(study.dataset.study); if (!s || !t) return;
+    el.task.value = t.name; store.set('task', t.name);
+    setSubject(s.id);
+    if (mode !== 'focus') setMode('focus');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
   // ---------- Distracciones ----------
   const esc =(s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   function renderNotes() {
@@ -519,6 +667,7 @@
   // ---------- Estadísticas ----------
   const dayKey = (d) => { const x = new Date(d); return `${x.getFullYear()}-${x.getMonth()}-${x.getDate()}`; };
   function renderStats() {
+    renderPlan();
     const byDay = {};
     for (const s of log) { const k = dayKey(s.ts); (byDay[k] ||= { n: 0, min: 0 }); byDay[k].n++; byDay[k].min += s.min; }
     const today = byDay[dayKey(Date.now())] || { n: 0, min: 0 };

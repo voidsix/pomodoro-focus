@@ -10,6 +10,7 @@ App web instalable (PWA) para hacer pomodoros personalizados y mejorar la concen
 - **Tiempos a medida**: foco, descanso corto, descanso largo y cada cuántos pomodoros va el largo.
 - **Materias**: cargás tus materias y cada pomodoro se guarda en la que estás estudiando.
 - **Cuenta regresiva a finales**: "Faltan 12 días para el final de Análisis II".
+- **Plan de estudio**: cargás los temas de cada materia y la app calcula cuántos pomodoros hacer hoy para llegar al final (el día antes queda para repasar), te dice si vas en ritmo y te sugiere el próximo tema.
 - **Horas por materia**: cuánto le dedicaste a cada una en los últimos 7 días.
 - **Tarea actual**: queda guardada junto a cada sesión.
 - **Anotador de distracciones**: anotás lo que se te cruza y seguís.
