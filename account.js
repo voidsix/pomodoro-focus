@@ -76,7 +76,8 @@ function render() {
       ${promo ? `<p class="promo-ok">Código <b>${esc(promo.code)}</b> aplicado <button class="link" data-act="promo-clear">quitar</button></p>`
         : promoOpen ? `<form class="promo-form" data-promo><input name="code" maxlength="20" autocomplete="off" autocapitalize="characters" placeholder="Código de descuento" aria-label="Código de descuento"><button class="ghost sm" type="submit" ${busy ? 'disabled' : ''}>${busy === 'promo' ? 'Revisando…' : 'Aplicar'}</button></form>`
         : '<button class="link promo-link" data-act="promo-open">¿Tenés un código de descuento?</button>'}
-      <button class="add wide" data-act="buy" ${busy ? 'disabled' : ''}>${busy === 'buy' ? 'Abriendo Mercado Pago…' : 'Pagar con Mercado Pago'}</button>
+      <button class="add wide" data-act="buy" ${busy ? 'disabled' : ''}>${busy === 'buy' ? 'Abriendo el pago…' : 'Pagar · tarjeta, efectivo o Mercado Pago'}</button>
+      <p class="sheet-fine pay-fine">No necesitás cuenta de Mercado Pago: podés pagar con tarjeta de crédito, débito o prepaga, o en efectivo en Rapipago o Pago Fácil.</p>
       <div class="sheet-actions"><button class="link" data-act="signout">Usar otra cuenta</button></div>`;
   } else {
     body = `${head}
@@ -232,8 +233,8 @@ async function returnFromPayment() {
         if (!r.pro && i < 3) await new Promise((res) => setTimeout(res, 2500));
       }
       note = r.pro ? '¡Listo! Ya sos Pro. Gracias por bancar Foco 💙' : r.status === 'pending' || r.status === 'processing' || status === 'pending'
-        ? 'Tu pago está pendiente. Cuando Mercado Pago lo apruebe, la Pro se activa sola.' : 'El pago no figura aprobado todavía. Si te lo cobraron, se activa solo en unos minutos.';
-    } else note = status === 'pending' ? 'Tu pago está pendiente. La Pro se activa sola cuando se apruebe.' : '';
+        ? 'Tu pago está pendiente. Si elegiste efectivo, pagá el cupón en Rapipago o Pago Fácil: la Pro se activa sola cuando se acredite (puede tardar unas horas).' : 'El pago no figura aprobado todavía. Si te lo cobraron, se activa solo en unos minutos.';
+    } else note = status === 'pending' ? 'Tu pago está pendiente. Si elegiste efectivo, pagá el cupón en Rapipago o Pago Fácil: la Pro se activa sola cuando se acredite (puede tardar unas horas).' : '';
   } catch (e) { note = esc(e.message); }
   render();
 }
