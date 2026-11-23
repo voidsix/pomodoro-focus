@@ -14,8 +14,13 @@
   const LABELS = { focus: 'Tiempo de foco', short: 'Descanso corto', long: 'Descanso largo' };
   const DEFAULTS = {
     focus: 25, short: 5, long: 15, every: 4, autoStart: false, sound: true, notify: false,
-    ambient: 'none', ambientVol: 50, ambientBreaks: false, alarm: 'bell'
+    ambient: 'none', ambientVol: 50, ambientBreaks: false, alarm: 'bell', skin: 'mar'
   };
+  const SKINS = [
+    { id: 'mar', name: 'Mar', desc: 'verde agua', bg: '#04141a', a: ['#1fcab5', '#2a9fd8'] },
+    { id: 'noche', name: 'Noche', desc: 'azul violeta', bg: '#0a0b10', a: ['#5b7cfa', '#9b6cf6'] },
+    { id: 'bosque', name: 'Bosque', desc: 'verdes suaves', bg: '#08120c', a: ['#4fc27c', '#2aa89a'] }
+  ];
 
   const settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
   let log = store.get('log', []);       // [{ts, min, task}]
@@ -72,7 +77,7 @@
     document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modeBtn === mode));
     el.dots.innerHTML = Array.from({ length: settings.every }, (_, i) => `<i class="${i < cycle ? 'on' : ''}"></i>`).join('');
     const meta = document.querySelector('meta[name=theme-color]');
-    if (meta) meta.content = '#0a0b10';
+    if (meta) meta.content = (SKINS.find((s) => s.id === settings.skin) || SKINS[0]).bg;
   }
 
   function persist() {
@@ -323,6 +328,22 @@
     settings.ambientBreaks = e.target.checked; store.set('settings', settings); updateAmbient();
   });
 
+  // ---------- Estilo ----------
+  function renderSkins() {
+    if (!SKINS.some((s) => s.id === settings.skin)) settings.skin = 'mar';
+    document.documentElement.dataset.skin = settings.skin;
+    $('#skins').innerHTML = SKINS.map((s) => `
+      <button class="chip" data-skin="${s.id}" aria-pressed="${s.id === settings.skin}">
+        <span class="swatch" style="background:radial-gradient(120% 140% at 20% 0%, ${s.a[0]}, transparent 60%), linear-gradient(135deg, ${s.a[0]}66, ${s.a[1]}), ${s.bg}"></span>
+        <b>${s.name}</b><span>${s.desc}</span>
+      </button>`).join('');
+  }
+  $('#skins').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-skin]'); if (!b) return;
+    settings.skin = b.dataset.skin; store.set('settings', settings);
+    renderSkins(); render();
+  });
+
   function alertDone(msg) {
     if (settings.sound) playAlarm(settings.alarm);
     try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch {}
@@ -571,5 +592,5 @@
     }
   } catch {}
 
-  fillForm(); renderPresets(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
+  fillForm(); renderPresets(); renderSkins(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
 }

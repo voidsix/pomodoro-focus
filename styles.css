@@ -8,18 +8,37 @@ MOTION: slow eases; the dial glow breathes (~6/min) and the wave drifts while a 
 */
 :root {
   color-scheme: dark;
-  --bg: #0a0b10;
-  --surface: #12131b;
-  --surface-2: #1a1b25;
-  --border: rgba(255,255,255,.07);
-  --border-2: rgba(255,255,255,.12);
-  --text: #f3f4f8;
-  --muted: #9a9db2;
   --ease: cubic-bezier(.22,.61,.36,1);
 }
-body { --a1: #5b7cfa; --a2: #9b6cf6; --accent: #93a8ff; --ring: rgba(123,140,250,.45); }
-body[data-mode=short] { --a1: #2fb39f; --a2: #5cc98a; --accent: #7fdcc0; --ring: rgba(95,201,160,.45); }
-body[data-mode=long] { --a1: #3a9fc8; --a2: #5b7cfa; --accent: #8cc8ec; --ring: rgba(90,160,220,.45); }
+/* ---------- Estilos: Mar (por defecto), Noche, Bosque ---------- */
+:root, :root[data-skin=mar] {
+  --bg: #04141a; --surface: #0a2027; --surface-2: #0f2a32;
+  --border: rgba(170,240,235,.08); --border-2: rgba(170,240,235,.15);
+  --text: #e9f7f6; --muted: #8fb4b5;
+}
+:root[data-skin=mar] body, body { --a1: #1fcab5; --a2: #2a9fd8; --accent: #82e8dc; }
+:root[data-skin=mar] body[data-mode=short] { --a1: #66e3b4; --a2: #1fcab5; --accent: #98f0cc; }
+:root[data-skin=mar] body[data-mode=long] { --a1: #2a8fd8; --a2: #1fcab5; --accent: #8fd2f2; }
+
+:root[data-skin=noche] {
+  --bg: #0a0b10; --surface: #12131b; --surface-2: #1a1b25;
+  --border: rgba(255,255,255,.07); --border-2: rgba(255,255,255,.12);
+  --text: #f3f4f8; --muted: #9a9db2;
+}
+:root[data-skin=noche] body { --a1: #5b7cfa; --a2: #9b6cf6; --accent: #93a8ff; }
+:root[data-skin=noche] body[data-mode=short] { --a1: #2fb39f; --a2: #5cc98a; --accent: #7fdcc0; }
+:root[data-skin=noche] body[data-mode=long] { --a1: #3a9fc8; --a2: #5b7cfa; --accent: #8cc8ec; }
+
+:root[data-skin=bosque] {
+  --bg: #08120c; --surface: #0f1c14; --surface-2: #15261b;
+  --border: rgba(200,240,210,.08); --border-2: rgba(200,240,210,.14);
+  --text: #edf6ef; --muted: #9bb3a2;
+}
+:root[data-skin=bosque] body { --a1: #4fc27c; --a2: #2aa89a; --accent: #95e2b2; }
+:root[data-skin=bosque] body[data-mode=short] { --a1: #a8dc78; --a2: #4fc27c; --accent: #c4eca0; }
+:root[data-skin=bosque] body[data-mode=long] { --a1: #2aa89a; --a2: #3a9fc8; --accent: #8fd8cf; }
+
+body { --ring: color-mix(in srgb, var(--a1) 50%, transparent); --halo: color-mix(in srgb, var(--a1) 16%, transparent); }
 
 * { box-sizing: border-box; min-width: 0; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--bg); }
@@ -55,7 +74,7 @@ h1::before {
 .modes button[aria-pressed=true] { background: var(--text); color: var(--bg); }
 
 /* ---------- Temporizador ---------- */
-.hero { position: relative; display: grid; justify-items: center; gap: 22px; padding-bottom: 44px; overflow: hidden; }
+.hero { position: relative; display: grid; justify-items: center; gap: 22px; padding-bottom: 96px; overflow: hidden; }
 .hero > * { position: relative; z-index: 1; }
 .wave { position: absolute !important; z-index: 0 !important; left: 0; right: 0; top: 20%; height: 200px; overflow: hidden; opacity: .22; pointer-events: none;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
@@ -119,8 +138,8 @@ body.running .dial::before { animation: breathe 10s ease-in-out infinite; }
   text-align: center; font-size: 16px; font-weight: 500;
   transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
 }
-.task::placeholder { color: #6e7187; }
-.task:focus { outline: none; border-color: var(--ring); box-shadow: 0 0 0 4px rgba(123,140,250,.12); }
+.task::placeholder { color: var(--muted); opacity: .75; }
+.task:focus { outline: none; border-color: var(--ring); box-shadow: 0 0 0 4px var(--halo); }
 
 .controls { display: flex; align-items: center; gap: 18px; }
 .main {
@@ -201,7 +220,7 @@ h3 { margin: 26px 0 12px; font-size: 12px; font-weight: 800; color: var(--muted)
   transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
 }
 .grid input[type=number]:focus, .row input:focus, .subj-form input:focus, .date-field input:focus {
-  outline: none; border-color: var(--ring); box-shadow: 0 0 0 4px rgba(123,140,250,.12);
+  outline: none; border-color: var(--ring); box-shadow: 0 0 0 4px var(--halo);
 }
 .grid .check { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; color: var(--text); font-size: 15px; min-height: 40px; }
 .check input { width: 19px; height: 19px; accent-color: var(--a1); }
@@ -303,3 +322,19 @@ body.done .dial { animation: pulse 1.2s var(--ease) 2; }
   .modes button { padding: 0 10px; letter-spacing: .06em; }
   .controls { gap: 12px; }
 }
+
+/* ---------- Olas en el borde del temporizador ---------- */
+.sea { position: absolute !important; z-index: 0 !important; left: 0; right: 0; bottom: 0; height: 84px; overflow: hidden; pointer-events: none; }
+.sea svg { position: absolute; left: 0; bottom: 0; width: 200%; height: 100%; }
+.sea path { transition: fill 1.4s var(--ease); }
+.sea .s1 { animation: drift 34s linear infinite; }
+.sea .s1 path { fill: var(--a2); opacity: .10; }
+.sea .s2 { height: 80%; animation: drift 22s linear infinite reverse; }
+.sea .s2 path { fill: var(--a1); opacity: .13; }
+.sea::after { content: ''; position: absolute; inset: auto 0 0 0; height: 30px; background: linear-gradient(transparent, var(--bg)); }
+
+/* ---------- Selector de estilo ---------- */
+.skin-chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.skin-chips .chip { display: grid; justify-items: start; gap: 10px; min-height: 0; padding: 14px; }
+.swatch { width: 100%; height: 44px; border-radius: 12px; position: relative; overflow: hidden; }
+.swatch::after { content: ''; position: absolute; inset: auto -10% -40% -10%; height: 70%; border-radius: 50% 50% 0 0; background: rgba(255,255,255,.12); }
