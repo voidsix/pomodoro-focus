@@ -1,0 +1,42 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$code": {
+        ".validate": "$code.matches(/^[A-HJ-NP-Z2-9]{6}$/)",
+        "createdAt": {
+          ".read": "auth != null",
+          ".write": "auth != null && !data.exists()",
+          ".validate": "newData.val() === now"
+        },
+        "members": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('rooms').child($code).child('createdAt').exists()",
+            ".validate": "newData.hasChildren(['name', 'mode', 'running', 'seen'])",
+            "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24" },
+            "mode": { ".validate": "newData.val() === 'focus' || newData.val() === 'short' || newData.val() === 'long'" },
+            "running": { ".validate": "newData.isBoolean()" },
+            "started": { ".validate": "newData.isBoolean()" },
+            "endAt": { ".validate": "newData.isNumber()" },
+            "remaining": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 14400000" },
+            "sub": { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "task": { ".validate": "newData.isString() && newData.val().length <= 60" },
+            "today": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999" },
+            "seen": { ".validate": "newData.val() === now" },
+            "$other": { ".validate": false }
+          }
+        },
+        "cheers": {
+          ".read": "auth != null",
+          ".indexOn": ["at"],
+          "$id": {
+            ".write": "auth != null && !data.exists() && root.child('rooms').child($code).child('members').child(auth.uid).exists()",
+            ".validate": "newData.hasChildren(['from', 'fromName', 'to', 'at']) && newData.child('from').val() === auth.uid && newData.child('to').isString() && newData.child('fromName').isString() && newData.child('fromName').val().length <= 24 && newData.child('at').val() === now"
+          }
+        }
+      }
+    }
+  }
+}

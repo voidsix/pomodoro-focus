@@ -78,6 +78,7 @@
     document.body.classList.toggle('running', !!timer);
     const zs = subById(currentSub);
     $('#zen-caption').textContent = [zs ? zs.name : '', el.task.value.trim()].filter(Boolean).join(' · ');
+    emitState();
     document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modeBtn === mode));
     el.dots.innerHTML = Array.from({ length: settings.every }, (_, i) => `<i class="${i < cycle ? 'on' : ''}"></i>`).join('');
     const meta = document.querySelector('meta[name=theme-color]');
@@ -503,7 +504,23 @@
     else { if (mode === 'long') cycle = 0; setMode('focus'); }
   });
   document.querySelectorAll('[data-mode-btn]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));
-  el.task.addEventListener('input', () => store.set('task', el.task.value));
+  el.task.addEventListener('input', () => { store.set('task', el.task.value); emitState(); });
+
+  // ---------- Estado público para las salas de estudio (rooms.js) ----------
+  // Se publica en window.__focoState y como evento; rooms.js decide cuándo subirlo.
+  function emitState() {
+    const s = subById(currentSub);
+    const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+    let today = 0; for (let i = log.length - 1; i >= 0 && log[i].ts >= t0.getTime(); i--) today++;
+    const detail = {
+      mode, running: !!timer, endAt: timer ? endAt : null,
+      remaining: Math.round(remaining / 1000) * 1000,
+      started: !!timer || remaining < total() - 1000,
+      sub: s ? s.name : '', task: el.task.value.trim(), today
+    };
+    window.__focoState = detail;
+    window.dispatchEvent(new CustomEvent('foco:state', { detail }));
+  }
   document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'BUTTON'].includes(document.activeElement.tagName)) {
       e.preventDefault(); timer ? pause() : start();
