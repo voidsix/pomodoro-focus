@@ -38,7 +38,7 @@
 
   const $ = (s) => document.querySelector(s);
   const el = {
-    time: $('#time'), label: $('#label'), dots: $('#dots'), prog: $('#prog'),
+    time: $('#time'), label: $('#label'), dots: $('#dots'), prog: $('#prog'), progGlow: $('#prog-glow'),
     toggle: $('#toggle'), reset: $('#reset'), skip: $('#skip'), task: $('#task'),
     presets: $('#presets'), form: $('#settings'), notes: $('#notes'), noteForm: $('#note-form'),
     note: $('#note'), history: $('#history'), week: $('#week'), ticks: $('#ticks'),
@@ -68,8 +68,10 @@
     el.time.textContent = t;
     el.label.textContent = LABELS[mode];
     const frac = Math.min(1, Math.max(0, remaining / total()));
-    el.prog.style.strokeDasharray = CIRC;
-    el.prog.style.strokeDashoffset = CIRC * (1 - frac);
+    for (const ring of [el.prog, el.progGlow]) {
+      ring.style.strokeDasharray = CIRC;
+      ring.style.strokeDashoffset = CIRC * (1 - frac);
+    }
     el.toggle.textContent = timer ? 'Pausar' : (remaining < total() ? 'Seguir' : 'Empezar');
     document.title = timer ? `${t} · ${mode === 'focus' ? 'Foco' : 'Descanso'}` : 'Foco Pomodoro';
     document.body.dataset.mode = mode;
@@ -588,7 +590,20 @@
   // ---------- PWA: instalación y uso offline ----------
   try {
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      // Si ya había una versión instalada y llega una nueva, recargar una vez para mostrarla
+      // (salvo que haya un pomodoro corriendo: en ese caso se aplica en la próxima apertura).
+      const hadController = !!navigator.serviceWorker.controller;
+      let reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!hadController || reloading || timer) return;
+        reloading = true; location.reload();
+      });
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+        // Buscar actualizaciones cada vez que se vuelve a la app
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+      }).catch(() => {});
     }
   } catch {}
 
