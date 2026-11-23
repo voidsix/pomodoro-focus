@@ -120,7 +120,6 @@ functions.http('api', async (req, res) => {
           total_amount: amount,
           external_reference: u.uid,
           description: 'Foco Pro · pago único',
-          ...(u.email ? { payer: { email: u.email } } : {}),
           items: [{ title: 'Foco Pro · pago único', unit_price: amount, quantity: 1, external_code: 'foco-pro' }],
           config: {
             statement_descriptor: 'FOCO PRO',
