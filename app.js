@@ -72,7 +72,7 @@
     document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modeBtn === mode));
     el.dots.innerHTML = Array.from({ length: settings.every }, (_, i) => `<i class="${i < cycle ? 'on' : ''}"></i>`).join('');
     const meta = document.querySelector('meta[name=theme-color]');
-    if (meta) meta.content = { focus: '#34557f', short: '#3a7560', long: '#36687a' }[mode];
+    if (meta) meta.content = '#0a0b10';
   }
 
   function persist() {

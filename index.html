@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#34557f">
+<meta name="theme-color" content="#0a0b10">
 <meta name="description" content="Pomodoros personalizados para mejorar la concentración">
 <title>Foco Pomodoro</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body data-mode="focus">
@@ -27,8 +27,19 @@
 
 <main>
   <section class="hero band">
+    <div class="wave" aria-hidden="true">
+      <svg viewBox="0 0 2400 200" preserveAspectRatio="none">
+        <path d="M0 100 Q75 30 150 100 T300 100 T450 100 T600 100 T750 100 T900 100 T1050 100 T1200 100 T1350 100 T1500 100 T1650 100 T1800 100 T1950 100 T2100 100 T2250 100 T2400 100"/>
+        <path class="w2" d="M0 100 Q150 150 300 100 T600 100 T900 100 T1200 100 T1500 100 T1800 100 T2100 100 T2400 100"/>
+      </svg>
+    </div>
     <div class="dial">
       <svg viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0"/><stop offset="1"/>
+          </linearGradient>
+        </defs>
         <circle class="track" cx="100" cy="100" r="88"/>
         <g id="ticks"></g>
         <circle class="prog" id="prog" cx="100" cy="100" r="88"/>
