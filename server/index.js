@@ -37,6 +37,18 @@ async function userFrom(req) {
 async function grant(order) {
   const uid = String(order.external_reference || '');
   const paid = Number(order.total_paid_amount ?? 0), total = Number(order.total_amount ?? 0);
+  // Pago devuelto (total o parcial) o contracargo: se quita la Pro que dio esa misma orden
+  const refunded = order.status === 'refunded' || order.status_detail === 'partially_refunded'
+    || (order.transactions?.chargebacks || []).length > 0;
+  if (refunded && /^[A-Za-z0-9]{10,64}$/.test(uid)) {
+    const db = admin.database(), proRef = db.ref(`users/${uid}/pro`);
+    const cur = (await proRef.get()).val();
+    if (cur && cur.pay === String(order.id)) {
+      await proRef.remove();
+      await db.ref(`payments/${order.id}`).update({ refundedAt: Date.now() });
+    }
+    return { pro: false, status: 'refunded' };
+  }
   const ok = order.status === 'processed' && order.status_detail === 'accredited'
     && (!order.currency || order.currency === 'ARS')
     && total >= PRICE && paid >= total && /^[A-Za-z0-9]{10,64}$/.test(uid);
