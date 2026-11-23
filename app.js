@@ -17,6 +17,10 @@
   const settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
   let log = store.get('log', []);       // [{ts, min, task}]
   let notes = store.get('notes', []);   // [{ts, t}]
+  let subjects = store.get('subjects', []); // [{id, name, exam: 'YYYY-MM-DD' | ''}]
+  let currentSub = store.get('subject', '');
+  if (!subjects.some((s) => s.id === currentSub)) currentSub = '';
+  const SUB_COLORS = ['#d9412b', '#17766f', '#7a4fd1', '#d98a1b', '#2a6fd6', '#c23c7d', '#4f8a2b', '#6b5a50'];
   const saved = store.get('state', {});
   let mode = saved.mode || 'focus';
   let cycle = saved.cycle || 0;         // pomodoros completados en el ciclo actual
@@ -29,7 +33,9 @@
     time: $('#time'), label: $('#label'), dots: $('#dots'), prog: $('#prog'),
     toggle: $('#toggle'), reset: $('#reset'), skip: $('#skip'), task: $('#task'),
     presets: $('#presets'), form: $('#settings'), notes: $('#notes'), noteForm: $('#note-form'),
-    note: $('#note'), history: $('#history'), week: $('#week'), ticks: $('#ticks')
+    note: $('#note'), history: $('#history'), week: $('#week'), ticks: $('#ticks'),
+    subject: $('#subject'), countdown: $('#countdown'), subForm: $('#subject-form'),
+    subName: $('#subject-name'), subDate: $('#subject-date'), subjects: $('#subjects'), bySubject: $('#by-subject')
   };
   const CIRC = 2 * Math.PI * 88;
   el.task.value = store.get('task', '');
@@ -98,7 +104,7 @@
     clearInterval(timer); timer = null;
     const wasFocus = mode === 'focus';
     if (wasFocus) {
-      log.push({ ts: Date.now(), min: settings.focus, task: el.task.value.trim() });
+      log.push({ ts: Date.now(), min: settings.focus, task: el.task.value.trim(), sub: currentSub });
       if (log.length > 2000) log = log.slice(-2000);
       store.set('log', log);
       cycle += 1;
@@ -206,8 +212,88 @@
     }
   });
 
+  // ---------- Materias y cuenta regresiva a finales ----------
+  const subById = (id) => subjects.find((s) => s.id === id);
+  const subColor = (id) => { const i = subjects.findIndex((s) => s.id === id); return i < 0 ? 'var(--muted)' : SUB_COLORS[i % SUB_COLORS.length]; };
+  const isoToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  function daysUntil(iso) {
+    if (!iso) return null;
+    const [y, m, d] = iso.split('-').map(Number);
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return Math.round((new Date(y, m - 1, d) - t) / 86400000);
+  }
+  function examText(iso) {
+    const d = daysUntil(iso);
+    if (d === null) return 'Sin fecha de final';
+    if (d < 0) return 'El final ya pasó';
+    if (d === 0) return 'Final hoy';
+    if (d === 1) return 'Final mañana';
+    return `Final en ${d} días`;
+  }
+  function saveSubjects() { store.set('subjects', subjects); store.set('subject', currentSub); }
+
+  function renderSubjectBar() {
+    el.subject.innerHTML = '<option value="">Sin materia</option>' +
+      subjects.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    el.subject.value = currentSub;
+    const s = subById(currentSub), d = s ? daysUntil(s.exam) : null;
+    let msg = '';
+    if (s && d !== null && d >= 0) {
+      const n = esc(s.name);
+      msg = d === 0 ? `¡Hoy es el final de <b>${n}</b>! Vos podés.`
+        : d === 1 ? `El final de <b>${n}</b> es <b>mañana</b>`
+        : `Faltan <b>${d} días</b> para el final de <b>${n}</b>`;
+    }
+    el.countdown.innerHTML = msg;
+    el.countdown.hidden = !msg;
+  }
+
+  function renderSubjects() {
+    const order = (s) => { const d = daysUntil(s.exam); return d === null ? 1e6 : d < 0 ? 2e6 - d : d; };
+    const list = [...subjects].sort((a, b) => order(a) - order(b));
+    el.subjects.innerHTML = list.length
+      ? list.map((s) => {
+          const d = daysUntil(s.exam), soon = d !== null && d >= 0 && d <= 7;
+          return `<li class="${s.id === currentSub ? 'on' : ''}">
+            <span class="dot" style="background:${subColor(s.id)}"></span>
+            <button class="pick" data-pick="${s.id}"><b>${esc(s.name)}</b><small class="${soon ? 'soon' : ''}">${examText(s.exam)}</small></button>
+            <button class="del" data-del-sub="${s.id}" aria-label="Quitar ${esc(s.name)}">×</button>
+          </li>`;
+        }).join('')
+      : '<li class="empty">Todavía no cargaste materias. Empezá por la que tenés más cerca.</li>';
+    renderSubjectBar();
+  }
+
+  function setSubject(id) {
+    currentSub = id; saveSubjects(); renderSubjects();
+  }
+
+  el.subDate.min = isoToday();
+  el.subForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = el.subName.value.trim(); if (!name) return;
+    if (subjects.length >= 20) { el.subName.setCustomValidity('Máximo 20 materias.'); el.subName.reportValidity(); el.subName.setCustomValidity(''); return; }
+    let id;
+    do { id = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); } while (subById(id));
+    subjects.push({ id, name, exam: el.subDate.value || '' });
+    el.subName.value = ''; el.subDate.value = '';
+    setSubject(id); renderStats();
+  });
+  el.subjects.addEventListener('click', async (e) => {
+    const pick = e.target.closest('[data-pick]');
+    if (pick) { setSubject(pick.dataset.pick); return; }
+    const del = e.target.closest('[data-del-sub]'); if (!del) return;
+    const s = subById(del.dataset.delSub); if (!s) return;
+    if (await ask(`¿Quitar "${s.name}"? Sus pomodoros quedan en el historial como "Sin materia".`)) {
+      subjects = subjects.filter((x) => x.id !== s.id);
+      if (currentSub === s.id) currentSub = '';
+      saveSubjects(); renderSubjects(); renderStats();
+    }
+  });
+  el.subject.addEventListener('change', () => setSubject(el.subject.value));
+
   // ---------- Distracciones ----------
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const esc =(s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   function renderNotes() {
     el.notes.innerHTML = notes.length
       ? notes.map((n, i) => `<li><span>${esc(n.t)}</span><button data-del="${i}" aria-label="Quitar">×</button></li>`).join('')
@@ -249,12 +335,33 @@
         <small>${i === 6 ? 'Hoy' : names[x.getDay()]}</small>
       </div>`).join('');
 
+    // Minutos por materia en los últimos 7 días
+    const from = days[0]; from.setHours(0, 0, 0, 0);
+    const per = {};
+    for (const s of log) {
+      if (s.ts < from.getTime()) continue;
+      const k = subById(s.sub) ? s.sub : '';
+      per[k] = (per[k] || 0) + s.min;
+    }
+    const rows = Object.entries(per).sort((a, b) => b[1] - a[1]);
+    const top = Math.max(1, ...rows.map((r) => r[1]));
+    const hm = (m) => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ' ' + (m % 60) + ' min' : ''}` : `${m} min`);
+    el.bySubject.innerHTML = rows.length
+      ? rows.map(([id, m]) => {
+          const s = subById(id), c = subColor(id);
+          return `<li><span class="name"><span class="dot" style="background:${c}"></span>${s ? esc(s.name) : 'Sin materia'}</span><em>${hm(m)}</em>
+            <span class="track-h"><i style="width:${(m / top) * 100}%;background:${c}"></i></span></li>`;
+        }).join('')
+      : '<li class="empty">Cuando completes pomodoros vas a ver acá cuánto le dedicaste a cada materia.</li>';
+
     const recent = log.slice(-8).reverse();
     el.history.innerHTML = recent.length
       ? recent.map((s) => {
           const t = new Date(s.ts);
           const when = t.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric' }) + ' ' + t.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-          return `<li><span>${s.task ? esc(s.task) : 'Sin tarea'}</span><em>${s.min} min</em><time>${when}</time></li>`;
+          const sub = subById(s.sub);
+          const what = [sub ? sub.name : '', s.task].filter(Boolean).map(esc).join(' · ') || 'Sin tarea';
+          return `<li><span>${what}</span><em>${s.min} min</em><time>${when}</time></li>`;
         }).join('')
       : '<li class="empty">Todavía no completaste pomodoros. El primero es el más difícil.</li>';
   }
@@ -281,5 +388,5 @@
     }
   } catch {}
 
-  fillForm(); renderPresets(); renderNotes(); renderStats(); render();
+  fillForm(); renderPresets(); renderNotes(); renderSubjects(); renderStats(); render();
 }

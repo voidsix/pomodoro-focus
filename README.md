@@ -6,6 +6,9 @@ App web instalable (PWA) para hacer pomodoros personalizados y mejorar la concen
 
 - **Ritmos predefinidos**: Clásico (25/5), Arranque suave (15/3), Profundo (50/10) y Flow (90/20).
 - **Tiempos a medida**: foco, descanso corto, descanso largo y cada cuántos pomodoros va el largo.
+- **Materias**: cargás tus materias y cada pomodoro se guarda en la que estás estudiando.
+- **Cuenta regresiva a finales**: "Faltan 12 días para el final de Análisis II".
+- **Horas por materia**: cuánto le dedicaste a cada una en los últimos 7 días.
 - **Tarea actual**: queda guardada junto a cada sesión.
 - **Anotador de distracciones**: anotás lo que se te cruza y seguís.
 - **Progreso**: pomodoros y minutos del día, racha de días seguidos, gráfico de 7 días e historial.

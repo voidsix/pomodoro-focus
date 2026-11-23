@@ -40,7 +40,12 @@
       </div>
     </div>
 
-    <input id="task" class="task" type="text" maxlength="80" placeholder="¿En qué te vas a concentrar?" autocomplete="off" aria-label="Tarea actual">
+    <div class="subject-bar">
+      <select id="subject" class="subject" aria-label="Materia actual"></select>
+      <p id="countdown" class="countdown" hidden></p>
+    </div>
+
+    <input id="task" class="task" type="text" maxlength="80" placeholder="¿Qué tema vas a estudiar?" autocomplete="off" aria-label="Tarea actual">
 
     <div class="controls">
       <button id="reset" class="round" aria-label="Reiniciar">
@@ -51,6 +56,17 @@
         <svg viewBox="0 0 24 24"><path d="M6 5l9 7-9 7zM18 5v14" /></svg>
       </button>
     </div>
+  </section>
+
+  <section class="panel band" id="subjects-sec">
+    <h2>Materias</h2>
+    <p class="hint">Cargá tus materias y la fecha del final. Cada pomodoro se guarda en la materia que elijas arriba.</p>
+    <form id="subject-form" class="subj-form">
+      <input id="subject-name" type="text" maxlength="40" placeholder="Ej: Análisis II" autocomplete="off" aria-label="Nombre de la materia" required>
+      <label class="date-field">Fecha del final (opcional)<input id="subject-date" type="date" aria-label="Fecha del final"></label>
+      <button class="add" type="submit">Agregar</button>
+    </form>
+    <ul id="subjects" class="subjects"></ul>
   </section>
 
   <section class="panel band" id="presets-sec">
@@ -88,6 +104,8 @@
       <div><b id="s-streak">0</b><span>días seguidos</span></div>
     </div>
     <div id="week" class="week" aria-label="Últimos 7 días"></div>
+    <h3>Por materia · últimos 7 días</h3>
+    <ul id="by-subject" class="by-subject"></ul>
     <h3>Últimas sesiones</h3>
     <ul id="history" class="history"></ul>
   </section>
