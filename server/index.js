@@ -1,8 +1,8 @@
 // Servidor de cobro de Foco Pro (Google Cloud Functions, Node 20).
 //   POST /checkout  → crea el pago en Mercado Pago para el usuario logueado y devuelve el link
-//   POST /confirm   → al volver de Mercado Pago, verifica el pago y activa la Pro
-//   POST /webhook   → aviso automático de Mercado Pago; verifica el pago y activa la Pro
-// Nunca se confía en lo que manda el navegador: cada pago se consulta a Mercado Pago con el token privado.
+//   POST /confirm   → al volver de Mercado Pago, consulta la última orden del usuario y activa la Pro
+//   POST /webhook   → aviso de Mercado Pago (tema "Order"); consulta la orden y activa la Pro
+// Usa la API de Orders (Checkout Pro). Nunca se confía en el navegador: cada orden se consulta a Mercado Pago.
 import functions from '@google-cloud/functions-framework';
 import admin from 'firebase-admin';
 import crypto from 'node:crypto';
@@ -33,19 +33,21 @@ async function userFrom(req) {
   return t;
 }
 
-// Activa la Pro si el pago está aprobado, es en pesos y alcanza el precio. Idempotente.
-async function grant(payment) {
-  const uid = String(payment.external_reference || '');
-  const ok = payment.status === 'approved' && payment.currency_id === 'ARS'
-    && Number(payment.transaction_amount) >= PRICE && /^[A-Za-z0-9]{10,64}$/.test(uid);
-  if (!ok) return { pro: false, status: payment.status };
+// Activa la Pro si la orden está pagada y acreditada, en pesos y por el precio completo. Idempotente.
+async function grant(order) {
+  const uid = String(order.external_reference || '');
+  const paid = Number(order.total_paid_amount ?? 0), total = Number(order.total_amount ?? 0);
+  const ok = order.status === 'processed' && order.status_detail === 'accredited'
+    && (!order.currency || order.currency === 'ARS')
+    && total >= PRICE && paid >= total && /^[A-Za-z0-9]{10,64}$/.test(uid);
+  if (!ok) return { pro: false, status: order.status, detail: order.status_detail };
   const db = admin.database();
-  await db.ref(`payments/${payment.id}`).transaction((cur) => cur || { uid, amount: payment.transaction_amount, at: Date.now() });
+  await db.ref(`payments/${order.id}`).transaction((cur) => cur || { uid, amount: paid, at: Date.now() });
   const proRef = db.ref(`users/${uid}/pro`);
   if (!(await proRef.get()).exists()) {
-    await proRef.set({ at: Date.now(), pay: String(payment.id), amount: Number(payment.transaction_amount) });
+    await proRef.set({ at: Date.now(), pay: String(order.id), amount: paid });
   }
-  return { pro: true, status: payment.status, uid };
+  return { pro: true, status: order.status, uid };
 }
 
 function validSignature(req, dataId) {
@@ -72,37 +74,48 @@ functions.http('api', async (req, res) => {
     if (path === '/checkout') {
       const u = await userFrom(req);
       if ((await admin.database().ref(`users/${u.uid}/pro`).get()).exists()) return res.json({ already: true, url: SITE + '/?pro=ok' });
-      const self = `https://${req.get('host')}`;
-      const pref = await mp('/checkout/preferences', {
+      const amount = PRICE.toFixed(2);
+      const order = await mp('/v1/orders', {
         method: 'POST',
+        headers: { 'X-Idempotency-Key': crypto.randomUUID() },
         body: JSON.stringify({
-          items: [{ id: 'foco-pro', title: 'Foco Pro · pago único', quantity: 1, unit_price: PRICE, currency_id: 'ARS' }],
+          type: 'online',
+          processing_mode: 'manual',
+          total_amount: amount,
           external_reference: u.uid,
-          payer: u.email ? { email: u.email } : undefined,
-          back_urls: { success: `${SITE}/?pro=ok`, pending: `${SITE}/?pro=pending`, failure: `${SITE}/?pro=fail` },
-          auto_return: 'approved',
-          notification_url: `${self}/webhook`,
-          statement_descriptor: 'FOCO PRO',
-          payment_methods: { installments: 1 }
+          description: 'Foco Pro · pago único',
+          ...(u.email ? { payer: { email: u.email } } : {}),
+          items: [{ title: 'Foco Pro · pago único', unit_price: amount, quantity: 1, external_code: 'foco-pro' }],
+          config: {
+            statement_descriptor: 'FOCO PRO',
+            online: { success_url: `${SITE}/?pro=ok`, pending_url: `${SITE}/?pro=pending`, failure_url: `${SITE}/?pro=fail`, auto_return: 'approved' },
+            payment_method: { max_installments: 1 }
+          }
         })
       });
-      return res.json({ url: pref.init_point });
+      // Guardar la última orden del usuario: al volver se confirma con ella (no hace falta que el navegador la mande)
+      await admin.database().ref(`orders/${u.uid}`).set({ id: String(order.id), at: Date.now() });
+      return res.json({ url: order.checkout_url || order.init_point });
     }
 
     if (path === '/confirm') {
       const u = await userFrom(req);
-      const id = String(req.body?.payment_id || '').replace(/\D/g, '');
-      if (!id) return res.status(400).json({ error: 'Falta el número de pago.' });
-      const p = await mp(`/v1/payments/${id}`);
-      if (String(p.external_reference) !== u.uid) return res.status(403).json({ error: 'Ese pago es de otra cuenta.' });
-      return res.json(await grant(p));
+      const saved = (await admin.database().ref(`orders/${u.uid}`).get()).val();
+      if (!saved?.id) return res.json({ pro: false, status: 'none' });
+      const order = await mp(`/v1/orders/${encodeURIComponent(saved.id)}`);
+      if (String(order.external_reference) !== u.uid) return res.status(403).json({ error: 'Esa orden es de otra cuenta.' });
+      const r = await grant(order);
+      return res.json({ ...r, status: r.pro ? 'approved' : order.status === 'processing' ? 'pending' : order.status });
     }
 
     if (path === '/webhook') {
-      const type = req.body?.type || req.query.type || req.query.topic;
+      const type = req.body?.type || req.query.type || req.query.topic || '';
       const id = String(req.body?.data?.id || req.query['data.id'] || req.query.id || '');
       if (!validSignature(req, req.query['data.id'] || id)) return res.status(401).send('firma inválida');
-      if (type === 'payment' && /^\d+$/.test(id)) await grant(await mp(`/v1/payments/${id}`));
+      if (/^order/.test(type) && /^[A-Za-z0-9_-]{4,64}$/.test(id)) {
+        const order = await mp(`/v1/orders/${encodeURIComponent(id)}`);
+        if (/^[A-Za-z0-9]{10,64}$/.test(String(order.external_reference || ''))) await grant(order);
+      }
       return res.status(200).send('ok');
     }
 

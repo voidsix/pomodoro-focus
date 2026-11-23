@@ -208,10 +208,15 @@ async function returnFromPayment() {
   try {
     await boot();
     await new Promise((res) => { const t = setInterval(() => { if (user) { clearInterval(t); res(); } }, 100); setTimeout(() => { clearInterval(t); res(); }, 5000); });
-    if (payment && user && !user.isAnonymous) {
-      const r = await api('/confirm', { payment_id: payment });
-      note = r.pro ? '¡Listo! Ya sos Pro. Gracias por bancar Foco 💙' : r.status === 'pending' || r.status === 'in_process'
-        ? 'Tu pago está pendiente. Cuando Mercado Pago lo apruebe, la Pro se activa sola.' : 'El pago no figura aprobado todavía.';
+    if (user && !user.isAnonymous) {
+      // El servidor recuerda la última orden de esta cuenta; reintenta unos segundos por si la acreditación demora
+      let r = { pro: false };
+      for (let i = 0; i < 4 && !r.pro; i++) {
+        r = await api('/confirm', { payment_id: payment || '' });
+        if (!r.pro && i < 3) await new Promise((res) => setTimeout(res, 2500));
+      }
+      note = r.pro ? '¡Listo! Ya sos Pro. Gracias por bancar Foco 💙' : r.status === 'pending' || r.status === 'processing' || status === 'pending'
+        ? 'Tu pago está pendiente. Cuando Mercado Pago lo apruebe, la Pro se activa sola.' : 'El pago no figura aprobado todavía. Si te lo cobraron, se activa solo en unos minutos.';
     } else note = status === 'pending' ? 'Tu pago está pendiente. La Pro se activa sola cuando se apruebe.' : '';
   } catch (e) { note = esc(e.message); }
   render();
