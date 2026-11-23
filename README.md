@@ -2,6 +2,8 @@
 
 App web instalable (PWA) para hacer pomodoros personalizados y mejorar la concentración. Funciona en el celular y la computadora, y también sin conexión.
 
+**Online:** https://focoestudio.app
+
 ## Funciones
 
 - **Ritmos predefinidos**: Clásico (25/5), Arranque suave (15/3), Profundo (50/10) y Flow (90/20).
@@ -12,7 +14,8 @@ App web instalable (PWA) para hacer pomodoros personalizados y mejorar la concen
 - **Tarea actual**: queda guardada junto a cada sesión.
 - **Anotador de distracciones**: anotás lo que se te cruza y seguís.
 - **Progreso**: pomodoros y minutos del día, racha de días seguidos, gráfico de 7 días e historial.
-- **Avisos**: sonido, vibración y notificaciones al terminar cada bloque.
+- **Sonidos de fondo**: lluvia, olas, chimenea, ruido marrón, ruido blanco y tic-tac, con volumen. Suenan mientras corre el pomodoro (opcional también en descansos). Se generan con Web Audio, sin archivos, así que funcionan sin conexión.
+- **Avisos**: cuatro sonidos a elegir (campanitas, gong, digital, suave), vibración y notificaciones al terminar cada bloque.
 - **Encadenado automático** opcional entre foco y descanso.
 - Atajo de teclado: barra espaciadora para empezar o pausar.
 
@@ -50,7 +53,6 @@ Después abrí `http://localhost:8000` (o la dirección que indique `serve`).
 
 ## Ideas para seguir
 
-- Sonidos de fondo (ruido blanco, lluvia, café).
 - Estadísticas por tarea y comparación entre ritmos para ver cuál te rinde más.
 - Exportar e importar el historial.
 - Empaquetarla para Play Store con [Capacitor](https://capacitorjs.com/) o [PWABuilder](https://www.pwabuilder.com/).

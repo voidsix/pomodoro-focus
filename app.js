@@ -12,7 +12,10 @@
     { id: 'flow', name: 'Flow', focus: 90, short: 20, long: 30, every: 2 }
   ];
   const LABELS = { focus: 'Tiempo de foco', short: 'Descanso corto', long: 'Descanso largo' };
-  const DEFAULTS = { focus: 25, short: 5, long: 15, every: 4, autoStart: false, sound: true, notify: false };
+  const DEFAULTS = {
+    focus: 25, short: 5, long: 15, every: 4, autoStart: false, sound: true, notify: false,
+    ambient: 'none', ambientVol: 50, ambientBreaks: false, alarm: 'bell'
+  };
 
   const settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
   let log = store.get('log', []);       // [{ts, min, task}]
@@ -86,18 +89,18 @@
     endAt = Date.now() + remaining;
     clearInterval(timer);
     timer = setInterval(tick, 250);
-    render();
+    render(); updateAmbient();
   }
   function pause() {
     clearInterval(timer); timer = null;
     if (endAt) remaining = Math.max(0, endAt - Date.now());
-    persist(); render();
+    persist(); render(); updateAmbient();
   }
   function setMode(m, keepCycle = true) {
     clearInterval(timer); timer = null;
     mode = m; remaining = total();
     if (!keepCycle) cycle = 0;
-    persist(); render();
+    persist(); render(); updateAmbient();
   }
 
   function finish() {
@@ -117,31 +120,210 @@
     persist(); render(); renderStats();
     document.body.classList.add('done');
     setTimeout(() => document.body.classList.remove('done'), 2000);
-    if (settings.autoStart) start();
+    if (settings.autoStart) start(); else updateAmbient();
   }
 
-  // ---------- Sonido y avisos ----------
+  // ---------- Sonido: todo se genera con Web Audio (sin archivos, funciona offline) ----------
   let ctx = null;
   function unlockAudio() {
-    if (!settings.sound) return;
-    try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); } catch {}
-  }
-  function chime() {
-    if (!settings.sound || !ctx) return;
     try {
-      [0, 0.28, 0.56].forEach((d, i) => {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.type = 'sine'; o.frequency.value = [660, 880, 990][i];
-        g.gain.setValueAtTime(0.0001, ctx.currentTime + d);
-        g.gain.exponentialRampToValueAtTime(0.35, ctx.currentTime + d + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + d + 0.5);
-        o.connect(g).connect(ctx.destination);
-        o.start(ctx.currentTime + d); o.stop(ctx.currentTime + d + 0.55);
-      });
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+    } catch { ctx = null; }
+    return ctx;
+  }
+
+  // Avisos al terminar
+  const ALARMS = [
+    { id: 'bell', name: 'Campanitas', desc: 'tres notas' },
+    { id: 'gong', name: 'Gong', desc: 'grave y largo' },
+    { id: 'digital', name: 'Digital', desc: 'bip bip' },
+    { id: 'soft', name: 'Suave', desc: 'acorde tranquilo' }
+  ];
+  function playAlarm(id) {
+    const c = unlockAudio(); if (!c) return;
+    try {
+      const t = c.currentTime + 0.05;
+      const tone = (f, at, dur, vol, type = 'sine') => {
+        const o = c.createOscillator(), g = c.createGain();
+        o.type = type; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(vol, at + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+        o.connect(g).connect(c.destination);
+        o.start(at); o.stop(at + dur + 0.05);
+      };
+      if (id === 'gong') [[110, 1], [221, 0.5], [332, 0.3], [445, 0.2], [590, 0.12]].forEach(([f, v]) => tone(f, t, 4, 0.4 * v));
+      else if (id === 'digital') { for (let r = 0; r < 3; r++) for (let k = 0; k < 2; k++) tone(1046, t + r * 0.6 + k * 0.14, 0.09, 0.12, 'square'); }
+      else if (id === 'soft') { tone(523.25, t, 1.6, 0.25); tone(783.99, t + 0.25, 1.8, 0.18); tone(1046.5, t + 0.5, 2.2, 0.12); }
+      else [660, 880, 990].forEach((f, i) => tone(f, t + i * 0.28, 0.5, 0.35));
     } catch {}
   }
+
+  // Sonidos de fondo: cada uno se "graba" una vez en un bucle de 16 s y se repite sin cortes
+  const AMBIENTS = [
+    { id: 'none', name: 'Silencio', desc: 'sin fondo' },
+    { id: 'rain', name: 'Lluvia', desc: 'suave y constante' },
+    { id: 'waves', name: 'Olas', desc: 'ritmo lento' },
+    { id: 'fire', name: 'Chimenea', desc: 'crepitar cálido' },
+    { id: 'brown', name: 'Ruido marrón', desc: 'grave, tapa voces' },
+    { id: 'white', name: 'Ruido blanco', desc: 'tapa todo' },
+    { id: 'clock', name: 'Tic-tac', desc: 'reloj de estudio' }
+  ];
+  const LOOP = 16, FADE = 1;
+  function noise(c, kind, secs) {
+    const n = Math.floor(c.sampleRate * secs), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
+    let last = 0, b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < n; i++) {
+      const w = Math.random() * 2 - 1;
+      if (kind === 'white') d[i] = w * 0.5;
+      else if (kind === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+      else { // rosa
+        b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.969 * b2 + w * 0.153852;
+        b3 = 0.8665 * b3 + w * 0.3104856; b4 = 0.55 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.016898;
+        d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926;
+      }
+    }
+    return b;
+  }
+  function layer(c, buf, vol, filters = []) {
+    const s = c.createBufferSource(); s.buffer = buf;
+    let node = s;
+    for (const [type, f, q] of filters) { const bq = c.createBiquadFilter(); bq.type = type; bq.frequency.value = f; if (q) bq.Q.value = q; node.connect(bq); node = bq; }
+    const g = c.createGain(); g.gain.value = vol; node.connect(g).connect(c.destination); s.start(0);
+    return g;
+  }
+  function blip(c, at, f, dur, vol, type = 'sine') {
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + 0.002);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    o.connect(g).connect(c.destination); o.start(at); o.stop(at + dur + 0.01);
+  }
+  function burst(c, white, at, dur, vol, hp) {
+    const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = white; f.type = 'highpass'; f.frequency.value = hp;
+    g.gain.setValueAtTime(vol, at); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    s.connect(f).connect(g).connect(c.destination); s.start(at, Math.random() * 2, dur + 0.01);
+  }
+  const RECIPES = {
+    white: (c, T) => layer(c, noise(c, 'white', T), 0.6, [['lowpass', 9000]]),
+    brown: (c, T) => layer(c, noise(c, 'brown', T), 1),
+    rain: (c, T) => {
+      layer(c, noise(c, 'pink', T), 0.7, [['highpass', 400], ['lowpass', 7000]]);
+      layer(c, noise(c, 'brown', T), 0.5, [['lowpass', 500]]);
+      for (let t = 0; t < T; t += 0.02 + Math.random() * 0.1) blip(c, t, 1800 + Math.random() * 2700, 0.03, 0.015 + Math.random() * 0.04);
+    },
+    waves: (c, T) => {
+      const env = (g, lo, hi) => {
+        g.gain.setValueAtTime(lo, 0);
+        for (let k = 0; k * 8 < T; k++) { g.gain.linearRampToValueAtTime(hi, k * 8 + 3.5); g.gain.linearRampToValueAtTime(lo, k * 8 + 8); }
+      };
+      env(layer(c, noise(c, 'brown', T), 1, [['lowpass', 700]]), 0.15, 1);
+      env(layer(c, noise(c, 'pink', T), 1, [['highpass', 1500]]), 0.02, 0.25);
+    },
+    fire: (c, T) => {
+      layer(c, noise(c, 'brown', T), 0.6, [['lowpass', 300]]);
+      layer(c, noise(c, 'pink', T), 0.12, [['bandpass', 800, 0.7]]);
+      const white = noise(c, 'white', 3);
+      for (let t = 0; t < T; t += 0.03 + Math.random() * 0.25) burst(c, white, t, 0.004 + Math.random() * 0.012, 0.15 + Math.random() * 0.5, 1500);
+    },
+    clock: (c, T) => {
+      const white = noise(c, 'white', 3);
+      for (let k = 0; k < T; k++) {
+        blip(c, k, k % 2 ? 1900 : 2400, 0.02, 0.3);
+        burst(c, white, k, 0.012, 0.25, 3000);
+      }
+    }
+  };
+  const ambCache = {};
+  async function ambBuffer(id) {
+    if (ambCache[id]) return ambCache[id];
+    const sr = ctx.sampleRate, T = LOOP + FADE;
+    const Off = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const oc = new Off(1, Math.ceil(sr * T), sr);
+    RECIPES[id](oc, T);
+    const r = await oc.startRendering();
+    const src = r.getChannelData(0), n = Math.floor(sr * LOOP), f = Math.floor(sr * FADE);
+    const out = ctx.createBuffer(1, n, sr), d = out.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = src[i];
+    // Fundido entre el final y el principio para que el bucle no se note
+    for (let i = 0; i < f; i++) { const a = i / f; d[i] = src[i] * a + src[n + i] * (1 - a); }
+    // Volumen parejo entre sonidos
+    let sum = 0, peak = 0;
+    for (let i = 0; i < n; i++) { sum += d[i] * d[i]; peak = Math.max(peak, Math.abs(d[i])); }
+    const k = Math.min(0.15 / Math.sqrt(sum / n || 1), 0.95 / (peak || 1));
+    for (let i = 0; i < n; i++) d[i] *= k;
+    return (ambCache[id] = out);
+  }
+
+  let amb = { id: null, src: null, gain: null }, ambToken = 0, previewTimer = null;
+  const ambLevel = () => Math.pow(settings.ambientVol / 100, 2);
+  function stopAmbient(fade = 0.8) {
+    if (!amb.src) return;
+    const { src, gain } = amb;
+    try { gain.gain.cancelScheduledValues(ctx.currentTime); gain.gain.setTargetAtTime(0, ctx.currentTime, fade / 4); src.stop(ctx.currentTime + fade); } catch {}
+    amb = { id: null, src: null, gain: null };
+    renderSounds();
+  }
+  async function playAmbient(id) {
+    if (amb.id === id) return;
+    const token = ++ambToken;
+    const c = unlockAudio(); if (!c) return;
+    let buf;
+    try { buf = await ambBuffer(id); } catch { return; }
+    if (token !== ambToken) return; // otro cambio llegó mientras se generaba
+    stopAmbient();
+    const src = c.createBufferSource(), gain = c.createGain();
+    src.buffer = buf; src.loop = true;
+    gain.gain.setValueAtTime(0, c.currentTime);
+    gain.gain.setTargetAtTime(ambLevel(), c.currentTime, 0.4);
+    src.connect(gain).connect(c.destination); src.start();
+    amb = { id, src, gain };
+    renderSounds();
+  }
+  function wantsAmbient() {
+    return !!timer && settings.ambient !== 'none' && (mode === 'focus' || settings.ambientBreaks);
+  }
+  function updateAmbient() {
+    if (wantsAmbient()) { clearTimeout(previewTimer); previewTimer = null; playAmbient(settings.ambient); }
+    else if (!previewTimer) { ambToken++; stopAmbient(); }
+  }
+  function previewAmbient(id) {
+    clearTimeout(previewTimer); previewTimer = null;
+    if (wantsAmbient()) { playAmbient(id); return; }
+    if (id === 'none') { ambToken++; stopAmbient(); return; }
+    playAmbient(id);
+    previewTimer = setTimeout(() => { previewTimer = null; if (!wantsAmbient()) { ambToken++; stopAmbient(1.5); } }, 6000);
+  }
+
+  function renderSounds() {
+    const chip = (x, on, playing) => `<button class="chip${playing ? ' playing' : ''}" data-id="${x.id}" aria-pressed="${on}"><b>${x.name}</b><span>${x.desc}</span></button>`;
+    $('#ambients').innerHTML = AMBIENTS.map((a) => chip(a, a.id === settings.ambient, a.id === amb.id)).join('');
+    $('#alarms').innerHTML = ALARMS.map((a) => chip(a, a.id === settings.alarm, false)).join('');
+    $('#amb-vol').value = settings.ambientVol;
+    $('#amb-breaks').checked = settings.ambientBreaks;
+  }
+  $('#ambients').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]'); if (!b) return;
+    settings.ambient = b.dataset.id; store.set('settings', settings);
+    renderSounds(); previewAmbient(settings.ambient);
+  });
+  $('#alarms').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]'); if (!b) return;
+    settings.alarm = b.dataset.id; store.set('settings', settings);
+    renderSounds(); playAlarm(settings.alarm);
+  });
+  $('#amb-vol').addEventListener('input', (e) => {
+    settings.ambientVol = Number(e.target.value); store.set('settings', settings);
+    if (amb.gain) amb.gain.gain.setTargetAtTime(ambLevel(), ctx.currentTime, 0.05);
+  });
+  $('#amb-breaks').addEventListener('change', (e) => {
+    settings.ambientBreaks = e.target.checked; store.set('settings', settings); updateAmbient();
+  });
+
   function alertDone(msg) {
-    chime();
+    if (settings.sound) playAlarm(settings.alarm);
     try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch {}
     try {
       if (settings.notify && 'Notification' in window && Notification.permission === 'granted') {
@@ -388,5 +570,5 @@
     }
   } catch {}
 
-  fillForm(); renderPresets(); renderNotes(); renderSubjects(); renderStats(); render();
+  fillForm(); renderPresets(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
 }

@@ -86,6 +86,18 @@
     </details>
   </section>
 
+  <section class="panel band" id="sounds-sec">
+    <h2>Sonidos</h2>
+    <p class="hint">Un fondo constante tapa los ruidos de alrededor y ayuda a entrar en foco. Suena mientras corre el pomodoro; tocá uno para escucharlo.</p>
+    <div id="ambients" class="chips sound-chips" role="group" aria-label="Sonido de fondo"></div>
+    <div class="sound-opts">
+      <label class="vol">Volumen <input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Volumen del fondo"></label>
+      <label class="check"><input id="amb-breaks" type="checkbox"> También en los descansos</label>
+    </div>
+    <h3>Aviso al terminar</h3>
+    <div id="alarms" class="chips sound-chips" role="group" aria-label="Sonido de aviso"></div>
+  </section>
+
   <section class="panel band">
     <h2>Distracciones</h2>
     <p class="hint">¿Se te cruzó algo? Anotalo y seguí. Lo revisás en el descanso.</p>
