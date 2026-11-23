@@ -57,6 +57,8 @@
       </div>
     </div>
 
+    <p id="zen-caption" class="zen-caption"></p>
+
     <div class="subject-bar">
       <select id="subject" class="subject" aria-label="Materia actual"></select>
       <p id="countdown" class="countdown" hidden></p>
@@ -71,6 +73,10 @@
       <button id="toggle" class="main">Empezar</button>
       <button id="skip" class="round" aria-label="Saltar">
         <svg viewBox="0 0 24 24"><path d="M6 5l9 7-9 7zM18 5v14" /></svg>
+      </button>
+      <button id="zen" class="round" aria-label="Modo zen (Z)" aria-pressed="false" title="Modo zen (Z)">
+        <svg class="i-in" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+        <svg class="i-out" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /></svg>
       </button>
     </div>
 
@@ -122,6 +128,12 @@
     <div class="sound-opts">
       <label class="vol">Volumen <input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Volumen del fondo"></label>
       <label class="check"><input id="amb-breaks" type="checkbox"> También en los descansos</label>
+    </div>
+    <h3>Frecuencias de concentración</h3>
+    <p class="hint">Suenan junto al fondo. Un sonido que late a ritmo beta (14–16 Hz) se asocia con la atención sostenida; alfa (10 Hz), con la calma. La evidencia es prometedora pero todavía limitada: probalo unos días y fijate si te sirve.</p>
+    <div id="freqs" class="chips sound-chips" role="group" aria-label="Frecuencias de concentración"></div>
+    <div class="sound-opts">
+      <label class="vol">Volumen <input id="freq-vol" type="range" min="0" max="100" step="1" aria-label="Volumen de las frecuencias"></label>
     </div>
     <h3>Aviso al terminar</h3>
     <div id="alarms" class="chips sound-chips" role="group" aria-label="Sonido de aviso"></div>

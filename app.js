@@ -14,7 +14,7 @@
   const LABELS = { focus: 'Tiempo de foco', short: 'Descanso corto', long: 'Descanso largo' };
   const DEFAULTS = {
     focus: 25, short: 5, long: 15, every: 4, autoStart: false, sound: true, notify: false,
-    ambient: 'none', ambientVol: 50, ambientBreaks: false, alarm: 'bell', skin: 'mar'
+    ambient: 'none', ambientVol: 50, ambientBreaks: false, freq: 'none', freqVol: 40, alarm: 'bell', skin: 'mar'
   };
   const SKINS = [
     { id: 'mar', name: 'Mar', desc: 'verde agua', bg: '#04141a', a: ['#1fcab5', '#2a9fd8'] },
@@ -76,6 +76,8 @@
     document.title = timer ? `${t} · ${mode === 'focus' ? 'Foco' : 'Descanso'}` : 'Foco Pomodoro';
     document.body.dataset.mode = mode;
     document.body.classList.toggle('running', !!timer);
+    const zs = subById(currentSub);
+    $('#zen-caption').textContent = [zs ? zs.name : '', el.task.value.trim()].filter(Boolean).join(' · ');
     document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modeBtn === mode));
     el.dots.innerHTML = Array.from({ length: settings.every }, (_, i) => `<i class="${i < cycle ? 'on' : ''}"></i>`).join('');
     const meta = document.querySelector('meta[name=theme-color]');
@@ -168,17 +170,19 @@
     } catch {}
   }
 
-  // Sonidos de fondo: cada uno se "graba" una vez en un bucle de 16 s y se repite sin cortes
+  // Sonidos de fondo: cada uno se "graba" en dos bucles de distinto largo que suenan juntos;
+  // como no coinciden, la combinación tarda muchos minutos en repetirse.
   const AMBIENTS = [
     { id: 'none', name: 'Silencio', desc: 'sin fondo' },
     { id: 'rain', name: 'Lluvia', desc: 'suave y constante' },
-    { id: 'waves', name: 'Olas', desc: 'ritmo lento' },
+    { id: 'waves', name: 'Olas', desc: 'mar que no para' },
     { id: 'fire', name: 'Chimenea', desc: 'crepitar cálido' },
     { id: 'brown', name: 'Ruido marrón', desc: 'grave, tapa voces' },
     { id: 'white', name: 'Ruido blanco', desc: 'tapa todo' },
     { id: 'clock', name: 'Tic-tac', desc: 'reloj de estudio' }
   ];
-  const LOOP = 16, FADE = 1;
+  const FADE = 1.5;
+  const LOOPS = { clock: [16], waves: [29, 41] }; // el resto usa [23, 31]
   function noise(c, kind, secs) {
     const n = Math.floor(c.sampleRate * secs), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
     let last = 0, b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -223,12 +227,30 @@
       for (let t = 0; t < T; t += 0.02 + Math.random() * 0.1) blip(c, t, 1800 + Math.random() * 2700, 0.03, 0.015 + Math.random() * 0.04);
     },
     waves: (c, T) => {
-      const env = (g, lo, hi) => {
-        g.gain.setValueAtTime(lo, 0);
-        for (let k = 0; k * 8 < T; k++) { g.gain.linearRampToValueAtTime(hi, k * 8 + 3.5); g.gain.linearRampToValueAtTime(lo, k * 8 + 8); }
-      };
-      env(layer(c, noise(c, 'brown', T), 1, [['lowpass', 700]]), 0.15, 1);
-      env(layer(c, noise(c, 'pink', T), 1, [['highpass', 1500]]), 0.02, 0.25);
+      // Lecho grave constante: el mar nunca se queda en silencio
+      layer(c, noise(c, 'brown', T), 0.6, [['lowpass', 420]]);
+      // Agua: olas de duración y fuerza irregulares que suben, rompen y bajan hasta un piso (nunca a cero)
+      const wash = c.createBufferSource(); wash.buffer = noise(c, 'pink', T);
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.3;
+      const g = c.createGain(); wash.connect(lp).connect(g).connect(c.destination); wash.start(0);
+      // Espuma: siseo agudo cuando la ola rompe
+      const foam = c.createBufferSource(); foam.buffer = noise(c, 'white', T);
+      const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2200;
+      const fg = c.createGain(); foam.connect(hp).connect(fg).connect(c.destination); foam.start(0);
+      const floor = 0.34;
+      g.gain.setValueAtTime(floor, 0); lp.frequency.setValueAtTime(600, 0); fg.gain.setValueAtTime(0.004, 0);
+      let t = Math.random() * 1.5;
+      while (t < T) {
+        const period = 5 + Math.random() * 6, peak = 0.75 + Math.random() * 0.6;
+        const rise = period * (0.35 + Math.random() * 0.15), crest = t + rise, end = t + period;
+        g.gain.setTargetAtTime(peak, t, rise / 3);
+        lp.frequency.setTargetAtTime(1300 + Math.random() * 1500, t, rise / 3);
+        fg.gain.setTargetAtTime(0.04 + Math.random() * 0.08, Math.max(t, crest - 0.4), 0.25);
+        g.gain.setTargetAtTime(floor + Math.random() * 0.18, crest, (end - crest) / 3);
+        lp.frequency.setTargetAtTime(480 + Math.random() * 240, crest, (end - crest) / 3);
+        fg.gain.setTargetAtTime(0.004, crest + 0.4, (end - crest) / 4);
+        t = end - Math.random() * 1.4; // a veces la ola siguiente llega antes de que termine la anterior
+      }
     },
     fire: (c, T) => {
       layer(c, noise(c, 'brown', T), 0.6, [['lowpass', 300]]);
@@ -245,77 +267,147 @@
     }
   };
   const ambCache = {};
-  async function ambBuffer(id) {
-    if (ambCache[id]) return ambCache[id];
-    const sr = ctx.sampleRate, T = LOOP + FADE;
+  async function renderLoop(id, loop) {
+    const sr = ctx.sampleRate, T = loop + FADE;
     const Off = window.OfflineAudioContext || window.webkitOfflineAudioContext;
     const oc = new Off(1, Math.ceil(sr * T), sr);
     RECIPES[id](oc, T);
     const r = await oc.startRendering();
-    const src = r.getChannelData(0), n = Math.floor(sr * LOOP), f = Math.floor(sr * FADE);
+    const src = r.getChannelData(0), n = Math.floor(sr * loop), f = Math.floor(sr * FADE);
     const out = ctx.createBuffer(1, n, sr), d = out.getChannelData(0);
     for (let i = 0; i < n; i++) d[i] = src[i];
-    // Fundido entre el final y el principio para que el bucle no se note
-    for (let i = 0; i < f; i++) { const a = i / f; d[i] = src[i] * a + src[n + i] * (1 - a); }
+    // Fundido de potencia constante entre el final y el principio: el bucle no "salta" ni baja de volumen
+    for (let i = 0; i < f; i++) { const a = (i / f) * Math.PI / 2; d[i] = src[i] * Math.sin(a) + src[n + i] * Math.cos(a); }
     // Volumen parejo entre sonidos
     let sum = 0, peak = 0;
     for (let i = 0; i < n; i++) { sum += d[i] * d[i]; peak = Math.max(peak, Math.abs(d[i])); }
     const k = Math.min(0.15 / Math.sqrt(sum / n || 1), 0.95 / (peak || 1));
     for (let i = 0; i < n; i++) d[i] *= k;
-    return (ambCache[id] = out);
+    return out;
+  }
+  async function ambBuffers(id) {
+    if (!ambCache[id]) ambCache[id] = Promise.all((LOOPS[id] || [23, 31]).map((l) => renderLoop(id, l)));
+    try { return await ambCache[id]; } catch (e) { delete ambCache[id]; throw e; }
   }
 
-  let amb = { id: null, src: null, gain: null }, ambToken = 0, previewTimer = null;
+  // Frecuencias de concentración (en vivo, sin bucles): un acorde suave modulado en amplitud
+  // o un binaural (dos tonos apenas distintos en cada oído, requiere auriculares).
+  const FREQS = [
+    { id: 'none', name: 'Sin frecuencias', desc: 'solo el fondo' },
+    { id: 'pulse16', name: 'Pulso 16 Hz', desc: 'beta · sin auriculares' },
+    { id: 'bin14', name: 'Binaural 14 Hz', desc: 'beta · con auriculares' },
+    { id: 'alpha10', name: 'Alfa 10 Hz', desc: 'calma · descansos' }
+  ];
+
+  let amb = { id: null, srcs: [], gain: null }, ambToken = 0, previewTimer = null;
+  let freq = { id: null, nodes: [], out: null };
   const ambLevel = () => Math.pow(settings.ambientVol / 100, 2);
+  const freqLevel = () => Math.pow(settings.freqVol / 100, 2) * 0.5;
   function stopAmbient(fade = 0.8) {
-    if (!amb.src) return;
-    const { src, gain } = amb;
-    try { gain.gain.cancelScheduledValues(ctx.currentTime); gain.gain.setTargetAtTime(0, ctx.currentTime, fade / 4); src.stop(ctx.currentTime + fade); } catch {}
-    amb = { id: null, src: null, gain: null };
+    if (!amb.gain) return;
+    const { srcs, gain } = amb;
+    try { gain.gain.cancelScheduledValues(ctx.currentTime); gain.gain.setTargetAtTime(0, ctx.currentTime, fade / 4); srcs.forEach((s) => s.stop(ctx.currentTime + fade)); } catch {}
+    amb = { id: null, srcs: [], gain: null };
     renderSounds();
   }
   async function playAmbient(id) {
     if (amb.id === id) return;
     const token = ++ambToken;
     const c = unlockAudio(); if (!c) return;
-    let buf;
-    try { buf = await ambBuffer(id); } catch { return; }
+    let bufs;
+    try { bufs = await ambBuffers(id); } catch { return; }
     if (token !== ambToken) return; // otro cambio llegó mientras se generaba
     stopAmbient();
-    const src = c.createBufferSource(), gain = c.createGain();
-    src.buffer = buf; src.loop = true;
+    const gain = c.createGain();
     gain.gain.setValueAtTime(0, c.currentTime);
     gain.gain.setTargetAtTime(ambLevel(), c.currentTime, 0.4);
-    src.connect(gain).connect(c.destination); src.start();
-    amb = { id, src, gain };
+    gain.connect(c.destination);
+    const each = 1 / Math.sqrt(bufs.length);
+    const srcs = bufs.map((buf) => {
+      const s = c.createBufferSource(), g = c.createGain();
+      s.buffer = buf; s.loop = true; g.gain.value = each;
+      s.connect(g).connect(gain); s.start(c.currentTime, Math.random() * buf.duration);
+      return s;
+    });
+    amb = { id, srcs, gain };
     renderSounds();
   }
-  function wantsAmbient() {
-    return !!timer && settings.ambient !== 'none' && (mode === 'focus' || settings.ambientBreaks);
+
+  function stopFreq(fade = 0.8) {
+    if (!freq.out) return;
+    const { nodes, out } = freq;
+    try { out.gain.cancelScheduledValues(ctx.currentTime); out.gain.setTargetAtTime(0, ctx.currentTime, fade / 4); nodes.forEach((n) => n.stop(ctx.currentTime + fade)); } catch {}
+    freq = { id: null, nodes: [], out: null };
+    renderSounds();
   }
+  function playFreq(id) {
+    if (freq.id === id) return;
+    stopFreq();
+    const c = unlockAudio(); if (!c) return;
+    const out = c.createGain(), nodes = [];
+    out.gain.setValueAtTime(0, c.currentTime);
+    out.gain.setTargetAtTime(freqLevel(), c.currentTime, 0.6);
+    out.connect(c.destination);
+    const osc = (f, type = 'sine', detune = 0) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = detune; o.start(); nodes.push(o); return o; };
+    if (id === 'bin14') {
+      // 200 Hz en el oído izquierdo y 214 Hz en el derecho: el cerebro percibe un latido de 14 Hz
+      const merger = c.createChannelMerger(2); merger.connect(out);
+      [[200, 0], [214, 1]].forEach(([f, ch]) => { const g = c.createGain(); g.gain.value = 0.5; osc(f).connect(g).connect(merger, 0, ch); });
+    } else {
+      // Acorde cálido (La mayor abierto), apenas desafinado para que "respire", con filtro que se mueve lento
+      const rate = id === 'alpha10' ? 10 : 16;
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850; lp.Q.value = 0.4;
+      const am = c.createGain(); am.gain.value = 0.62;
+      lp.connect(am).connect(out);
+      [110, 164.81, 220, 277.18, 329.63].forEach((f, i) => {
+        for (const det of [-5, 5]) { const g = c.createGain(); g.gain.value = 0.11 / (1 + i * 0.45); osc(f, i % 2 ? 'triangle' : 'sine', det).connect(g).connect(lp); }
+      });
+      // Modulación de amplitud: el volumen late entre 24 % y 100 %, nunca hasta el silencio
+      const depth = c.createGain(); depth.gain.value = 0.38; osc(rate).connect(depth).connect(am.gain);
+      const sweep = c.createGain(); sweep.gain.value = 260; osc(0.035).connect(sweep).connect(lp.frequency);
+    }
+    freq = { id, nodes, out };
+    renderSounds();
+  }
+
+  function wantsSound() { return !!timer && (mode === 'focus' || settings.ambientBreaks); }
   function updateAmbient() {
-    if (wantsAmbient()) { clearTimeout(previewTimer); previewTimer = null; playAmbient(settings.ambient); }
-    else if (!previewTimer) { ambToken++; stopAmbient(); }
+    if (wantsSound()) {
+      clearTimeout(previewTimer); previewTimer = null;
+      if (settings.ambient !== 'none') playAmbient(settings.ambient); else { ambToken++; stopAmbient(); }
+      if (settings.freq !== 'none') playFreq(settings.freq); else stopFreq();
+    } else if (!previewTimer) { ambToken++; stopAmbient(); stopFreq(); }
   }
-  function previewAmbient(id) {
+  function preview(kind, id) {
+    if (wantsSound()) { updateAmbient(); return; }
     clearTimeout(previewTimer); previewTimer = null;
-    if (wantsAmbient()) { playAmbient(id); return; }
-    if (id === 'none') { ambToken++; stopAmbient(); return; }
-    playAmbient(id);
-    previewTimer = setTimeout(() => { previewTimer = null; if (!wantsAmbient()) { ambToken++; stopAmbient(1.5); } }, 6000);
+    if (kind === 'amb') { if (id === 'none') { ambToken++; stopAmbient(); } else playAmbient(id); }
+    else if (id === 'none') stopFreq(); else playFreq(id);
+    previewTimer = setTimeout(() => { previewTimer = null; if (!wantsSound()) { ambToken++; stopAmbient(1.5); stopFreq(1.5); } }, 6000);
   }
 
   function renderSounds() {
     const chip = (x, on, playing) => `<button class="chip${playing ? ' playing' : ''}" data-id="${x.id}" aria-pressed="${on}"><b>${x.name}</b><span>${x.desc}</span></button>`;
     $('#ambients').innerHTML = AMBIENTS.map((a) => chip(a, a.id === settings.ambient, a.id === amb.id)).join('');
+    $('#freqs').innerHTML = FREQS.map((a) => chip(a, a.id === settings.freq, a.id === freq.id)).join('');
     $('#alarms').innerHTML = ALARMS.map((a) => chip(a, a.id === settings.alarm, false)).join('');
     $('#amb-vol').value = settings.ambientVol;
+    $('#freq-vol').value = settings.freqVol;
     $('#amb-breaks').checked = settings.ambientBreaks;
   }
   $('#ambients').addEventListener('click', (e) => {
     const b = e.target.closest('[data-id]'); if (!b) return;
     settings.ambient = b.dataset.id; store.set('settings', settings);
-    renderSounds(); previewAmbient(settings.ambient);
+    renderSounds(); preview('amb', settings.ambient);
+  });
+  $('#freqs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]'); if (!b) return;
+    settings.freq = b.dataset.id; store.set('settings', settings);
+    renderSounds(); preview('freq', settings.freq);
+  });
+  $('#freq-vol').addEventListener('input', (e) => {
+    settings.freqVol = Number(e.target.value); store.set('settings', settings);
+    if (freq.out) freq.out.gain.setTargetAtTime(freqLevel(), ctx.currentTime, 0.05);
   });
   $('#alarms').addEventListener('click', (e) => {
     const b = e.target.closest('[data-id]'); if (!b) return;
@@ -644,6 +736,52 @@
     setSubject(s.id);
     if (mode !== 'focus') setMode('focus');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ---------- Modo zen ----------
+  // Pantalla completa con solo el reloj; los controles se esconden tras 3 s sin actividad
+  // y la pantalla no se apaga (Wake Lock) mientras dure.
+  const zenBtn = $('#zen');
+  let wakeLock = null, idleTimer = null;
+  const isZen = () => document.body.classList.contains('zen');
+  async function keepAwake(on) {
+    try {
+      if (on && 'wakeLock' in navigator && document.visibilityState === 'visible' && !wakeLock) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
+      } else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+    } catch { wakeLock = null; }
+  }
+  function poke() {
+    document.body.classList.remove('idle');
+    clearTimeout(idleTimer);
+    if (isZen()) idleTimer = setTimeout(() => document.body.classList.add('idle'), 3000);
+  }
+  function setZen(on) {
+    if (on === isZen()) return;
+    document.body.classList.toggle('zen', on);
+    zenBtn.setAttribute('aria-pressed', on);
+    zenBtn.setAttribute('aria-label', on ? 'Salir del modo zen (Esc)' : 'Modo zen (Z)');
+    zenBtn.title = zenBtn.getAttribute('aria-label');
+    render();
+    if (on) {
+      window.scrollTo(0, 0);
+      const root = document.documentElement;
+      if (root.requestFullscreen && !document.fullscreenElement) root.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+      keepAwake(true); poke();
+    } else {
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      keepAwake(false); clearTimeout(idleTimer); document.body.classList.remove('idle');
+    }
+  }
+  zenBtn.addEventListener('click', () => setZen(!isZen()));
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && isZen()) setZen(false); });
+  document.addEventListener('visibilitychange', () => { if (isZen() && document.visibilityState === 'visible') keepAwake(true); });
+  ['pointermove', 'pointerdown', 'keydown', 'touchstart'].forEach((ev) => document.addEventListener(ev, () => { if (isZen()) poke(); }, { passive: true }));
+  document.addEventListener('keydown', (e) => {
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+    if (e.key === 'Escape' && isZen()) setZen(false);
+    else if ((e.key === 'z' || e.key === 'Z') && !e.ctrlKey && !e.metaKey && !e.altKey) setZen(!isZen());
   });
 
   // ---------- Distracciones ----------

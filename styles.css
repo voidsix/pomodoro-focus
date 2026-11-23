@@ -410,3 +410,34 @@ body.done .dial { animation: pulse 1.2s var(--ease) 2; }
 }
 .plan-settings input:focus { outline: none; border-color: var(--ring); box-shadow: 0 0 0 4px var(--halo); }
 @media (max-width: 420px) { .plan-settings { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Modo zen ---------- */
+.zen-caption { display: none; margin: -6px 0 0; color: var(--muted); font-size: 16px; font-weight: 600; letter-spacing: .01em; text-align: center; max-width: min(90vw, 640px); }
+#zen .i-out { display: none; }
+body.zen #zen .i-in { display: none; }
+body.zen #zen .i-out { display: block; }
+
+body.zen .top, body.zen main > .panel, body.zen .foot,
+body.zen .subject-bar, body.zen .task { display: none; }
+body.zen .hero {
+  min-height: 100vh; min-height: 100dvh; align-content: center; gap: 28px;
+  padding-top: max(env(safe-area-inset-top), 24px); padding-bottom: 120px;
+}
+body.zen .zen-caption:not(:empty) { display: block; }
+body.zen .dial { width: min(72vmin, 560px); margin-top: 0; }
+body.zen .time { font-size: clamp(64px, 14vmin, 150px); }
+body.zen .label { font-size: clamp(12px, 1.6vmin, 15px); }
+body.zen .wave { top: calc(50% - 160px); height: 240px; }
+body.zen .sea { height: 120px; }
+
+/* Controles que se esconden solos */
+.controls { transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.zen-caption { transition: opacity .6s var(--ease); }
+body.zen { overflow: hidden; }
+body.zen.idle { cursor: none; }
+body.zen.idle .controls { opacity: 0; transform: translateY(8px); pointer-events: none; }
+
+@media (max-width: 420px) {
+  .main { min-width: 140px; }
+  .controls { gap: 10px; }
+}
