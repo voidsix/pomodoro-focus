@@ -29,7 +29,7 @@
   const LABELS = { focus: 'Tiempo de foco', short: 'Descanso corto', long: 'Descanso largo' };
   const DEFAULTS = {
     focus: 25, short: 5, long: 15, every: 4, autoStart: false, sound: true, notify: false,
-    ambient: 'none', ambientVol: 50, ambientBreaks: false, freq: 'none', freqVol: 60, alarm: 'bell', skin: 'mar'
+    ambient: 'none', ambientVol: 50, ambientBreaks: false, music: 'none', musicVol: 45, freq: 'none', freqVol: 60, alarm: 'bell', skin: 'mar'
   };
   const SKINS = [
     { id: 'mar', name: 'Mar', desc: 'verde agua', bg: '#04141a', a: ['#1fcab5', '#2a9fd8'] },
@@ -408,16 +408,16 @@
     { id: 'bin40', name: 'Binaural gamma 40 Hz', desc: 'foco intenso · auriculares', pro: true }
   ];
   const FREQ_SPEC = {
-    pulse16: { kind: 'pulse', rate: 16, depth: 0.38 },
-    gamma40: { kind: 'pulse', rate: 40, depth: 0.3, bright: true },
-    alpha10: { kind: 'pulse', rate: 10, depth: 0.38 },
-    bin14: { kind: 'bin', base: 200, beat: 14 },
-    binAlpha10: { kind: 'bin', base: 200, beat: 10 },
-    theta6: { kind: 'bin', base: 180, beat: 6 },
-    smr12: { kind: 'pulse', rate: 12, depth: 0.36 },
-    pulse18: { kind: 'pulse', rate: 18, depth: 0.34, bright: true },
-    bin40: { kind: 'bin', base: 220, beat: 40 },
-    mod16: { kind: 'mod', rate: 16, depth: 0.32 }
+    pulse16: { kind: 'pulse', rate: 16, depth: 0.14 },
+    gamma40: { kind: 'pulse', rate: 40, depth: 0.1 },
+    alpha10: { kind: 'pulse', rate: 10, depth: 0.16 },
+    bin14: { kind: 'bin', base: 150, beat: 14 },
+    binAlpha10: { kind: 'bin', base: 150, beat: 10 },
+    theta6: { kind: 'bin', base: 140, beat: 6 },
+    smr12: { kind: 'pulse', rate: 12, depth: 0.14 },
+    pulse18: { kind: 'pulse', rate: 18, depth: 0.12 },
+    bin40: { kind: 'bin', base: 160, beat: 40 },
+    mod16: { kind: 'mod', rate: 16, depth: 0.14 }
   };
 
   // ---------- Cadena de audio ----------
@@ -471,7 +471,15 @@
     const fEq = biq('highshelf', 5000, -4);
     fIn.connect(fEq).connect(limiter);
     const fSend = c.createGain(); fSend.gain.value = 0.35; fEq.connect(fSend).connect(reverb);
-    return (bus = { ambIn, ambMod, fIn });
+    // Música: cadena limpia (sin el EQ oscuro del fondo), compresor suave y un poco de reverb
+    const musIn = c.createGain();
+    const musMod = c.createGain(); musMod.gain.value = 1;
+    const musEq = biq('highshelf', 9000, -2);
+    const musComp = c.createDynamicsCompressor();
+    musComp.threshold.value = -24; musComp.knee.value = 10; musComp.ratio.value = 2; musComp.attack.value = 0.02; musComp.release.value = 0.3;
+    musIn.connect(musMod).connect(musEq).connect(musComp).connect(limiter);
+    const musSend = c.createGain(); musSend.gain.value = 0.12; musComp.connect(musSend).connect(reverb);
+    return (bus = { ambIn, ambMod, fIn, musIn, musMod });
   }
 
   let amb = { id: null, srcs: [], gain: null }, ambToken = 0, previewTimer = null;
@@ -520,7 +528,7 @@
       const t = ctx.currentTime;
       out.gain.cancelScheduledValues(t); out.gain.setTargetAtTime(0, t, fade / 4);
       nodes.forEach((n) => n.stop(t + fade));
-      if (id === 'mod16' && bus) { bus.ambMod.gain.cancelScheduledValues(t); bus.ambMod.gain.setTargetAtTime(1, t, fade / 4); }
+      if (id === 'mod16' && bus) for (const g of [bus.ambMod, bus.musMod]) { g.gain.cancelScheduledValues(t); g.gain.setTargetAtTime(1, t, fade / 4); }
     } catch {}
     freq = { id: null, nodes: [], out: null };
     renderSounds();
@@ -528,7 +536,7 @@
   function pad(c, dest, nodes, { bright = false, level = 1 } = {}) {
     // Acorde cálido (La mayor abierto con 9na), apenas desafinado para que "respire"
     const osc = (f, type, detune) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = detune; o.start(); nodes.push(o); return o; };
-    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = bright ? 1600 : 900; lp.Q.value = 0.4;
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = bright ? 1100 : 650; lp.Q.value = 0.4;
     lp.connect(dest);
     [55, 110, 164.81, 220, 277.18, 329.63, 493.88].forEach((f, i) => {
       for (const det of [-6, 6]) {
@@ -558,9 +566,9 @@
       const merger = c.createChannelMerger(2); merger.connect(out);
       [[spec.base, 0], [spec.base + spec.beat, 1]].forEach(([f, ch]) => {
         const o = c.createOscillator(); o.frequency.value = f; o.start(); nodes.push(o);
-        const g = c.createGain(); g.gain.value = 0.42; o.connect(g).connect(merger, 0, ch);
+        const g = c.createGain(); g.gain.value = 0.16; o.connect(g).connect(merger, 0, ch);
       });
-      const soft = c.createGain(); soft.gain.value = 0.35; soft.connect(out);
+      const soft = c.createGain(); soft.gain.value = 0.45; soft.connect(out);
       pad(c, soft, nodes);
     } else if (spec.kind === 'pulse') {
       // El volumen del acorde late entre ~25 % y 100 %, nunca hasta el silencio
@@ -571,7 +579,10 @@
       // Hace latir el sonido de fondo; si no hay fondo elegido, late un acorde suave
       b.ambMod.gain.setValueAtTime(1 - spec.depth, c.currentTime);
       lfo(spec.rate, spec.depth, b.ambMod.gain);
-      if (settings.ambient === 'none') {
+      // también la música, como brain.fm
+      b.musMod.gain.setValueAtTime(1 - spec.depth, c.currentTime);
+      lfo(spec.rate, spec.depth, b.musMod.gain);
+      if (settings.ambient === 'none' && settings.music === 'none') {
         const am = c.createGain(); am.gain.value = 1 - spec.depth; am.connect(out);
         lfo(spec.rate, spec.depth, am.gain);
         pad(c, am, nodes);
@@ -579,6 +590,71 @@
     }
     freq = { id, nodes, out };
     renderSounds();
+  }
+
+  // ---------- Música para estudiar (grabaciones con licencia libre; ver musica/CREDITOS.md) ----------
+  const T = (file, title, by) => ({ file: 'musica/' + file, title, by });
+  const MUSIC = [
+    { id: 'none', name: 'Sin música', desc: 'solo el fondo' },
+    { id: 'piano', name: 'Piano clásico', desc: 'Satie, Chopin, Debussy, Bach', tracks: [
+      T('satie-gymnopedie-1.mp3', 'Gymnopédie n.º 1', 'Erik Satie'),
+      T('satie-gymnopedie-3.mp3', 'Gymnopédie n.º 3', 'Erik Satie'),
+      T('chopin-nocturno-op9-2.mp3', 'Nocturno op. 9 n.º 2', 'Frédéric Chopin'),
+      T('chopin-nocturno-op15-1.mp3', 'Nocturno op. 15 n.º 1', 'Frédéric Chopin'),
+      T('chopin-nocturno-op72.mp3', 'Nocturno op. 72', 'Frédéric Chopin'),
+      T('debussy-clair-de-lune.mp3', 'Clair de lune', 'Claude Debussy'),
+      T('debussy-reverie.mp3', 'Rêverie', 'Claude Debussy'),
+      T('bach-goldberg-aria.mp3', 'Variaciones Goldberg: Aria', 'J. S. Bach')
+    ] },
+    { id: 'lofi', name: 'Lo-fi', desc: 'beats tranquilos', pro: true, tracks: [
+      T('macleod-study-and-relax.mp3', 'Study and Relax', 'Kevin MacLeod'),
+      T('sappheiros-perspective.mp3', 'Perspective', 'Sappheiros'),
+      T('currie-lofi.mp3', 'Lofi', 'Caden Currie')
+    ] },
+    { id: 'jazz', name: 'Jazz suave', desc: 'baladas instrumentales', pro: true, tracks: [
+      T('reid-smooth-jazz-ballad-1.mp3', 'Smooth Jazz Ballad n.º 1', 'Claude Reid'),
+      T('reid-smooth-jazz-ballad-2.mp3', 'Smooth Jazz Ballad n.º 2', 'Claude Reid')
+    ] }
+  ];
+  let mus = { id: null, el: null };
+  const musLevel = () => Math.pow(settings.musicVol / 100, 2) * 1.6;
+  function playMusic(id) {
+    if (mus.id === id) return;
+    stopMusic();
+    const c = unlockAudio(); if (!c) return;
+    const b = getBus(); if (!b) return;
+    const list = MUSIC.find((m) => m.id === id); if (!list || !list.tracks) return;
+    const el = new Audio(); el.preload = 'auto';
+    const src = c.createMediaElementSource(el);
+    const gain = c.createGain();
+    gain.gain.setValueAtTime(0, c.currentTime); gain.gain.setTargetAtTime(musLevel(), c.currentTime, 0.8);
+    src.connect(gain).connect(b.musIn);
+    const order = list.tracks.map((_, i) => i).sort(() => Math.random() - 0.5);
+    let n = 0, fails = 0;
+    const next = () => {
+      if (mus.el !== el) return;
+      el.src = list.tracks[order[n++ % order.length]].file;
+      el.play().then(() => { fails = 0; renderNowPlaying(); }).catch(() => {});
+    };
+    el.addEventListener('ended', next);
+    el.addEventListener('error', () => { if (++fails < order.length) setTimeout(next, 400); });
+    mus = { id, el, gain, src, list, current: () => list.tracks[order[(n - 1 + order.length) % order.length]] };
+    next();
+    renderSounds();
+  }
+  function stopMusic(fade = 0.8) {
+    if (!mus.el) return;
+    const { el, gain, src } = mus;
+    mus = { id: null, el: null };
+    try { gain.gain.cancelScheduledValues(ctx.currentTime); gain.gain.setTargetAtTime(0, ctx.currentTime, fade / 4); } catch {}
+    setTimeout(() => { el.pause(); el.removeAttribute('src'); el.load(); try { src.disconnect(); } catch {} }, fade * 1000 + 150);
+    renderSounds();
+  }
+  function renderNowPlaying() {
+    const box = $('#now-playing'); if (!box) return;
+    const t = mus.el && mus.current ? mus.current() : null;
+    box.innerHTML = t ? 'Sonando: <b>' + t.title + '</b> · ' + t.by : '';
+    box.hidden = !t;
   }
 
   // Los sonidos Pro solo suenan con Pro (sin Pro se pueden escuchar 6 s de muestra)
@@ -591,28 +667,34 @@
       const a = allowed(AMBIENTS, settings.ambient), f = allowed(FREQS, settings.freq);
       if (a !== 'none') playAmbient(a); else { ambToken++; stopAmbient(); }
       if (f !== 'none') playFreq(f); else stopFreq();
-    } else if (!previewTimer) { ambToken++; stopAmbient(); stopFreq(); }
+      const m = allowed(MUSIC, settings.music);
+      if (m !== 'none') playMusic(m); else stopMusic();
+    } else if (!previewTimer) { ambToken++; stopAmbient(); stopFreq(); stopMusic(); }
   }
   function preview(kind, id) {
     if (wantsSound()) { updateAmbient(); return; }
     clearTimeout(previewTimer); previewTimer = null;
     if (kind === 'amb') { if (id === 'none') { ambToken++; stopAmbient(); } else playAmbient(id); }
+    else if (kind === 'mus') { if (id === 'none') stopMusic(); else playMusic(id); }
     else if (id === 'none') stopFreq(); else playFreq(id);
-    previewTimer = setTimeout(() => { previewTimer = null; if (!wantsSound()) { ambToken++; stopAmbient(1.5); stopFreq(1.5); } }, 6000);
+    previewTimer = setTimeout(() => { previewTimer = null; if (!wantsSound()) { ambToken++; stopAmbient(1.5); stopFreq(1.5); stopMusic(1.5); } }, kind === 'mus' ? 12000 : 6000);
   }
 
   function lockedPreview(kind, id) {
     if (!wantsSound()) {
       clearTimeout(previewTimer); previewTimer = null;
-      if (kind === 'amb') playAmbient(id); else playFreq(id);
-      previewTimer = setTimeout(() => { previewTimer = null; if (!wantsSound()) { ambToken++; stopAmbient(1.5); stopFreq(1.5); } else updateAmbient(); }, 6000);
+      if (kind === 'amb') playAmbient(id); else if (kind === 'mus') playMusic(id); else playFreq(id);
+      previewTimer = setTimeout(() => { previewTimer = null; if (!wantsSound()) { ambToken++; stopAmbient(1.5); stopFreq(1.5); stopMusic(1.5); } else updateAmbient(); }, kind === 'mus' ? 12000 : 6000);
     }
-    paywall(kind === 'amb' ? 'sounds' : 'freqs');
+    paywall(kind === 'amb' ? 'sounds' : kind === 'mus' ? 'music' : 'freqs');
   }
   function renderSounds() {
     const chip = (x, on, playing) => `<button class="chip${playing ? ' playing' : ''}${x.pro ? ' pro' : ''}${x.pro && !pro ? ' locked' : ''}" data-id="${x.id}" aria-pressed="${on && !(x.pro && !pro)}"><b>${x.name}${x.pro ? '<i class="pro-tag">PRO</i>' : ''}</b><span>${x.desc}</span></button>`;
     $('#ambients').innerHTML = AMBIENTS.map((a) => chip(a, a.id === settings.ambient, a.id === amb.id)).join('');
     $('#freqs').innerHTML = FREQS.map((a) => chip(a, a.id === settings.freq, a.id === freq.id)).join('');
+    $('#music').innerHTML = MUSIC.map((a) => chip(a, a.id === settings.music, a.id === mus.id)).join('');
+    $('#mus-vol').value = settings.musicVol;
+    renderNowPlaying();
     $('#alarms').innerHTML = ALARMS.map((a) => chip(a, a.id === settings.alarm, false)).join('');
     $('#amb-vol').value = settings.ambientVol;
     $('#freq-vol').value = settings.freqVol;
@@ -629,6 +711,16 @@
     if (locked(FREQS, b.dataset.id)) { lockedPreview('freq', b.dataset.id); return; }
     settings.freq = b.dataset.id; store.set('settings', settings);
     renderSounds(); preview('freq', settings.freq);
+  });
+  $('#music').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]'); if (!b) return;
+    if (locked(MUSIC, b.dataset.id)) { lockedPreview('mus', b.dataset.id); return; }
+    settings.music = b.dataset.id; store.set('settings', settings);
+    renderSounds(); preview('mus', settings.music);
+  });
+  $('#mus-vol').addEventListener('input', (e) => {
+    settings.musicVol = Number(e.target.value); store.set('settings', settings);
+    if (mus.gain) mus.gain.gain.setTargetAtTime(musLevel(), ctx.currentTime, 0.05);
   });
   $('#freq-vol').addEventListener('input', (e) => {
     settings.freqVol = Number(e.target.value); store.set('settings', settings);

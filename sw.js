@@ -1,6 +1,6 @@
 // Service worker: la app siempre busca la versión nueva en internet y guarda una copia
 // para cuando no hay conexión. Así las actualizaciones llegan solas y sigue andando offline.
-const CACHE = 'foco-v29';
+const CACHE = 'foco-v30';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'catalog.js', 'fb.js', 'rooms.js', 'account.js', 'firebase-config.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', (e) => {
@@ -26,6 +26,8 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   // Páginas del login con Google: siempre directo de internet
   if (url.origin === location.origin && url.pathname.startsWith('/__/')) return;
+  // Música: se transmite por partes (no se guarda entera)
+  if (url.origin === location.origin && url.pathname.startsWith('/musica/')) return;
 
   // Archivos fijos de otros sitios (fuentes y librería de Firebase): primero la copia guardada.
   // Todo lo demás de afuera (base de datos, login, cobro) va directo, sin guardar.

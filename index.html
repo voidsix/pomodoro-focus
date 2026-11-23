@@ -135,8 +135,15 @@
       <label class="vol">Volumen <input id="amb-vol" type="range" min="0" max="100" step="1" aria-label="Volumen del fondo"></label>
       <label class="check"><input id="amb-breaks" type="checkbox"> También en los descansos</label>
     </div>
+    <h3>Música</h3>
+    <p class="hint">Música tranquila para estudiar, sin letra. Suena junto al fondo mientras corre el pomodoro.</p>
+    <div id="music" class="chips sound-chips" role="group" aria-label="Música"></div>
+    <p id="now-playing" class="now-playing" hidden></p>
+    <div class="sound-opts">
+      <label class="vol">Volumen <input id="mus-vol" type="range" min="0" max="100" step="1" aria-label="Volumen de la música"></label>
+    </div>
     <h3>Frecuencias de concentración</h3>
-    <p class="hint">Suenan junto al fondo. Un sonido que late a ritmo beta (14–16 Hz) se asocia con la atención sostenida; alfa (10 Hz), con la calma. La evidencia es prometedora pero todavía limitada: probalo unos días y fijate si te sirve.</p>
+    <p class="hint">Opcionales y suaves. Lo más natural es <b>"Fondo modulado"</b>: hace latir apenas la música y el fondo, como brain.fm. Si alguna te incomoda o te pone nervioso, dejalas en "Sin frecuencias": la evidencia todavía es limitada y a cada persona le sirve algo distinto.</p>
     <div id="freqs" class="chips sound-chips" role="group" aria-label="Frecuencias de concentración"></div>
     <div class="sound-opts">
       <label class="vol">Volumen <input id="freq-vol" type="range" min="0" max="100" step="1" aria-label="Volumen de las frecuencias"></label>

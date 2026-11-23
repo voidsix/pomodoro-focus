@@ -26,13 +26,14 @@ const REASONS = {
   catalog: 'El catálogo de materias es Pro',
   sounds: 'Ese sonido es Pro · escuchaste una muestra',
   freqs: 'Esa frecuencia es Pro · escuchaste una muestra',
-  stats: 'Las estadísticas avanzadas son Pro'
+  stats: 'Las estadísticas avanzadas son Pro',
+  music: 'Esa música es Pro · escuchaste una muestra'
 };
 const PERKS = [
   ['Sincronización', 'Materias, plan e historial iguales en el celu y la compu.'],
   ['Catálogo de materias', 'Programas oficiales separados en unidades y temas: CBC y UBA XXI, UTN, UNC y UNS (y vamos sumando).'],
   ['Estadísticas', 'Mapa de tus últimos 6 meses, tu mejor horario y horas por materia.'],
-  ['Más sonidos', 'Café, tormenta, arroyo y noche de campo, y 3 frecuencias nuevas.']
+  ['Más música y sonidos', 'Lo-fi y jazz suave para estudiar, grabaciones reales de café, tormenta, arroyo y noche de campo, y 3 frecuencias nuevas.']
 ];
 
 // ---------- Interfaz ----------
