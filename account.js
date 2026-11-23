@@ -20,6 +20,7 @@ const store = {
 let f = null, user = null, pro = store.get('pro', null);
 let proUnsub = null, dataUnsub = null, booting = null;
 let reason = '', busy = '', note = '', sync = { state: '', at: 0 };
+let promo = null, promoOpen = false; // { code, price } validado por el servidor
 
 const REASONS = {
   catalog: 'El catálogo de materias es Pro',
@@ -71,7 +72,10 @@ function render() {
       <h2 id="sheet-title">${reason ? REASONS[reason] || 'Pasate a Pro' : 'Pasate a Pro'}</h2>
       <p class="sheet-sub">Hola, ${esc((user.displayName || '').split(' ')[0] || user.email)}. Un solo pago y es tuyo para siempre.</p>
       ${perks}${msg}
-      <div class="price"><b>${money(PRICE)}</b><span>pago único · sin suscripción</span></div>
+      <div class="price">${promo ? `<s>${money(PRICE)}</s>` : ''}<b>${money(promo ? promo.price : PRICE)}</b><span>pesos argentinos · pago único · sin suscripción</span></div>
+      ${promo ? `<p class="promo-ok">Código <b>${esc(promo.code)}</b> aplicado <button class="link" data-act="promo-clear">quitar</button></p>`
+        : promoOpen ? `<form class="promo-form" data-promo><input name="code" maxlength="20" autocomplete="off" autocapitalize="characters" placeholder="Código de descuento" aria-label="Código de descuento"><button class="ghost sm" type="submit" ${busy ? 'disabled' : ''}>${busy === 'promo' ? 'Revisando…' : 'Aplicar'}</button></form>`
+        : '<button class="link promo-link" data-act="promo-open">¿Tenés un código de descuento?</button>'}
       <button class="add wide" data-act="buy" ${busy ? 'disabled' : ''}>${busy === 'buy' ? 'Abriendo Mercado Pago…' : 'Pagar con Mercado Pago'}</button>
       <div class="sheet-actions"><button class="link" data-act="signout">Usar otra cuenta</button></div>`;
   } else {
@@ -79,7 +83,7 @@ function render() {
       <h2 id="sheet-title">${reason ? REASONS[reason] || 'Foco Pro' : 'Foco Pro'}</h2>
       <p class="sheet-sub">Todo lo que ya usás sigue gratis. Pro suma esto:</p>
       ${perks}
-      <div class="price"><b>${money(PRICE)}</b><span>pago único · sin suscripción</span></div>${msg}
+      <div class="price"><b>${money(PRICE)}</b><span>pesos argentinos · pago único · sin suscripción</span></div>${msg}
       <button class="add wide google" data-act="signin" ${busy || (!f && booting) ? 'disabled' : ''}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>
         ${busy === 'signin' ? 'Entrando…' : 'Entrar con Google para comprar'}</button>
@@ -97,7 +101,18 @@ sheet.addEventListener('click', async (e) => {
     if (act === 'signin') { busy = 'signin'; render(); await signIn(); }
     else if (act === 'signout') { busy = 'signout'; render(); await signOut(); }
     else if (act === 'buy') { busy = 'buy'; render(); await buy(); return; }
+    else if (act === 'promo-open') { promoOpen = true; render(); box.querySelector('[data-promo] input')?.focus(); return; }
+    else if (act === 'promo-clear') { promo = null; promoOpen = true; }
   } catch (err) { note = esc(err.message || 'Algo falló. Probá de nuevo.'); }
+  busy = ''; render();
+});
+sheet.addEventListener('submit', async (e) => {
+  const form = e.target.closest('[data-promo]'); if (!form) return;
+  e.preventDefault();
+  const code = form.code.value.trim(); if (!code) return;
+  busy = 'promo'; note = ''; render();
+  try { const r = await api('/quote', { code }); promo = r.code ? { code: r.code, price: r.price } : null; }
+  catch (err) { note = esc(err.message); }
   busy = ''; render();
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) close(); });
@@ -193,7 +208,7 @@ async function api(path, body) {
 }
 async function buy() {
   if (!user || user.isAnonymous) throw new Error('Primero entrá con Google.');
-  const { url } = await api('/checkout');
+  const { url } = await api('/checkout', promo ? { code: promo.code } : {});
   location.href = url;
 }
 // Al volver de Mercado Pago: confirmar el pago enseguida (el aviso del servidor también lo hace solo)

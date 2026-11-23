@@ -49,17 +49,33 @@ async function grant(order) {
     }
     return { pro: false, status: 'refunded' };
   }
+  // Precio que se le cobró a esta orden (el normal, o el de un código de descuento que validó el servidor)
+  const db = admin.database();
+  const meta = (await db.ref(`orderMeta/${order.id}`).get()).val();
+  const expected = meta?.price || PRICE;
   const ok = order.status === 'processed' && order.status_detail === 'accredited'
     && (!order.currency || order.currency === 'ARS')
-    && total >= PRICE && paid >= total && /^[A-Za-z0-9]{10,64}$/.test(uid);
+    && total >= expected && paid >= total && /^[A-Za-z0-9]{10,64}$/.test(uid);
   if (!ok) return { pro: false, status: order.status, detail: order.status_detail };
-  const db = admin.database();
-  await db.ref(`payments/${order.id}`).transaction((cur) => cur || { uid, amount: paid, at: Date.now() });
+  const first = await db.ref(`payments/${order.id}`).transaction((cur) => (cur ? undefined : { uid, amount: paid, at: Date.now(), code: meta?.code || null }));
+  if (first.committed && meta?.code) await db.ref(`promo/${meta.code}/used`).transaction((n) => (n || 0) + 1);
   const proRef = db.ref(`users/${uid}/pro`);
   if (!(await proRef.get()).exists()) {
     await proRef.set({ at: Date.now(), pay: String(order.id), amount: paid });
   }
   return { pro: true, status: order.status, uid };
+}
+
+// Códigos de descuento: promo/{CODIGO} = { price, max?, used?, until? } (los crea server/codigo.ps1)
+const cleanCode = (c) => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
+async function promoFor(raw) {
+  const code = cleanCode(raw);
+  if (!code) return null;
+  const p = (await admin.database().ref(`promo/${code}`).get()).val();
+  const valid = p && Number(p.price) > 0 && Number(p.price) < PRICE
+    && (!p.max || (p.used || 0) < p.max) && (!p.until || Date.now() < p.until);
+  if (!valid) throw Object.assign(new Error('Ese código no existe o ya venció.'), { status: 400 });
+  return { code, price: Number(p.price) };
 }
 
 function validSignature(req, dataId) {
@@ -83,10 +99,18 @@ functions.http('api', async (req, res) => {
   const path = req.path.replace(/\/+$/, '');
 
   try {
+    if (path === '/quote') {
+      await userFrom(req);
+      const promo = await promoFor(req.body?.code);
+      return res.json(promo ? { code: promo.code, price: promo.price } : { price: PRICE });
+    }
+
     if (path === '/checkout') {
       const u = await userFrom(req);
       if ((await admin.database().ref(`users/${u.uid}/pro`).get()).exists()) return res.json({ already: true, url: SITE + '/?pro=ok' });
-      const amount = PRICE.toFixed(2);
+      const promo = await promoFor(req.body?.code);
+      const price = promo ? promo.price : PRICE;
+      const amount = price.toFixed(2);
       const order = await mp('/v1/orders', {
         method: 'POST',
         headers: { 'X-Idempotency-Key': crypto.randomUUID() },
@@ -107,6 +131,7 @@ functions.http('api', async (req, res) => {
       });
       // Guardar la última orden del usuario: al volver se confirma con ella (no hace falta que el navegador la mande)
       await admin.database().ref(`orders/${u.uid}`).set({ id: String(order.id), at: Date.now() });
+      await admin.database().ref(`orderMeta/${order.id}`).set({ uid: u.uid, price, code: promo?.code || null, at: Date.now() });
       return res.json({ url: order.checkout_url || order.init_point });
     }
 
