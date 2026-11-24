@@ -639,3 +639,9 @@ body.sheet-open { overflow: hidden; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .now-playing { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
 .now-playing b { color: var(--text); font-weight: 700; }
+/* Borrar materia */
+.del.trash svg, .danger-link svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.del.trash:hover { color: #e0806a !important; background: color-mix(in srgb, #e0806a 12%, transparent) !important; }
+.danger-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; min-height: 40px; padding: 0 12px; border-radius: 12px;
+  color: #e0806a; font-size: 14px; font-weight: 700; border: 1px solid color-mix(in srgb, #e0806a 35%, transparent); background: transparent; }
+.danger-link:hover { background: color-mix(in srgb, #e0806a 10%, transparent); }

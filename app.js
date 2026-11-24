@@ -896,7 +896,7 @@
           return `<li class="${s.id === currentSub ? 'on' : ''}">
             <span class="dot" style="background:${subColor(s.id)}"></span>
             <button class="pick" data-pick="${s.id}"><b>${esc(s.name)}</b><small class="${soon ? 'soon' : ''}">${examText(s.exam)}</small></button>
-            <button class="del" data-del-sub="${s.id}" aria-label="Quitar ${esc(s.name)}">×</button>
+            <button class="del trash" data-del-sub="${s.id}" aria-label="Borrar ${esc(s.name)}" title="Borrar materia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
           </li>`;
         }).join('')
       : '<li class="empty">Todavía no cargaste materias. Empezá por la que tenés más cerca.</li>';
@@ -1019,13 +1019,19 @@
     const pick = e.target.closest('[data-pick]');
     if (pick) { setSubject(pick.dataset.pick); return; }
     const del = e.target.closest('[data-del-sub]'); if (!del) return;
-    const s = subById(del.dataset.delSub); if (!s) return;
-    if (await ask(`¿Quitar "${s.name}"? Sus pomodoros quedan en el historial como "Sin materia".`)) {
-      subjects = subjects.filter((x) => x.id !== s.id);
-      if (currentSub === s.id) currentSub = '';
-      saveSubjects(); renderSubjects(); renderStats();
-    }
+    deleteSubject(del.dataset.delSub);
   });
+  // Borrar una materia (desde la lista o desde su tarjeta del plan), siempre con confirmación
+  async function deleteSubject(id) {
+    const s = subById(id); if (!s) return;
+    const n = topicsOf(s).length;
+    const msg = `¿Borrar "${s.name}"${n ? ` y sus ${n} temas` : ''}? Los pomodoros que ya hiciste quedan en el historial como "Sin materia".`;
+    if (!(await ask(msg, 'Borrar'))) return;
+    subjects = subjects.filter((x) => x.id !== s.id);
+    openPlans.delete(s.id);
+    if (currentSub === s.id) currentSub = '';
+    saveSubjects(); renderSubjects(); renderStats();
+  }
   el.subject.addEventListener('change', () => setSubject(el.subject.value));
 
   // ---------- Plan de estudio ----------
@@ -1131,6 +1137,9 @@
               <label>Pomodoros por tema<input type="number" min="1" max="12" value="${perTopicOf(s)}" data-per="${s.id}"></label>
               <label>Fecha del final<input type="date" value="${s.exam || ''}" min="${isoToday()}" data-exam="${s.id}"></label>
             </div>
+            <button type="button" class="danger-link" data-del-plan="${s.id}">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>Borrar materia
+            </button>
           </details>
         </article>`;
     }).join('');
@@ -1187,6 +1196,8 @@
       if (c) { const keep = el.subDate.value; el.subDate.value = ''; addFromCatalog(c, [Number(i)], { scroll: false }); el.subDate.value = keep; }
       return;
     }
+    const delPlan = e.target.closest('[data-del-plan]');
+    if (delPlan) { deleteSubject(delPlan.dataset.delPlan); return; }
     const del = e.target.closest('[data-del-topic]');
     if (del) {
       const { s, t } = findTopic(del.dataset.delTopic);
@@ -1413,9 +1424,9 @@
   };
 
   // ---------- Diálogo propio (sin confirm()) ----------
-  function ask(msg) {
+  function ask(msg, yes = 'Confirmar') {
     return new Promise((res) => {
-      const d = $('#dialog'); $('#dialog-msg').textContent = msg; d.hidden = false;
+      const d = $('#dialog'); $('#dialog-msg').textContent = msg; $('#dialog-yes').textContent = yes; d.hidden = false;
       const done = (v) => { d.hidden = true; $('#dialog-yes').onclick = $('#dialog-no').onclick = null; res(v); };
       $('#dialog-yes').onclick = () => done(true);
       $('#dialog-no').onclick = () => done(false);
