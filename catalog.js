@@ -744,6 +744,267 @@ window.FOCO_CATALOG = [
     ]
   },
 
+  {
+    "id": "utn-analisis-2",
+    "name": "Análisis Matemático II",
+    "inst": "UTN · FRBA, FRC y demás regionales",
+    "keys": "analisis matematico 2 ii am2 utn tecnologica frba buenos aires frc cordoba frro rosario frm mendoza frt tucuman frlp la plata frbb bahia blanca frsf santa fe haedo avellaneda pacheco delta parana resistencia neuquen mar del plata villa maria san nicolas regional ingenieria",
+    "source": "Programa UTN FRBA 2023 · contenidos mínimos comunes a todas las regionales",
+    "units": [
+      {
+        "name": "Funciones de varias variables: límite y continuidad",
+        "topics": [
+          "Topología en Rn: puntos y conjuntos",
+          "Funciones escalares y vectoriales, dominio y conjuntos de nivel",
+          "Límite, límites iterados y continuidad",
+          "Curvas y superficies: ecuaciones vectoriales y paramétricas"
+        ]
+      },
+      {
+        "name": "Derivabilidad",
+        "topics": [
+          "Derivada de funciones vectoriales, recta tangente y plano normal",
+          "Derivadas parciales y direccionales",
+          "Derivadas sucesivas y teorema de Schwarz"
+        ]
+      },
+      {
+        "name": "Diferenciabilidad",
+        "topics": [
+          "Diferenciabilidad, gradiente y matriz jacobiana",
+          "Plano tangente y recta normal a una superficie",
+          "Propiedades del gradiente"
+        ]
+      },
+      {
+        "name": "Funciones compuestas e implícitas",
+        "topics": [
+          "Regla de la cadena",
+          "Funciones implícitas: teorema de Dini",
+          "Gradiente y conjuntos de nivel"
+        ]
+      },
+      {
+        "name": "Taylor y extremos",
+        "topics": [
+          "Fórmula de Taylor",
+          "Extremos relativos y Hessiano",
+          "Extremos ligados: multiplicadores de Lagrange"
+        ]
+      },
+      {
+        "name": "Integrales de línea",
+        "topics": [
+          "Longitud de arco",
+          "Integral de línea y trabajo",
+          "Independencia del camino y función potencial",
+          "Rotor y campos conservativos"
+        ]
+      },
+      {
+        "name": "Integrales múltiples",
+        "topics": [
+          "Integrales dobles y triples",
+          "Cambio de variables y coordenadas polares",
+          "Coordenadas cilíndricas y esféricas"
+        ]
+      },
+      {
+        "name": "Integrales de superficie",
+        "topics": [
+          "Área de una superficie",
+          "Superficies orientables y flujo"
+        ]
+      },
+      {
+        "name": "Teoremas integrales",
+        "topics": [
+          "Divergencia y teorema de Gauss",
+          "Teorema de Green",
+          "Teorema de Stokes"
+        ]
+      },
+      {
+        "name": "Ecuaciones diferenciales",
+        "topics": [
+          "EDO de primer orden: separables, lineales, homogéneas y exactas",
+          "Líneas de campo y trayectorias ortogonales",
+          "EDO de segundo orden con coeficientes constantes",
+          "Variación de parámetros y coeficientes indeterminados",
+          "Sistemas de ecuaciones diferenciales lineales"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "utn-probabilidad-estadistica",
+    "name": "Probabilidad y Estadística",
+    "inst": "UTN · FRBA, FRC y demás regionales",
+    "keys": "probabilidad y estadistica pye utn tecnologica frba buenos aires frc cordoba frro rosario frm mendoza frt tucuman frlp la plata frbb bahia blanca frsf santa fe haedo avellaneda pacheco delta parana resistencia neuquen mar del plata villa maria san nicolas regional ingenieria",
+    "source": "Programa UTN FRBA 2024 · contenidos mínimos comunes a todas las regionales",
+    "units": [
+      {
+        "name": "Probabilidad",
+        "topics": [
+          "Experimentos aleatorios y espacio muestral",
+          "Probabilidad laplaciana y axiomática",
+          "Probabilidad condicional e independencia",
+          "Probabilidad total y teorema de Bayes"
+        ]
+      },
+      {
+        "name": "Variable aleatoria",
+        "topics": [
+          "Variables discretas y continuas",
+          "Función de probabilidad, densidad y distribución",
+          "Esperanza, varianza y desvío",
+          "Covarianza y correlación"
+        ]
+      },
+      {
+        "name": "Distribuciones especiales",
+        "topics": [
+          "Binomial y Poisson",
+          "Uniforme y Gamma",
+          "Distribución normal y uso de tablas"
+        ]
+      },
+      {
+        "name": "Estimación",
+        "topics": [
+          "Muestra aleatoria y estimadores",
+          "Teorema central del límite",
+          "Propiedades de los estimadores",
+          "Intervalos de confianza para una población",
+          "Intervalos de confianza para dos poblaciones"
+        ]
+      },
+      {
+        "name": "Prueba de hipótesis",
+        "topics": [
+          "Hipótesis y errores tipo I y II",
+          "Pruebas para medias y prueba t de Student",
+          "Prueba chi-cuadrado y pruebas de proporciones",
+          "Valor p y significación estadística"
+        ]
+      },
+      {
+        "name": "Regresión y correlación",
+        "topics": [
+          "Regresión lineal simple y mínimos cuadrados",
+          "Coeficiente de determinación",
+          "Significación de la regresión y predicción"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "utn-quimica-general",
+    "name": "Química General",
+    "inst": "UTN · FRBA, FRC y demás regionales",
+    "keys": "quimica general utn tecnologica frba buenos aires frc cordoba frro rosario frm mendoza frt tucuman frlp la plata frbb bahia blanca frsf santa fe haedo avellaneda pacheco delta parana resistencia neuquen mar del plata villa maria san nicolas regional ingenieria",
+    "source": "Programa UTN FRBA 2025",
+    "units": [
+      {
+        "name": "Sistemas materiales",
+        "topics": [
+          "Propiedades intensivas y extensivas",
+          "Sistemas homogéneos y heterogéneos",
+          "Soluciones y métodos de fraccionamiento",
+          "Sustancias puras, elementos y cambios"
+        ]
+      },
+      {
+        "name": "Estructura atómica y mol",
+        "topics": [
+          "Número atómico, isótopos y masa atómica",
+          "Mol, número de Avogadro y volumen molar"
+        ]
+      },
+      {
+        "name": "Estado gaseoso",
+        "topics": [
+          "Teoría cinético-molecular",
+          "Gases ideales y ecuación general",
+          "Dalton, Graham y gases reales (van der Waals)"
+        ]
+      },
+      {
+        "name": "Reacciones y estequiometría",
+        "topics": [
+          "Ecuaciones químicas y balanceo",
+          "Cálculos estequiométricos",
+          "Reactivo limitante, pureza y rendimiento"
+        ]
+      },
+      {
+        "name": "Estructura electrónica y tabla periódica",
+        "topics": [
+          "Modelos atómicos y números cuánticos",
+          "Configuración electrónica",
+          "Tabla periódica y propiedades periódicas"
+        ]
+      },
+      {
+        "name": "Uniones químicas",
+        "topics": [
+          "Enlace covalente, iónico y metálico",
+          "Fuerzas intermoleculares",
+          "Número de oxidación y nomenclatura"
+        ]
+      },
+      {
+        "name": "Líquidos y sólidos",
+        "topics": [
+          "Presión de vapor, viscosidad y tensión superficial",
+          "Sólidos amorfos y cristalinos",
+          "Diagramas de fases"
+        ]
+      },
+      {
+        "name": "Soluciones",
+        "topics": [
+          "Concentración y solubilidad",
+          "Ley de Henry",
+          "Propiedades coligativas"
+        ]
+      },
+      {
+        "name": "Termoquímica",
+        "topics": [
+          "Primera ley y entalpía",
+          "Ley de Hess y entalpías estándar",
+          "Poder calorífico"
+        ]
+      },
+      {
+        "name": "Cinética y equilibrio",
+        "topics": [
+          "Velocidad de reacción y catálisis",
+          "Equilibrio químico y Le Châtelier",
+          "Equilibrio iónico, pH y pOH"
+        ]
+      },
+      {
+        "name": "Electroquímica",
+        "topics": [
+          "Redox: método ion-electrón",
+          "Potenciales estándar y pilas",
+          "Electrólisis y leyes de Faraday",
+          "Corrosión"
+        ]
+      },
+      {
+        "name": "Química del ambiente",
+        "topics": [
+          "Contaminación del aire y efecto invernadero",
+          "Contaminación del agua y agua potable",
+          "Contaminación del suelo"
+        ]
+      }
+    ]
+  },
+
   // ======================= UNC · FCEFyN (Córdoba) =======================
   {
     id: 'unc-fcefyn-analisis-1',
@@ -893,6 +1154,538 @@ window.FOCO_CATALOG = [
         'Ondas sonoras',
         'Ondas estacionarias y efecto Doppler'
       ] }
+    ]
+  },
+
+  {
+    "id": "unc-fcefyn-analisis-2",
+    "name": "Análisis Matemático 2",
+    "inst": "UNC · FCEFyN (Córdoba)",
+    "keys": "analisis matematico 2 ii am2 unc universidad nacional de cordoba fcefyn ingenieria",
+    "source": "Programa oficial FCEFyN · cód. 10-04063",
+    "units": [
+      {
+        "name": "Cónicas y funciones de Rn en Rp",
+        "topics": [
+          "Secciones cónicas y coordenadas polares",
+          "Topología en Rn",
+          "Funciones de varias variables: dominio y representación"
+        ]
+      },
+      {
+        "name": "Límite y continuidad",
+        "topics": [
+          "Límite y límites iterados",
+          "Continuidad"
+        ]
+      },
+      {
+        "name": "Derivadas y diferencial",
+        "topics": [
+          "Derivadas parciales y de orden superior",
+          "Diferenciabilidad y plano tangente",
+          "Matriz jacobiana y regla de la cadena",
+          "Derivada direccional y gradiente"
+        ]
+      },
+      {
+        "name": "Extremos e integración múltiple",
+        "topics": [
+          "Taylor y extremos con Hessiano",
+          "Multiplicadores de Lagrange",
+          "Integrales dobles y triples",
+          "Cambio de variables"
+        ]
+      },
+      {
+        "name": "Curvas e integrales de línea",
+        "topics": [
+          "Parametrización y longitud de arco",
+          "Triedro de Frenet: curvatura y torsión",
+          "Integrales de línea"
+        ]
+      },
+      {
+        "name": "Superficies e integrales de superficie",
+        "topics": [
+          "Parametrización y orientación",
+          "Integrales de superficie"
+        ]
+      },
+      {
+        "name": "Campos vectoriales",
+        "topics": [
+          "Divergencia y rotor",
+          "Campos conservativos y función potencial",
+          "Teoremas de Green, Stokes y Gauss"
+        ]
+      },
+      {
+        "name": "Ecuaciones diferenciales ordinarias",
+        "topics": [
+          "Primer orden: separables, exactas y lineales",
+          "Ecuación de Bernoulli",
+          "Segundo orden con coeficientes constantes",
+          "Sistemas de EDO lineales"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unc-fcefyn-analisis-3",
+    "name": "Análisis Matemático 3",
+    "inst": "UNC · FCEFyN (Córdoba)",
+    "keys": "analisis matematico 3 iii am3 variable compleja fourier laplace unc universidad nacional de cordoba fcefyn ingenieria",
+    "source": "Programa oficial FCEFyN · cód. 10-04070",
+    "units": [
+      {
+        "name": "Variable compleja",
+        "topics": [
+          "Funciones complejas, límite y derivada",
+          "Cauchy-Riemann, holomorfía y armonicidad",
+          "Funciones elementales complejas",
+          "Integración compleja y teorema de Cauchy",
+          "Series de Taylor y Laurent",
+          "Residuos y cálculo de integrales",
+          "Transformaciones conformes"
+        ]
+      },
+      {
+        "name": "Series y transformadas",
+        "topics": [
+          "Series de Fourier",
+          "Transformada de Fourier",
+          "Transformada de Laplace",
+          "Resolución de EDO con Laplace",
+          "Soluciones por series: Legendre y Bessel",
+          "Problemas de Sturm-Liouville"
+        ]
+      },
+      {
+        "name": "Ecuaciones en derivadas parciales",
+        "topics": [
+          "Clasificación y condiciones de contorno",
+          "Separación de variables",
+          "Ecuaciones de Laplace, del calor y de onda"
+        ]
+      },
+      {
+        "name": "Cálculo variacional",
+        "topics": [
+          "Funcionales y ecuación de Euler",
+          "Extensiones de la ecuación de Euler"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unc-fcefyn-fisica-2",
+    "name": "Física II",
+    "inst": "UNC · FCEFyN (Córdoba)",
+    "keys": "fisica 2 ii electricidad magnetismo optica unc universidad nacional de cordoba fcefyn geologia",
+    "source": "Programa oficial FCEFyN (Ciencias Geológicas)",
+    "units": [
+      {
+        "name": "Ondas",
+        "topics": [
+          "Ondas armónicas y ecuación de onda"
+        ]
+      },
+      {
+        "name": "Electrostática",
+        "topics": [
+          "Carga, ley de Coulomb y campo eléctrico",
+          "Ley de Gauss",
+          "Potencial eléctrico y superficies equipotenciales",
+          "Dieléctricos y capacitores"
+        ]
+      },
+      {
+        "name": "Corriente y circuitos",
+        "topics": [
+          "Corriente, resistividad y ley de Ohm",
+          "Fuerza electromotriz y potencia",
+          "Reglas de Kirchhoff",
+          "Circuitos RC e instrumentos de medición"
+        ]
+      },
+      {
+        "name": "Magnetismo",
+        "topics": [
+          "Fuerza magnética sobre cargas y corrientes",
+          "Fuentes de campo magnético",
+          "Propiedades magnéticas de la materia"
+        ]
+      },
+      {
+        "name": "Electromagnetismo",
+        "topics": [
+          "Inducción electromagnética e inductancia",
+          "Ecuaciones de Maxwell y ondas electromagnéticas"
+        ]
+      },
+      {
+        "name": "Óptica",
+        "topics": [
+          "Naturaleza de la luz y óptica geométrica",
+          "Óptica ondulatoria: interferencia, difracción y polarización"
+        ]
+      }
+    ]
+  },
+
+  // ======================= UBA · carreras (después del CBC) =======================
+  {
+    "id": "uba-exactas-algebra-1",
+    "name": "Álgebra I",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "algebra 1 i exactas fcen uba matematica computacion datos carrera",
+    "source": "Programa oficial FCEN-UBA (2020)",
+    "units": [
+      {
+        "name": "Conjuntos, relaciones y funciones",
+        "topics": [
+          "Conjuntos y operaciones · leyes de De Morgan",
+          "Producto cartesiano y conjunto de partes",
+          "Relaciones de orden y de equivalencia",
+          "Funciones inyectivas, sobreyectivas y biyectivas"
+        ]
+      },
+      {
+        "name": "Naturales e inducción",
+        "topics": [
+          "Principio de inducción",
+          "Sumatorias y productorias",
+          "Factorial y combinatorios",
+          "Recursión"
+        ]
+      },
+      {
+        "name": "Números enteros",
+        "topics": [
+          "Divisibilidad, algoritmo de división y bases",
+          "MCD, algoritmo de Euclides y coprimos",
+          "Primos y teorema fundamental de la aritmética",
+          "Congruencias y ecuaciones diofánticas",
+          "Teorema chino del resto",
+          "Fermat, Euler-Fermat y RSA"
+        ]
+      },
+      {
+        "name": "Polinomios",
+        "topics": [
+          "Cuerpos y anillo de polinomios",
+          "División, MCD y factorización única",
+          "Raíces, teorema del resto y multiplicidad",
+          "Polinomios en C[x] y R[x]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-exactas-analisis-2",
+    "name": "Análisis II",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "analisis 2 ii exactas fcen uba matematica fisica computacion datos carrera",
+    "source": "Programa oficial FCEN-UBA (2020)",
+    "units": [
+      {
+        "name": "Topología en R y Rn",
+        "topics": [
+          "Completitud de R y supremo",
+          "Abiertos, cerrados y clausura",
+          "Sucesiones en Rn"
+        ]
+      },
+      {
+        "name": "Funciones de Rn en Rk",
+        "topics": [
+          "Dominio, gráficos y conjuntos de nivel",
+          "Límite y continuidad"
+        ]
+      },
+      {
+        "name": "Cálculo diferencial",
+        "topics": [
+          "Derivadas parciales y diferencial",
+          "Matriz jacobiana y regla de la cadena",
+          "Función inversa e implícita",
+          "Gradiente y derivadas direccionales",
+          "Hessiano y aproximación de orden 2"
+        ]
+      },
+      {
+        "name": "Extremos",
+        "topics": [
+          "Puntos críticos y formas cuadráticas",
+          "Máximos, mínimos y puntos silla",
+          "Multiplicadores de Lagrange"
+        ]
+      },
+      {
+        "name": "Integrales múltiples",
+        "topics": [
+          "Integrales impropias",
+          "Integrales dobles y teorema de Fubini",
+          "Integrales triples",
+          "Cambio de variables"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-exactas-algebra-lineal",
+    "name": "Álgebra Lineal",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "algebra lineal exactas fcen uba matematica carrera",
+    "source": "Programa oficial FCEN-UBA (2020)",
+    "units": [
+      {
+        "name": "Espacios vectoriales",
+        "topics": [
+          "Subespacios y generadores",
+          "Independencia lineal, base y dimensión",
+          "Suma y suma directa"
+        ]
+      },
+      {
+        "name": "Matrices",
+        "topics": [
+          "Álgebra de matrices e inversa",
+          "Coordenadas y cambio de base"
+        ]
+      },
+      {
+        "name": "Transformaciones lineales",
+        "topics": [
+          "Núcleo, imagen y teorema de la dimensión",
+          "Matriz de una transformación y rango",
+          "Equivalencia y semejanza"
+        ]
+      },
+      {
+        "name": "Espacio dual",
+        "topics": [
+          "Base dual y anulador",
+          "Función transpuesta"
+        ]
+      },
+      {
+        "name": "Determinante",
+        "topics": [
+          "Definición como forma multilineal alternada",
+          "Propiedades, adjunta y regla de Cramer"
+        ]
+      },
+      {
+        "name": "Diagonalización",
+        "topics": [
+          "Autovalores y polinomio característico",
+          "Polinomio minimal y Hamilton-Cayley",
+          "Subespacios invariantes"
+        ]
+      },
+      {
+        "name": "Forma de Jordan",
+        "topics": [
+          "Nilpotentes",
+          "Forma de Jordan general y potencias"
+        ]
+      },
+      {
+        "name": "Producto interno",
+        "topics": [
+          "Gram-Schmidt y proyecciones",
+          "Adjunta, autoadjuntas, unitarias y ortogonales"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-exactas-calculo-numerico",
+    "name": "Cálculo Numérico",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "calculo numerico metodos numericos exactas fcen uba computacion datos fisica carrera",
+    "source": "Programa oficial FCEN-UBA (2020)",
+    "units": [
+      {
+        "name": "Aritmética de punto flotante",
+        "topics": [
+          "Representación y errores de redondeo",
+          "Propagación de errores y condicionamiento"
+        ]
+      },
+      {
+        "name": "Sistemas lineales",
+        "topics": [
+          "Normas y condicionamiento de matrices",
+          "Gauss, pivoteo y LU",
+          "Cholesky",
+          "Jacobi, Gauss-Seidel y SOR",
+          "Método de las potencias"
+        ]
+      },
+      {
+        "name": "Ecuaciones no lineales",
+        "topics": [
+          "Bisección",
+          "Newton, secante y regula falsi",
+          "Punto fijo"
+        ]
+      },
+      {
+        "name": "Interpolación",
+        "topics": [
+          "Lagrange y Newton",
+          "Error y Hermite",
+          "Polinomios de Chebyshev"
+        ]
+      },
+      {
+        "name": "Cuadrados mínimos",
+        "topics": [
+          "Polinomios ortogonales",
+          "QR y Gram-Schmidt",
+          "Valores singulares (SVD)"
+        ]
+      },
+      {
+        "name": "Integración numérica",
+        "topics": [
+          "Trapecio y Simpson",
+          "Reglas compuestas y cuadratura de Gauss"
+        ]
+      },
+      {
+        "name": "Ecuaciones diferenciales",
+        "topics": [
+          "Euler explícito e implícito",
+          "Runge-Kutta",
+          "Métodos multipaso y estabilidad"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-exactas-matematica-1-bio",
+    "name": "Matemática I (Biológicas)",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "matematica 1 i biologicas biologia exactas fcen uba carrera",
+    "source": "Programa oficial FCEN-UBA (2020)",
+    "units": [
+      {
+        "name": "Vectores y números complejos",
+        "topics": [
+          "Vectores, producto escalar y vectorial",
+          "Complejos: forma binómica y polar",
+          "De Moivre y raíces"
+        ]
+      },
+      {
+        "name": "Sistemas lineales y matrices",
+        "topics": [
+          "Gauss y rango",
+          "Matrices y determinantes",
+          "Autovalores, autovectores y diagonalización"
+        ]
+      },
+      {
+        "name": "Funciones de 2 y 3 variables",
+        "topics": [
+          "Funciones vectoriales de una variable",
+          "Funciones escalares y conjuntos de nivel"
+        ]
+      },
+      {
+        "name": "Diferenciación",
+        "topics": [
+          "Derivadas parciales y gradiente",
+          "Plano tangente y regla de la cadena",
+          "Derivadas direccionales"
+        ]
+      },
+      {
+        "name": "Aproximación por polinomios",
+        "topics": [
+          "Polinomio de Taylor"
+        ]
+      },
+      {
+        "name": "Extremos",
+        "topics": [
+          "Máximos y mínimos de funciones de varias variables"
+        ]
+      },
+      {
+        "name": "Ecuaciones diferenciales",
+        "topics": [
+          "EDO de primer orden",
+          "Sistemas lineales de primer orden",
+          "Sistemas no lineales de primer orden"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-fmed-anatomia-kinesio",
+    "name": "Anatomía (Kinesiología)",
+    "inst": "UBA · Medicina (carrera)",
+    "keys": "anatomia kinesiologia fisiatria medicina fmed uba salud carrera",
+    "source": "Programa oficial Facultad de Medicina UBA 2026 · Lic. en Kinesiología y Fisiatría",
+    "units": [
+      {
+        "name": "Generalidades",
+        "topics": [
+          "Introducción a la anatomía humana",
+          "Osteología",
+          "Artrología",
+          "Miología"
+        ]
+      },
+      {
+        "name": "Cabeza, cuello y tronco",
+        "topics": [
+          "Cabeza y cuello: neurocráneo y esplacnocráneo",
+          "Tronco: sistema osteoarticular",
+          "Cabeza y cuello: músculos, vasos y nervios",
+          "Músculos del raquis",
+          "Paredes del tórax y del abdomen"
+        ]
+      },
+      {
+        "name": "Extremidad superior",
+        "topics": [
+          "Huesos y articulaciones",
+          "Músculos",
+          "Vasos y nervios"
+        ]
+      },
+      {
+        "name": "Extremidad inferior",
+        "topics": [
+          "Huesos y articulaciones",
+          "Músculos",
+          "Vasos y nervios"
+        ]
+      },
+      {
+        "name": "Esplacnología",
+        "topics": [
+          "Sistema fonorrespiratorio",
+          "Sistema circulatorio",
+          "Sistema digestivo",
+          "Sistemas urinario, genital y endocrino"
+        ]
+      },
+      {
+        "name": "Neuroanatomía",
+        "topics": [
+          "Generalidades del sistema nervioso",
+          "Médula y tronco encefálico",
+          "Cerebelo y cerebro",
+          "Vías de conducción y órganos de los sentidos"
+        ]
+      }
     ]
   },
 
