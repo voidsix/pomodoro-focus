@@ -36,6 +36,8 @@ const PERKS = [
   ['Más música y sonidos', 'Lo-fi y jazz suave para estudiar, grabaciones reales de café, tormenta, arroyo y noche de campo, y 3 frecuencias nuevas.']
 ];
 
+const GOOGLE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>';
+
 // ---------- Interfaz ----------
 function updateBtn() {
   btn.classList.toggle('on', !!pro);
@@ -60,13 +62,18 @@ function render() {
     <button class="sheet-x" data-act="close" aria-label="Cerrar">×</button>
     <span class="cat-badge">Foco Pro</span>`;
   const msg = note ? `<p class="sheet-note">${note}</p>` : '';
+  // Cuenta con la que este dispositivo ya tuvo Pro (para no confundir cuentas de Google)
+  const known = store.get('proEmail', '');
+  const me = signed ? (user.email || '') : '';
+  const dis = busy || (!f && booting) ? 'disabled' : '';
   let body;
   if (pro && signed) {
     const when = pro.at ? new Date(pro.at).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     const st = { ok: `Sincronizado${sync.at ? ' · ' + new Date(sync.at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : ''}`, busy: 'Sincronizando…', error: 'No se pudo sincronizar. Se reintenta solo.', '': 'Conectando…' }[sync.state];
     body = `${head}
       <h2 id="sheet-title">Sos Pro ✓</h2>
-      <p class="sheet-sub">${esc(user.email || user.displayName || '')}${when ? ` · desde el ${when}` : ''}</p>
+      <p class="sheet-sub">Tu Pro está en <b>${esc(me || user.displayName || '')}</b>${when ? ` · desde el ${when}` : ''}</p>
+      <p class="sheet-fine">En otro celu o compu, entrá con esta misma cuenta de Google y la Pro aparece sola.</p>
       <div class="sync-row"><span class="sync-dot ${sync.state}"></span>${st}</div>
       ${perks}${msg}
       <div class="sheet-actions"><button class="ghost" data-act="signout">Cerrar sesión</button></div>`;
@@ -74,24 +81,34 @@ function render() {
     body = `${head}
       <h2 id="sheet-title">${reason ? REASONS[reason] || 'Pasate a Pro' : 'Pasate a Pro'}</h2>
       <p class="sheet-sub">Hola, ${esc((user.displayName || '').split(' ')[0] || user.email)}. Un solo pago y es tuyo para siempre.</p>
+      ${known && known !== me ? `<div class="acct-warn"><b>Ojo:</b> en este dispositivo tu Pro está en <b>${esc(known)}</b>.<button class="add wide" data-act="signin" ${dis}>Entrar con esa cuenta</button></div>` : ''}
       ${perks}${msg}
       <div class="price">${promo ? `<s>${money(PRICE)}</s>` : ''}<b>${money(promo ? promo.price : PRICE)}</b><span>pesos argentinos · pago único · sin suscripción</span></div>
       ${promo ? `<p class="promo-ok">Código <b>${esc(promo.code)}</b> aplicado <button class="link" data-act="promo-clear">quitar</button></p>`
         : promoOpen ? `<form class="promo-form" data-promo><input name="code" maxlength="20" autocomplete="off" autocapitalize="characters" placeholder="Código de descuento" aria-label="Código de descuento"><button class="ghost sm" type="submit" ${busy ? 'disabled' : ''}>${busy === 'promo' ? 'Revisando…' : 'Aplicar'}</button></form>`
         : '<button class="link promo-link" data-act="promo-open">¿Tenés un código de descuento?</button>'}
+      <div class="acct-box"><span>La Pro queda guardada en</span><b>${esc(me || user.displayName || '')}</b><button class="link" data-act="signin" ${dis}>Usar otra cuenta</button></div>
       <button class="add wide" data-act="buy" ${busy ? 'disabled' : ''}>${busy === 'buy' ? 'Abriendo el pago…' : 'Pagar · tarjeta, efectivo o Mercado Pago'}</button>
       <p class="sheet-fine pay-fine">No necesitás cuenta de Mercado Pago: podés pagar con tarjeta de crédito, débito o prepaga, o en efectivo en Rapipago o Pago Fácil.</p>
-      <p class="sheet-fine">Entraste como <b>${esc(user.email || user.displayName || '')}</b>. ¿Ya pagaste con otra cuenta de Google? Cambiá a esa y tu Pro aparece sola.</p>
-      <div class="sheet-actions"><button class="link" data-act="signout">Usar otra cuenta</button></div>`;
+      <p class="sheet-fine">Para usar la Pro en el celu y en la compu, entrá siempre con esta misma cuenta. ¿Ya pagaste con otra? Tocá «Usar otra cuenta» y elegila.</p>
+      <div class="sheet-actions"><button class="link" data-act="signout">Cerrar sesión</button></div>`;
+  } else if (reason === 'welcome') {
+    body = `${head.replace('Foco Pro</span>', 'Tu cuenta</span>')}
+      <h2 id="sheet-title">Entrá con tu cuenta de Google</h2>
+      <p class="sheet-sub">Así tus materias, tu plan y tu Pro (si la comprás) quedan guardados en tu cuenta, y los usás en el celu y en la compu.</p>${msg}
+      <button class="add wide google" data-act="signin" ${dis}>${GOOGLE_SVG} ${busy === 'signin' ? 'Entrando…' : 'Entrar con Google'}</button>
+      <div class="sheet-actions"><button class="link" data-act="close">Seguir sin cuenta</button></div>
+      <p class="sheet-fine">Foco es gratis. Al continuar aceptás los <a href="/terminos/" target="_blank">términos</a> y la <a href="/privacidad/" target="_blank">política de privacidad</a>.</p>`;
   } else {
     body = `${head}
       <h2 id="sheet-title">${reason ? REASONS[reason] || 'Foco Pro' : 'Foco Pro'}</h2>
       <p class="sheet-sub">Todo lo que ya usás sigue gratis. Pro suma esto:</p>
-      <p class="sheet-fine already-pro">¿Ya sos Pro? <button class="link" data-act="signin" ${busy || (!f && booting) ? 'disabled' : ''}>Entrá con tu cuenta de Google</button></p>
+      ${known ? `<div class="acct-warn">Ya sos Pro con <b>${esc(known)}</b>. Entrá con esa cuenta para recuperarla.<button class="add wide" data-act="signin" ${dis}>Entrar con Google</button></div>`
+        : `<p class="sheet-fine already-pro">¿Ya sos Pro? <button class="link" data-act="signin" ${dis}>Entrá con tu cuenta de Google</button></p>`}
       ${perks}
       <div class="price"><b>${money(PRICE)}</b><span>pesos argentinos · pago único · sin suscripción</span></div>${msg}
       <button class="add wide google" data-act="signin" ${busy || (!f && booting) ? 'disabled' : ''}>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>
+        ${GOOGLE_SVG}
         ${busy === 'signin' ? 'Entrando…' : 'Entrar con Google'}</button>
       <p class="sheet-fine"><b>¿Ya sos Pro?</b> Entrá con la misma cuenta de Google con la que pagaste.<br>
         La Pro queda en tu cuenta de Google: la usás en todos tus dispositivos.<br>
@@ -105,7 +122,10 @@ sheet.addEventListener('click', async (e) => {
   const act = e.target.closest('[data-act]')?.dataset.act; if (!act) return;
   if (act === 'close') return close();
   try {
-    if (act === 'signin') { busy = 'signin'; render(); await signIn(); }
+    if (act === 'signin') {
+      busy = 'signin'; render(); await signIn();
+      if (reason === 'welcome' && user && !user.isAnonymous) { busy = ''; close(); return; }
+    }
     else if (act === 'signout') { busy = 'signout'; render(); await signOut(); }
     else if (act === 'buy') { busy = 'buy'; render(); await buy(); return; }
     else if (act === 'promo-open') { promoOpen = true; render(); box.querySelector('[data-promo] input')?.focus(); return; }
@@ -151,6 +171,7 @@ function setPro(p) {
   pro = p || null;
   if (pro && !was && store.get('paying', null)) { store.set('paying', null); if (!sheet.hidden) note = '¡Listo! Ya sos Pro. Gracias por bancar Foco 💙'; }
   store.set('pro', pro ? { at: pro.at || Date.now() } : null);
+  if (pro && user?.email) store.set('proEmail', user.email);
   window.dispatchEvent(new CustomEvent('foco:pro', { detail: !!pro }));
   updateBtn();
   if (pro && user && !user.isAnonymous) startSync(); else stopSync();
@@ -333,6 +354,11 @@ else {
   // Solo se carga Firebase al abrir si ya habías entrado con tu cuenta o volvés de pagar
   if (store.get('acct', false) || new URLSearchParams(location.search).has('pro')) boot().catch(() => {});
   returnFromPayment();
+  // Primera vez: invitamos a entrar con Google (se puede seguir sin cuenta)
+  if (!store.get('acct', false) && !store.get('welcomed', false) && !new URLSearchParams(location.search).has('pro')) {
+    store.set('welcomed', Date.now());
+    setTimeout(() => { if (sheet.hidden && !store.get('acct', false)) open('welcome'); }, 1800);
+  }
   const paying = store.get('paying', null);
   if (paying && Date.now() - paying < 7 * 864e5 && !new URLSearchParams(location.search).has('pro')) {
     boot().then(() => setTimeout(() => { if (user && !user.isAnonymous && !pro) checkPayment({ tries: 6, every: 10000, quiet: true }); }, 1500)).catch(() => {});

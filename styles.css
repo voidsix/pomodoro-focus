@@ -645,3 +645,11 @@ body.sheet-open { overflow: hidden; }
 .danger-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; min-height: 40px; padding: 0 12px; border-radius: 12px;
   color: #e0806a; font-size: 14px; font-weight: 700; border: 1px solid color-mix(in srgb, #e0806a 35%, transparent); background: transparent; }
 .danger-link:hover { background: color-mix(in srgb, #e0806a 10%, transparent); }
+.acct-box { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px 8px; margin: 0 0 12px; padding: 10px 12px;
+  border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2); font-size: 14px; text-align: center; }
+.acct-box span { color: var(--muted); font-weight: 600; }
+.acct-box b { color: var(--text); word-break: break-all; }
+.acct-warn { margin: 0 0 16px; padding: 12px 14px; border-radius: 14px; font-size: 14px; line-height: 1.4; color: var(--text);
+  border: 1px solid color-mix(in srgb, #f5b041 55%, transparent); background: color-mix(in srgb, #f5b041 12%, transparent); }
+.acct-warn b { word-break: break-all; }
+.acct-warn .add { margin-top: 10px; }
