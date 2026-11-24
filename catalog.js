@@ -1689,6 +1689,481 @@ window.FOCO_CATALOG = [
     ]
   },
 
+  {
+    "id": "uba-df-fisica-1",
+    "name": "Física 1",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "fisica 1 i mecanica exactas fcen uba df departamento de fisica licenciatura ciencias fisicas carrera",
+    "source": "Programa oficial Departamento de Física, FCEN-UBA",
+    "units": [
+      {
+        "name": "Cinemática del punto",
+        "topics": [
+          "Sistemas de referencia y coordenadas",
+          "Movimiento curvilíneo y coordenadas polares",
+          "Movimiento circular",
+          "Movimiento relativo y relatividad de Galileo"
+        ]
+      },
+      {
+        "name": "Dinámica del punto",
+        "topics": [
+          "Leyes de Newton e interacciones",
+          "Fuerzas de vínculo",
+          "Rozamiento estático y dinámico",
+          "Fuerzas viscosas y velocidad límite"
+        ]
+      },
+      {
+        "name": "Movimiento oscilatorio",
+        "topics": [
+          "Ley de Hooke y oscilador armónico",
+          "Péndulo y pequeñas oscilaciones",
+          "Oscilaciones amortiguadas",
+          "Oscilaciones forzadas y resonancia"
+        ]
+      },
+      {
+        "name": "Sistemas no inerciales",
+        "topics": [
+          "Sistemas acelerados en línea recta",
+          "Sistemas rotantes y fuerzas no inerciales",
+          "La Tierra como sistema rotante"
+        ]
+      },
+      {
+        "name": "Relatividad especial: cinemática",
+        "topics": [
+          "Postulados de la relatividad especial",
+          "Transformaciones de Lorentz",
+          "Contracción de longitudes y dilatación del tiempo",
+          "Simultaneidad y suma de velocidades"
+        ]
+      },
+      {
+        "name": "Impulso lineal",
+        "topics": [
+          "Impulso de partículas y sistemas",
+          "Conservación del impulso y centro de masa"
+        ]
+      },
+      {
+        "name": "Impulso angular",
+        "topics": [
+          "Impulso angular de partículas y sistemas",
+          "Conservación del impulso angular"
+        ]
+      },
+      {
+        "name": "Trabajo y energía",
+        "topics": [
+          "Trabajo y energía cinética",
+          "Fuerzas conservativas y energía potencial",
+          "Conservación de la energía"
+        ]
+      },
+      {
+        "name": "Interacción gravitatoria",
+        "topics": [
+          "Gravitación universal: masa inercial y gravitatoria",
+          "Órbitas circulares y velocidad de escape"
+        ]
+      },
+      {
+        "name": "Cuerpo rígido",
+        "topics": [
+          "Cinemática del cuerpo rígido",
+          "Dinámica del cuerpo rígido"
+        ]
+      },
+      {
+        "name": "Relatividad especial: dinámica",
+        "topics": [
+          "Momento y energía relativistas"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-df-fisica-2",
+    "name": "Física 2",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "fisica 2 ii oscilaciones ondas optica exactas fcen uba df departamento de fisica licenciatura ciencias fisicas carrera",
+    "source": "Programa oficial Departamento de Física, FCEN-UBA",
+    "units": [
+      {
+        "name": "Oscilaciones",
+        "topics": [
+          "Oscilador armónico y notación compleja",
+          "Oscilaciones amortiguadas",
+          "Modos normales con varios grados de libertad",
+          "Oscilaciones forzadas y resonancia"
+        ]
+      },
+      {
+        "name": "Ondas",
+        "topics": [
+          "Cuerda con N cuentas y paso al continuo",
+          "Ecuación de ondas y condiciones de contorno",
+          "Análisis de Fourier",
+          "Medios dispersivos y ecuación de Klein-Gordon",
+          "Ondas en medios elásticos y acústicas",
+          "Ondas planas, esféricas y cilíndricas"
+        ]
+      },
+      {
+        "name": "Paquetes de ondas",
+        "topics": [
+          "Modulación y pulsaciones",
+          "Velocidad de fase y de grupo",
+          "Energía en ondas unidimensionales"
+        ]
+      },
+      {
+        "name": "Óptica",
+        "topics": [
+          "Rayos: reflexión y refracción",
+          "Huygens y Fermat",
+          "Leyes de Snell y reflexión total",
+          "Coeficientes de Fresnel",
+          "Polarización",
+          "Interferencia",
+          "Difracción de Fresnel y Fraunhofer"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-df-fisica-3",
+    "name": "Física 3",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "fisica 3 iii electromagnetismo exactas fcen uba df departamento de fisica licenciatura ciencias fisicas carrera",
+    "source": "Programa oficial Departamento de Física, FCEN-UBA",
+    "units": [
+      {
+        "name": "Electrostática",
+        "topics": [
+          "Ley de Coulomb y campo eléctrico",
+          "Ley de Gauss",
+          "Potencial y desarrollo multipolar",
+          "Dipolo eléctrico",
+          "Energía electrostática"
+        ]
+      },
+      {
+        "name": "Conductores",
+        "topics": [
+          "Conductores en equilibrio y blindaje",
+          "Método de imágenes",
+          "Capacidad y condensadores"
+        ]
+      },
+      {
+        "name": "Dieléctricos",
+        "topics": [
+          "Polarización y vector D",
+          "Medios lineales y permitividad",
+          "Condiciones de borde para E y D"
+        ]
+      },
+      {
+        "name": "Corrientes estacionarias",
+        "topics": [
+          "Densidad de corriente y continuidad",
+          "Ley de Ohm, fem y efecto Joule",
+          "Leyes de Kirchhoff y teorema de Thévenin"
+        ]
+      },
+      {
+        "name": "Magnetostática",
+        "topics": [
+          "Ley de Biot-Savart y fuerza de Lorentz",
+          "Ley de Ampère",
+          "Medios magnéticos"
+        ]
+      },
+      {
+        "name": "Inducción y circuitos",
+        "topics": [
+          "Inducción electromagnética",
+          "Circuitos de corrientes lentamente variables",
+          "Movimiento de cargas en campos eléctricos y magnéticos"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-df-fisica-4",
+    "name": "Física 4",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "fisica 4 iv termodinamica cuantica exactas fcen uba df departamento de fisica licenciatura ciencias fisicas carrera",
+    "source": "Programa oficial Departamento de Física, FCEN-UBA",
+    "units": [
+      {
+        "name": "Termodinámica",
+        "topics": [
+          "Calor, trabajo y primer principio",
+          "Segundo principio: Kelvin, Clausius y entropía",
+          "Expansión libre y estrangulación",
+          "Potenciales termodinámicos y relaciones de Maxwell",
+          "Tercer principio"
+        ]
+      },
+      {
+        "name": "Teoría cinética",
+        "topics": [
+          "Distribución de velocidades de Maxwell",
+          "Función de partición y equipartición",
+          "Fenómenos de transporte"
+        ]
+      },
+      {
+        "name": "Origen de la teoría cuántica",
+        "topics": [
+          "Radiación de cuerpo negro y Planck",
+          "Efecto fotoeléctrico y Compton",
+          "Modelos atómicos y Bohr",
+          "Dualidad onda-partícula y de Broglie"
+        ]
+      },
+      {
+        "name": "Mecánica cuántica",
+        "topics": [
+          "Función de onda e interpretación estadística",
+          "Operadores, observables e incerteza",
+          "Ecuación de Schrödinger y estados estacionarios",
+          "Pozos, barreras y efecto túnel",
+          "Oscilador armónico cuántico",
+          "Schrödinger en tres dimensiones"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-df-fisica-teorica-1",
+    "name": "Física Teórica 1",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "fisica teorica 1 i electrodinamica exactas fcen uba df departamento de fisica licenciatura ciencias fisicas carrera",
+    "source": "Programa oficial Departamento de Física, FCEN-UBA",
+    "units": [
+      {
+        "name": "Electrostática y magnetostática",
+        "topics": [
+          "Gauss, potencial escalar y dipolos",
+          "Biot-Savart, Ampère y potencial vector",
+          "Momento magnético"
+        ]
+      },
+      {
+        "name": "Problemas de contorno",
+        "topics": [
+          "Poisson, Laplace y función de Green",
+          "Método de imágenes",
+          "Separación de variables",
+          "Desarrollo multipolar"
+        ]
+      },
+      {
+        "name": "Medios materiales",
+        "topics": [
+          "Dieléctricos y Clausius-Mossotti",
+          "Campo magnético en la materia"
+        ]
+      },
+      {
+        "name": "Electrodinámica",
+        "topics": [
+          "Ecuaciones de Maxwell e invariancia de gauge",
+          "Corrientes de Foucault",
+          "Teorema de Poynting y tensor de Maxwell"
+        ]
+      },
+      {
+        "name": "Ondas electromagnéticas",
+        "topics": [
+          "Ondas planas y polarización",
+          "Reflexión y refracción",
+          "Ondas en conductores y modelo de Drude",
+          "Relaciones de Kramers-Kronig",
+          "Guías de onda y cavidades"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-df-fisica-teorica-2",
+    "name": "Física Teórica 2",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "fisica teorica 2 ii mecanica cuantica exactas fcen uba df departamento de fisica licenciatura ciencias fisicas carrera",
+    "source": "Programa oficial Departamento de Física, FCEN-UBA",
+    "units": [
+      {
+        "name": "Formalismo",
+        "topics": [
+          "Funciones de onda y vectores de estado",
+          "Espacio de estados y bases",
+          "Postulados y evolución temporal"
+        ]
+      },
+      {
+        "name": "Sistemas fundamentales",
+        "topics": [
+          "Oscilador armónico: creación y aniquilación",
+          "Momento angular y rotaciones",
+          "Spin y matrices de Pauli",
+          "Sistemas de partículas en una dimensión"
+        ]
+      },
+      {
+        "name": "Aproximaciones",
+        "topics": [
+          "Teoría de perturbaciones",
+          "Scattering y aproximación de Born"
+        ]
+      },
+      {
+        "name": "Partículas idénticas",
+        "topics": [
+          "Bosones y fermiones",
+          "Principio de exclusión de Pauli"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-df-fisica-teorica-3",
+    "name": "Física Teórica 3",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "fisica teorica 3 iii mecanica estadistica exactas fcen uba df departamento de fisica licenciatura ciencias fisicas carrera",
+    "source": "Programa oficial Departamento de Física, FCEN-UBA",
+    "units": [
+      {
+        "name": "Termodinámica",
+        "topics": [
+          "Leyes de la termodinámica"
+        ]
+      },
+      {
+        "name": "Mecánica estadística",
+        "topics": [
+          "Estadística clásica: ensambles",
+          "Estadística cuántica",
+          "Sistemas de Fermi",
+          "Sistemas de Bose"
+        ]
+      },
+      {
+        "name": "Transiciones de fase",
+        "topics": [
+          "Fenómenos críticos",
+          "Teoría de Landau-Ginzburg"
+        ]
+      },
+      {
+        "name": "Temas avanzados",
+        "topics": [
+          "Segunda cuantificación",
+          "Superfluidez"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-dc-intro-programacion",
+    "name": "Introducción a la Programación",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "introduccion a la programacion ip python haskell exactas fcen uba dc departamento de computacion licenciatura ciencias de la computacion datos carrera",
+    "source": "Programa oficial Departamento de Computación, FCEN-UBA (plan 2023)",
+    "units": [
+      {
+        "name": "Especificación",
+        "topics": [
+          "Precondición, postcondición y parámetros",
+          "Tipos de datos"
+        ]
+      },
+      {
+        "name": "Paradigma funcional",
+        "topics": [
+          "Reducción y transparencia referencial",
+          "Recursión y pattern matching",
+          "Listas"
+        ]
+      },
+      {
+        "name": "Paradigma imperativo",
+        "topics": [
+          "Estados, variables y memoria",
+          "Pasaje por valor y por referencia",
+          "Estructuras de control y ciclos",
+          "Listas, pilas, colas y TADs"
+        ]
+      },
+      {
+        "name": "Testing",
+        "topics": [
+          "Validación y verificación",
+          "Caja negra y caja blanca",
+          "Grafo de control de flujo y cobertura"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uba-dc-aed",
+    "name": "Algoritmos y Estructuras de Datos",
+    "inst": "UBA · Exactas (carrera)",
+    "keys": "algoritmos y estructuras de datos aed algo exactas fcen uba dc departamento de computacion licenciatura ciencias de la computacion datos carrera",
+    "source": "Programa oficial Departamento de Computación, FCEN-UBA (plan 2023)",
+    "units": [
+      {
+        "name": "Especificación y correctitud",
+        "topics": [
+          "Validación y verificación",
+          "Lógica proposicional y de primer orden",
+          "Especificación con contratos",
+          "Precondición más débil y teorema del invariante"
+        ]
+      },
+      {
+        "name": "Tipos abstractos de datos",
+        "topics": [
+          "Especificación de TADs",
+          "Invariante de representación y función de abstracción"
+        ]
+      },
+      {
+        "name": "Complejidad",
+        "topics": [
+          "Análisis asintótico y modelo RAM",
+          "Peor caso, promedio y mejor caso",
+          "Análisis amortizado"
+        ]
+      },
+      {
+        "name": "Estructuras de datos",
+        "topics": [
+          "Árboles de búsqueda y balanceados",
+          "Árboles digitales (tries)",
+          "Hashing",
+          "Colas de prioridad y heaps",
+          "Skip lists y splay trees",
+          "Memoria externa"
+        ]
+      },
+      {
+        "name": "Búsqueda y ordenamiento",
+        "topics": [
+          "Búsqueda binaria",
+          "Selection, insertion y merge sort",
+          "Heap sort y quick sort",
+          "Cota inferior por comparaciones",
+          "Radix sort"
+        ]
+      }
+    ]
+  },
+
   // ======================= UNS (Bahía Blanca) =======================
   {
     id: 'uns-algebra-geometria-5539',
