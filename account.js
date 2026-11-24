@@ -39,8 +39,10 @@ const PERKS = [
 // ---------- Interfaz ----------
 function updateBtn() {
   btn.classList.toggle('on', !!pro);
-  btn.textContent = pro ? 'Pro ✓' : 'Pro';
-  btn.setAttribute('aria-label', pro ? 'Tu cuenta Foco Pro' : 'Conocé Foco Pro');
+  // Sin sesión, el botón también es la entrada a la cuenta (para recuperar la Pro en otro dispositivo)
+  const signed = store.get('acct', false);
+  btn.textContent = pro ? 'Pro ✓' : signed ? 'Pro' : 'Pro · Entrar';
+  btn.setAttribute('aria-label', pro ? 'Tu cuenta Foco Pro' : signed ? 'Conocé Foco Pro' : 'Entrar con tu cuenta o conocer Foco Pro');
 }
 function open(why = '') {
   reason = why; note = '';
@@ -64,7 +66,7 @@ function render() {
     const st = { ok: `Sincronizado${sync.at ? ' · ' + new Date(sync.at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : ''}`, busy: 'Sincronizando…', error: 'No se pudo sincronizar. Se reintenta solo.', '': 'Conectando…' }[sync.state];
     body = `${head}
       <h2 id="sheet-title">Sos Pro ✓</h2>
-      <p class="sheet-sub">${esc(user.displayName || user.email || '')}${when ? ` · desde el ${when}` : ''}</p>
+      <p class="sheet-sub">${esc(user.email || user.displayName || '')}${when ? ` · desde el ${when}` : ''}</p>
       <div class="sync-row"><span class="sync-dot ${sync.state}"></span>${st}</div>
       ${perks}${msg}
       <div class="sheet-actions"><button class="ghost" data-act="signout">Cerrar sesión</button></div>`;
@@ -79,17 +81,20 @@ function render() {
         : '<button class="link promo-link" data-act="promo-open">¿Tenés un código de descuento?</button>'}
       <button class="add wide" data-act="buy" ${busy ? 'disabled' : ''}>${busy === 'buy' ? 'Abriendo el pago…' : 'Pagar · tarjeta, efectivo o Mercado Pago'}</button>
       <p class="sheet-fine pay-fine">No necesitás cuenta de Mercado Pago: podés pagar con tarjeta de crédito, débito o prepaga, o en efectivo en Rapipago o Pago Fácil.</p>
+      <p class="sheet-fine">Entraste como <b>${esc(user.email || user.displayName || '')}</b>. ¿Ya pagaste con otra cuenta de Google? Cambiá a esa y tu Pro aparece sola.</p>
       <div class="sheet-actions"><button class="link" data-act="signout">Usar otra cuenta</button></div>`;
   } else {
     body = `${head}
       <h2 id="sheet-title">${reason ? REASONS[reason] || 'Foco Pro' : 'Foco Pro'}</h2>
       <p class="sheet-sub">Todo lo que ya usás sigue gratis. Pro suma esto:</p>
+      <p class="sheet-fine already-pro">¿Ya sos Pro? <button class="link" data-act="signin" ${busy || (!f && booting) ? 'disabled' : ''}>Entrá con tu cuenta de Google</button></p>
       ${perks}
       <div class="price"><b>${money(PRICE)}</b><span>pesos argentinos · pago único · sin suscripción</span></div>${msg}
       <button class="add wide google" data-act="signin" ${busy || (!f && booting) ? 'disabled' : ''}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>
-        ${busy === 'signin' ? 'Entrando…' : 'Entrar con Google para comprar'}</button>
-      <p class="sheet-fine">La Pro queda en tu cuenta de Google: la usás en todos tus dispositivos.<br>
+        ${busy === 'signin' ? 'Entrando…' : 'Entrar con Google'}</button>
+      <p class="sheet-fine"><b>¿Ya sos Pro?</b> Entrá con la misma cuenta de Google con la que pagaste.<br>
+        La Pro queda en tu cuenta de Google: la usás en todos tus dispositivos.<br>
         Al continuar aceptás los <a href="/terminos/" target="_blank">términos</a> y la <a href="/privacidad/" target="_blank">política de privacidad</a>.</p>`;
   }
   box.innerHTML = body;
