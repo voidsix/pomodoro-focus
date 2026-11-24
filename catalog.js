@@ -226,6 +226,318 @@ window.FOCO_CATALOG = [
       ] }
     ]
   },
+  {
+    id: 'uba-cbc-ipc-40',
+    name: 'Introducción al Pensamiento Científico (40)',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'ipc pensamiento cientifico 40 cbc uba xxi ubaxxi ciclo basico comun presencial normal regular ciencia de datos',
+    source: 'Contenidos mínimos oficiales · Código UBA I-16, cap. D',
+    units: [
+      { name: 'Modos de conocimiento', topics: [
+        'Conocimiento tácito y explícito · lenguaje y metalenguaje',
+        'Sentido común y conocimiento científico',
+        'Ciencias formales y fácticas, sociales y humanidades',
+        'Tipos de enunciados y condiciones de verdad',
+        'Demostración',
+        'Tipos de argumentos y cómo evaluarlos'
+      ] },
+      { name: 'Historia y estructura institucional de la ciencia', topics: [
+        'Revoluciones copernicana y darwiniana',
+        'Cambios en la visión del mundo y en el método',
+        'Comunidades científicas e instituciones',
+        'Producción y difusión del conocimiento científico'
+      ] },
+      { name: 'Contrastación de hipótesis', topics: [
+        'Conceptos cualitativos, comparativos y cuantitativos',
+        'Enunciados generales, singulares y probabilísticos',
+        'Hipótesis auxiliares, ceteris paribus y condiciones iniciales',
+        'Asimetría y holismo de la contrastación'
+      ] },
+      { name: 'Estructura y cambio de las teorías científicas', topics: [
+        'Teorías como conjuntos de enunciados',
+        'Observación y experimentación',
+        'Ciencia normal y revoluciones científicas',
+        'Criterio de demarcación y progreso científico',
+        'Ciencia, tecnología, sociedad y ética'
+      ] }
+    ]
+  },
+  {
+    id: 'uba-cbc-analisis-a-66',
+    name: 'Análisis Matemático A (66)',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'analisis matematico a 66 am matematica cbc uba xxi ubaxxi ciclo basico comun ingenieria exactas ciencia de datos computacion',
+    source: 'Contenidos mínimos oficiales · Código UBA I-16, cap. D',
+    units: [
+      { name: 'Funciones y números reales', topics: [
+        'Funciones elementales y sus gráficos',
+        'Composición y función inversa',
+        'Exponenciales y logarítmicas',
+        'Funciones trigonométricas',
+        'Números reales: supremo, ínfimo y completitud'
+      ] },
+      { name: 'Sucesiones', topics: [
+        'Límite de sucesiones y álgebra de límites',
+        'Indeterminaciones',
+        'Sucesiones monótonas y el número e',
+        'Subsucesiones y sucesiones por recurrencia'
+      ] },
+      { name: 'Límite y continuidad', topics: [
+        'Límites en un punto, laterales e infinitos',
+        'Asíntotas horizontales y verticales',
+        'Continuidad y discontinuidades',
+        'Teoremas de Bolzano y de los valores intermedios'
+      ] },
+      { name: 'Derivadas', topics: [
+        'Recta tangente y definición de derivada',
+        'Reglas de derivación y regla de la cadena',
+        'Derivada de la inversa',
+        'Extremos absolutos y teorema de Fermat',
+        'Teoremas de Rolle, Lagrange y Cauchy',
+        'Regla de L\'Hôpital'
+      ] },
+      { name: 'Estudio de funciones y optimización', topics: [
+        'Crecimiento, extremos locales y asíntotas oblicuas',
+        'Concavidad y construcción de curvas',
+        'Cantidad de soluciones y desigualdades',
+        'Problemas de optimización',
+        'Polinomio de Taylor y resto'
+      ] },
+      { name: 'Integrales', topics: [
+        'Definición y propiedades de la integral',
+        'Teorema fundamental y regla de Barrow',
+        'Sustitución y por partes',
+        'Área entre curvas',
+        'Ecuaciones diferenciales'
+      ] },
+      { name: 'Series', topics: [
+        'Sumas parciales: series geométricas y telescópicas',
+        'Criterios de convergencia',
+        'Series de potencias'
+      ] }
+    ]
+  },
+  {
+    id: 'uba-cbc-algebra-a-62',
+    name: 'Álgebra A (62)',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'algebra a 62 matematica cbc uba xxi ubaxxi ciclo basico comun ingenieria exactas ciencia de datos computacion',
+    source: 'Contenidos mínimos oficiales · Código UBA I-16, cap. D',
+    units: [
+      { name: 'Conjuntos, complejos y polinomios', topics: [
+        'Conjuntos y operaciones',
+        'Números complejos: forma binómica, polar y exponencial',
+        'Conjugación, traslaciones, homotecias y rotaciones',
+        'Polinomios y algoritmo de división',
+        'Teorema fundamental del álgebra y factorización'
+      ] },
+      { name: 'Álgebra vectorial', topics: [
+        'Vectores en Rn y producto escalar',
+        'Norma, ángulo y producto vectorial',
+        'Rectas y planos',
+        'Combinación lineal, dependencia y subespacio generado',
+        'Distancias, proyecciones y simetrías'
+      ] },
+      { name: 'Sistemas lineales, matrices y determinantes', topics: [
+        'Sistemas de ecuaciones y su interpretación geométrica',
+        'Operaciones con matrices',
+        'Eliminación de Gauss-Jordan',
+        'Determinante y matriz inversa',
+        'Matrices de 2×2 y 3×3 como transformaciones'
+      ] },
+      { name: 'Funciones lineales', topics: [
+        'Transformaciones lineales y su matriz',
+        'Imagen, preimagen y núcleo',
+        'Interpretación geométrica del determinante',
+        'Transformación inversa'
+      ] },
+      { name: 'Cónicas', topics: [
+        'Ecuaciones canónicas',
+        'Focos, centro, vértices, semiejes y excentricidad'
+      ] }
+    ]
+  },
+  {
+    id: 'uba-cbc-biofisica-53',
+    name: 'Física e Introducción a la Biofísica (53)',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'fisica biofisica 53 cbc uba xxi ubaxxi ciclo basico comun medicina salud enfermeria kinesiologia nutricion odontologia farmacia bioquimica',
+    source: 'Contenidos mínimos oficiales · Código UBA I-16, cap. D',
+    units: [
+      { name: 'Introducción a la biomecánica', topics: [
+        'Magnitudes y Sistema Internacional',
+        'MRU y movimiento uniformemente acelerado',
+        'Inercia, fuerza y gravedad',
+        'Trabajo, energía y potencia',
+        'Oscilaciones: frecuencia y período',
+        'El cuerpo humano como estructura mecánica'
+      ] },
+      { name: 'Bases físicas de la circulación y la respiración', topics: [
+        'Hidrostática: presión y principio de Pascal',
+        'Gases: ecuación de estado y ley de Dalton',
+        'Gases en solución, evaporación y humedad',
+        'Hidrodinámica: continuidad y Bernoulli',
+        'Viscosidad y ley de Poiseuille',
+        'El aparato circulatorio como sistema tubular'
+      ] },
+      { name: 'Termodinámica de los seres vivos', topics: [
+        'Calor, temperatura y escalas',
+        'Primer principio de la termodinámica',
+        'Sistemas abiertos, cerrados y aislados',
+        'Entropía y segundo principio',
+        'El cuerpo como sistema termodinámico'
+      ] },
+      { name: 'Bases fisicoquímicas de la vida', topics: [
+        'Soluciones, molaridad y electrolitos',
+        'Permeabilidad y gradientes',
+        'Presión osmótica y ósmosis',
+        'Membranas biológicas'
+      ] },
+      { name: 'Fenómenos bioeléctricos', topics: [
+        'Carga, potencial y corriente eléctrica',
+        'Resistencia, conductancia y capacidad',
+        'Circuitos en medios sólidos y líquidos',
+        'Bioelectricidad en el cuerpo humano'
+      ] },
+      { name: 'Señales en los seres vivos', topics: [
+        'Fenómenos ondulatorios',
+        'Luz y sonido: visión y audición'
+      ] }
+    ]
+  },
+  {
+    id: 'uba-cbc-biologia',
+    name: 'Biología',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'biologia 54 celular cbc uba xxi ubaxxi ciclo basico comun exactas agronomia veterinaria',
+    source: 'Contenidos mínimos oficiales · Código UBA I-16, cap. D',
+    units: [
+      { name: 'Organización de la materia viva', topics: [
+        'Niveles de organización y teoría celular',
+        'Microscopía y técnicas de estudio de la célula',
+        'Células procariotas y eucariotas · virus',
+        'Organización de la célula eucariota animal y vegetal'
+      ] },
+      { name: 'Composición química de los seres vivos', topics: [
+        'Agua, iones y pequeñas moléculas',
+        'Ácidos nucleicos: ADN y ARN',
+        'Proteínas y enzimas',
+        'Azúcares y lípidos'
+      ] },
+      { name: 'Superficie celular y endomembranas', topics: [
+        'Membrana plasmática y modelo de mosaico fluido',
+        'Permeabilidad activa y pasiva',
+        'Receptores y comunicación celular',
+        'Endocitosis y exocitosis',
+        'Retículo endoplasmático y Golgi: secreción',
+        'Citoesqueleto, cilios y flagelos'
+      ] },
+      { name: 'Digestión celular', topics: [
+        'Lisosomas',
+        'Peroxisomas y glioxisomas'
+      ] },
+      { name: 'Transducción de energía', topics: [
+        'Mitocondrias: Krebs, cadena respiratoria y fosforilación',
+        'Cloroplastos y fotosíntesis'
+      ] },
+      { name: 'Núcleo y ciclo celular', topics: [
+        'Envoltura nuclear y cromatina',
+        'Cromosomas y nucléolo',
+        'Ciclo celular',
+        'Duplicación del ADN'
+      ] },
+      { name: 'Transcripción', topics: [
+        'Dogma central y transcripción',
+        'Procesamiento de los ARN',
+        'Ribosomas y código genético'
+      ] },
+      { name: 'Síntesis proteica', topics: [
+        'Etapas de la traducción',
+        'Destino de las proteínas y péptido señal',
+        'Regulación genética en procariotas y eucariotas'
+      ] },
+      { name: 'División celular', topics: [
+        'Mitosis',
+        'Meiosis'
+      ] },
+      { name: 'Herencia', topics: [
+        'Genes, alelos, genotipo y fenotipo',
+        'Leyes de Mendel',
+        'Ligamiento y recombinación',
+        'Mutaciones y aberraciones cromosómicas'
+      ] }
+    ]
+  },
+  {
+    id: 'uba-cbc-biologia-celular',
+    name: 'Biología e Introducción a la Biología Celular',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'biologia celular introduccion 08 cbc uba xxi ubaxxi ciclo basico comun medicina salud enfermeria kinesiologia nutricion odontologia',
+    source: 'Contenidos mínimos oficiales · Código UBA I-16, cap. D',
+    units: [
+      { name: 'La célula y la vida', topics: [
+        'Biología celular en la salud · niveles de organización',
+        'Diversidad y clasificación de los seres vivos',
+        'Células procariotas y eucariotas',
+        'Componentes químicos de la célula'
+      ] },
+      { name: 'Membrana, núcleo y citosol', topics: [
+        'Membrana celular y transporte',
+        'Señalización y reconocimiento',
+        'Núcleo, cromatina y cromosomas',
+        'Citosol, ribosomas y citoesqueleto'
+      ] },
+      { name: 'Endomembranas y organoides', topics: [
+        'Retículo, Golgi, endosomas y lisosomas',
+        'Biosíntesis, secreción y endocitosis',
+        'Mitocondria, cloroplasto y peroxisoma'
+      ] },
+      { name: 'Información genética', topics: [
+        'Código genético y transcripción',
+        'Procesamiento del ARN y traducción'
+      ] },
+      { name: 'La célula y su entorno', topics: [
+        'Señales intracelulares',
+        'Uniones intercelulares y matriz extracelular'
+      ] },
+      { name: 'División, reproducción y herencia', topics: [
+        'Ciclo celular, replicación y mitosis',
+        'Apoptosis',
+        'Reproducción, meiosis y fecundación',
+        'Leyes de Mendel y bases químicas de la herencia'
+      ] },
+      { name: 'Evolución', topics: [
+        'Biología de poblaciones',
+        'Teorías y evidencias de la evolución',
+        'Selección natural y origen de las especies'
+      ] }
+    ]
+  },
+  {
+    id: 'uba-cbc-pensamiento-computacional',
+    name: 'Pensamiento Computacional (90)',
+    inst: 'UBA · CBC presencial y UBA XXI',
+    keys: 'pensamiento computacional 90 programacion python cbc uba xxi ubaxxi ciclo basico comun ingenieria ciencia de datos computacion',
+    source: 'Contenidos mínimos oficiales · Código UBA I-16, cap. D',
+    units: [
+      { name: 'Resolución de problemas', topics: [
+        'Pensamiento computacional: descomposición y abstracción',
+        'Algoritmos y programas'
+      ] },
+      { name: 'Programación', topics: [
+        'Variables, expresiones y tipos de datos',
+        'Estructuras de control: condicionales',
+        'Estructuras de control: ciclos',
+        'Funciones y programación modular',
+        'Datos estructurados: listas y diccionarios'
+      ] },
+      { name: 'Datos y bibliotecas', topics: [
+        'Archivos de texto',
+        'Formatos de intercambio de datos',
+        'Funciones predefinidas y bibliotecas'
+      ] }
+    ]
+  },
 
   // ======================= UTN (programas de FRBA; contenidos mínimos comunes a todas las regionales) =======================
   {

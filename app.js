@@ -609,11 +609,19 @@
     { id: 'lofi', name: 'Lo-fi', desc: 'beats tranquilos', pro: true, tracks: [
       T('macleod-study-and-relax.mp3', 'Study and Relax', 'Kevin MacLeod'),
       T('sappheiros-perspective.mp3', 'Perspective', 'Sappheiros'),
-      T('currie-lofi.mp3', 'Lofi', 'Caden Currie')
+      T('currie-lofi.mp3', 'Lofi', 'Caden Currie'),
+      T('macleod-tea-roots.mp3', 'Tea Roots', 'Kevin MacLeod'),
+      T('macleod-off-to-osaka.mp3', 'Off to Osaka', 'Kevin MacLeod'),
+      T('macleod-healing.mp3', 'Healing', 'Kevin MacLeod')
     ] },
     { id: 'jazz', name: 'Jazz suave', desc: 'baladas instrumentales', pro: true, tracks: [
       T('reid-smooth-jazz-ballad-1.mp3', 'Smooth Jazz Ballad n.º 1', 'Claude Reid'),
-      T('reid-smooth-jazz-ballad-2.mp3', 'Smooth Jazz Ballad n.º 2', 'Claude Reid')
+      T('reid-smooth-jazz-ballad-2.mp3', 'Smooth Jazz Ballad n.º 2', 'Claude Reid'),
+      T('macleod-backed-vibes.mp3', 'Backed Vibes', 'Kevin MacLeod'),
+      T('macleod-vibe-ace.mp3', 'Vibe Ace', 'Kevin MacLeod'),
+      T('macleod-night-on-the-docks.mp3', 'Night on the Docks', 'Kevin MacLeod'),
+      T('macleod-i-knew-a-guy.mp3', 'I Knew a Guy', 'Kevin MacLeod'),
+      T('macleod-as-i-figure.mp3', 'As I Figure', 'Kevin MacLeod')
     ] }
   ];
   let mus = { id: null, el: null };

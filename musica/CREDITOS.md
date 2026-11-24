@@ -17,5 +17,13 @@ Grabaciones de Wikimedia Commons, convertidas a mp3 para Foco (sin silencio inic
 | currie-lofi.mp3 | [Lofi](https://commons.wikimedia.org/wiki/File:Lofi_by_Caden_Currie.mp3) | Caden Currie | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
 | reid-smooth-jazz-ballad-1.mp3 | [Smooth Jazz Ballad no1](https://commons.wikimedia.org/wiki/File:Smooth_Jazz_Ballad_no1_(accompagnement).flac) | Claude Reid | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
 | reid-smooth-jazz-ballad-2.mp3 | [Smooth Jazz Ballad no2](https://commons.wikimedia.org/wiki/File:Smooth_Jazz_Ballad_no2_(accompagnement).flac) | Claude Reid | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| macleod-tea-roots.mp3 | [Tea Roots](https://commons.wikimedia.org/wiki/File:Tea_Roots_(MacLeod,_Kevin)_(ISRC_USUAN1100472).oga) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| macleod-off-to-osaka.mp3 | [Off to Osaka](https://commons.wikimedia.org/wiki/File:Kevin_MacLeod_-_Off_to_Osaka.ogg) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| macleod-healing.mp3 | [Healing](https://commons.wikimedia.org/wiki/File:Healing_(Kevin_MacLeod)_(ISRC_USUAN1200048).oga) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| macleod-backed-vibes.mp3 | [Backed Vibes Clean](https://commons.wikimedia.org/wiki/File:Kevin_MacLeod_-_Backed_Vibes_Clean.ogg) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| macleod-vibe-ace.mp3 | [Vibe Ace](https://commons.wikimedia.org/wiki/File:Kevin_MacLeod_-_Vibe_Ace.ogg) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| macleod-night-on-the-docks.mp3 | [Night on the Docks (Sax)](https://commons.wikimedia.org/wiki/File:Kevin_MacLeod_-_Night_on_the_Docks_-_Sax.ogg) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| macleod-i-knew-a-guy.mp3 | [I Knew a Guy](https://commons.wikimedia.org/wiki/File:Kevin_MacLeod_-_I_Knew_a_Guy.ogg) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| macleod-as-i-figure.mp3 | [As I Figure](https://commons.wikimedia.org/wiki/File:Kevin_MacLeod_-_As_I_Figure.ogg) | Kevin MacLeod (incompetech.com) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
 
 Las obras con CC BY-SA se comparten con la misma licencia.
