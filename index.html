@@ -18,7 +18,7 @@
 <body data-mode="focus">
 
 <header class="top band">
-  <div class="brand"><h1><button id="brand-btn" class="brand-btn" aria-haspopup="dialog" aria-label="Tu cuenta" title="Tu cuenta">Foco<span id="brand-avatar" class="brand-avatar" hidden></span></button></h1><button id="pro-btn" class="pro-btn" aria-haspopup="dialog">Pro</button></div>
+  <div class="brand"><h1><button id="brand-btn" class="brand-btn" aria-haspopup="dialog" aria-label="Tu cuenta" title="Tu cuenta">Foco<span id="brand-avatar" class="brand-avatar" hidden></span></button></h1><button id="pro-btn" class="pro-btn" aria-haspopup="dialog">Pro</button><button id="streak-btn" class="streak-btn" aria-label="Tu racha"><span class="flame" aria-hidden="true">🔥</span><b id="streak-n">0</b></button></div>
   <nav class="modes" aria-label="Modo">
     <button data-mode-btn="focus" aria-pressed="true">Foco</button>
     <button data-mode-btn="short" aria-pressed="false">Descanso</button>
@@ -197,8 +197,10 @@
     <div class="stats">
       <div><b id="s-today">0</b><span>pomodoros hoy</span></div>
       <div><b id="s-min">0</b><span>min de foco hoy</span></div>
-      <div><b id="s-streak">0</b><span>días seguidos</span></div>
+      <div><b id="s-streak">0</b><span>días seguidos 🔥</span></div>
     </div>
+    <h3 id="cal-h">Calendario</h3>
+    <div id="cal" class="cal"></div>
     <div id="week" class="week" aria-label="Últimos 7 días"></div>
     <h3>Por materia · últimos 7 días</h3>
     <ul id="by-subject" class="by-subject"></ul>

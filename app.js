@@ -159,6 +159,7 @@
     if (!quiet) alertDone(wasFocus ? '¡Pomodoro completo! Tomate un descanso.' : 'Fin del descanso. A enfocarse.');
     mode = next; bonus = 0; remaining = total();
     persist(); render(); renderStats();
+    if (wasFocus && !quiet) celebrateStreak();
     document.body.classList.add('done');
     setTimeout(() => document.body.classList.remove('done'), 2000);
     if (settings.autoStart && !quiet) start(); else updateAmbient();
@@ -1431,6 +1432,100 @@
 
   // ---------- Estadísticas ----------
   const dayKey = (d) => { const x = new Date(d); return `${x.getFullYear()}-${x.getMonth()}-${x.getDate()}`; };
+  // ---------- Racha (fueguitos) y calendario ----------
+  function streakOf(byDay) {
+    let streak = 0; const d = new Date(); const today = !!byDay[dayKey(d)];
+    if (!today) d.setDate(d.getDate() - 1);
+    while (byDay[dayKey(d)]) { streak++; d.setDate(d.getDate() - 1); }
+    return { streak, today };
+  }
+  function bestStreak() {
+    const days = [...new Set(log.map((x) => { const t = new Date(x.ts); t.setHours(0, 0, 0, 0); return t.getTime(); }))].sort((a, b) => a - b);
+    let best = 0, run = 0, prev = null;
+    for (const t of days) { run = prev !== null && Math.round((t - prev) / 864e5) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = t; }
+    return best;
+  }
+  function renderStreak(n, today, best) {
+    const b = $('#streak-btn'); if (!b) return;
+    $('#streak-n').textContent = n;
+    b.classList.toggle('lit', n > 0 && today);
+    b.classList.toggle('risk', n > 0 && !today);
+    const dias = (x) => `${x} ${x === 1 ? 'día' : 'días'}`;
+    b.title = n === 0 ? 'Hacé un pomodoro hoy para arrancar tu racha'
+      : today ? `¡${dias(n)} seguidos estudiando!${best > n ? ` · Tu récord: ${best}` : ''}`
+      : `Racha de ${dias(n)}: hacé un pomodoro hoy para no perderla`;
+    b.setAttribute('aria-label', b.title);
+  }
+  let calMonth = null, calDay = null;
+  const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  function renderCal(byDay) {
+    const box = $('#cal'); if (!box) return;
+    const now = new Date();
+    if (!calMonth) calMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const y = calMonth.getFullYear(), m = calMonth.getMonth();
+    const lead = (new Date(y, m, 1).getDay() + 6) % 7; // la semana arranca el lunes
+    const nDays = new Date(y, m + 1, 0).getDate();
+    const exams = {};
+    for (const s of subjects) if (s.exam) { const [ey, em, ed] = s.exam.split('-').map(Number); (exams[`${ey}-${em - 1}-${ed}`] ||= []).push(s); }
+    const todayK = dayKey(now);
+    let cells = '';
+    for (let i = 0; i < lead; i++) cells += '<span class="cal-c empty"></span>';
+    for (let dd = 1; dd <= nDays; dd++) {
+      const k = `${y}-${m}-${dd}`, st = byDay[k], ex = exams[k];
+      const lv = !st ? 0 : st.n >= 6 ? 3 : st.n >= 3 ? 2 : 1;
+      const label = `${dd} de ${MESES[m]}${st ? `: ${st.n} pomodoros` : ''}${ex ? ' · final' : ''}`;
+      cells += `<button class="cal-c l${lv}${k === todayK ? ' today' : ''}${ex ? ' exam' : ''}${k === calDay ? ' sel' : ''}" data-day="${k}" aria-label="${label}">`
+        + `<span>${dd}</span>${st ? '<i class="cal-f">🔥</i>' : ''}${ex ? `<em style="background:${subColor(ex[0].id)}"></em>` : ''}</button>`;
+    }
+    let detail = '<p class="cal-hint">Los días con 🔥 estudiaste. Los puntitos de color son tus finales. Tocá un día para ver el detalle.</p>';
+    if (calDay) {
+      const [cy, cm, cd] = calDay.split('-').map(Number);
+      const st = byDay[calDay], ex = exams[calDay] || [];
+      const per = {};
+      for (const x of log) if (dayKey(x.ts) === calDay) { const id = subById(x.sub) ? x.sub : ''; per[id] = (per[id] || 0) + 1; }
+      const date = new Date(cy, cm, cd).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+      const subs = Object.entries(per).map(([id, n]) => `<span class="cal-sub"><i style="background:${subColor(id)}"></i>${id ? esc(subById(id).name) : 'Sin materia'} · ${n}</span>`).join('');
+      detail = `<div class="cal-detail"><b>${date}</b>`
+        + (st ? `<span>${st.n} pomodoro${st.n > 1 ? 's' : ''} · ${st.min} min de foco</span>${subs}` : '<span>Sin pomodoros este día.</span>')
+        + ex.map((x) => `<span class="cal-ex">📌 Final de <b>${esc(x.name)}</b></span>`).join('') + '</div>';
+    }
+    const monthN = Object.keys(byDay).filter((k) => k.startsWith(`${y}-${m}-`)).length;
+    box.innerHTML = `<div class="cal-head"><button class="cal-nav" data-cal="-1" aria-label="Mes anterior">‹</button>`
+      + `<b>${MESES[m]} ${y}</b><button class="cal-nav" data-cal="1" aria-label="Mes siguiente">›</button></div>`
+      + `<div class="cal-sum">${monthN ? `🔥 Estudiaste <b>${monthN} ${monthN === 1 ? 'día' : 'días'}</b> este mes` : 'Todavía no estudiaste este mes'} · récord de racha: <b>${bestStreak()}</b></div>`
+      + `<div class="cal-grid">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((w) => `<span class="cal-w">${w}</span>`).join('')}${cells}</div>${detail}`;
+  }
+  $('#cal').addEventListener('click', (e) => {
+    const nav = e.target.closest('[data-cal]');
+    if (nav) { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + Number(nav.dataset.cal), 1); calDay = null; renderStats(); return; }
+    const d = e.target.closest('[data-day]'); if (d) { calDay = calDay === d.dataset.day ? null : d.dataset.day; renderStats(); }
+  });
+  $('#streak-btn').addEventListener('click', () => {
+    window.__focoOpts?.('progreso');
+    setTimeout(() => $('#cal-h')?.scrollIntoView({ block: 'start' }), 60);
+  });
+  // Festejo: el primer pomodoro del día suma un fueguito
+  const STREAK_MSG = {
+    1: '🔥 ¡Arrancaste tu racha! Mañana sumás otro',
+    3: '🔥 ¡3 días seguidos! Ya es un hábito 💪',
+    7: '🔥 ¡Una semana entera estudiando!',
+    14: '🔥 ¡2 semanas sin cortar! Imparable',
+    30: '🏆 ¡Un mes seguido! Sos una máquina'
+  };
+  function celebrateStreak() {
+    const byDay = {}; for (const x of log) { const k = dayKey(x.ts); (byDay[k] ||= { n: 0 }).n++; }
+    if ((byDay[dayKey(Date.now())] || { n: 0 }).n !== 1) return;
+    const { streak } = streakOf(byDay);
+    toast(STREAK_MSG[streak] || `🔥 ¡${streak} días seguidos! No cortes la racha`, 'fire');
+    const b = $('#streak-btn'); b?.classList.add('pop'); setTimeout(() => b?.classList.remove('pop'), 1600);
+  }
+  function toast(text, kind = '') {
+    const n = document.createElement('div');
+    n.className = 'resume-note' + (kind ? ' ' + kind : ''); n.setAttribute('role', 'status'); n.textContent = text;
+    document.body.appendChild(n); requestAnimationFrame(() => n.classList.add('on'));
+    setTimeout(() => { n.classList.remove('on'); setTimeout(() => n.remove(), 500); }, 5000);
+  }
+
   function renderStats() {
     renderPlan();
     const byDay = {};
@@ -1439,10 +1534,10 @@
     $('#s-today').textContent = today.n;
     $('#s-min').textContent = today.min;
 
-    let streak = 0; const d = new Date();
-    if (!byDay[dayKey(d)]) d.setDate(d.getDate() - 1);
-    while (byDay[dayKey(d)]) { streak++; d.setDate(d.getDate() - 1); }
+    const { streak, today: didToday } = streakOf(byDay);
     $('#s-streak').textContent = streak;
+    renderStreak(streak, didToday, bestStreak(byDay));
+    renderCal(byDay);
 
     const days = Array.from({ length: 7 }, (_, i) => { const x = new Date(); x.setDate(x.getDate() - (6 - i)); return x; });
     const vals = days.map((x) => (byDay[dayKey(x)] || { n: 0 }).n);
