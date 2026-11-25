@@ -846,7 +846,7 @@
     window.dispatchEvent(new CustomEvent('foco:state', { detail }));
   }
   document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'BUTTON'].includes(document.activeElement.tagName)) {
+    if (e.code === 'Space' && !document.body.classList.contains('opts-open') && !['INPUT', 'TEXTAREA', 'BUTTON'].includes(document.activeElement.tagName)) {
       e.preventDefault(); timer ? pause() : start();
     }
   });
@@ -1002,7 +1002,7 @@
     if (scroll) { el.subName.value = ''; el.subDate.value = ''; catBox.hidden = true; catBox.innerHTML = ''; }
     openPlans.add(s.id);
     setSubject(s.id); renderStats();
-    if (scroll) document.getElementById('plan-sec').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (scroll) { window.__focoOpts?.(false); document.getElementById('plan-sec').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }
   el.subName.addEventListener('input', renderCatPick);
   catBox.addEventListener('change', (e) => { const u = e.target.dataset.catUnit; if (u) updateCatButton(Number(u.split('|')[0])); });
@@ -1066,7 +1066,7 @@
     const box = $('#plan'), top = $('#plan-today'); if (!box) return;
     if (!subjects.length) {
       top.innerHTML = '';
-      box.innerHTML = '<p class="empty">Primero cargá tus materias (más abajo, en "Materias") con la fecha del final.</p>';
+      box.innerHTML = '<p class="empty">Primero cargá tus materias con la fecha del final.</p><button class="add plan-empty-btn" data-open-tab="materias">Cargar materias</button>';
       return;
     }
     const order = (p) => (p.d === null ? 1e6 : p.d < 0 ? 2e6 : p.d);
@@ -1253,7 +1253,7 @@
   document.addEventListener('visibilitychange', () => { if (isZen() && document.visibilityState === 'visible') keepAwake(true); });
   ['pointermove', 'pointerdown', 'keydown', 'touchstart'].forEach((ev) => document.addEventListener(ev, () => { if (isZen()) poke(); }, { passive: true }));
   document.addEventListener('keydown', (e) => {
-    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) || document.body.classList.contains('opts-open')) return;
     if (e.key === 'Escape' && isZen()) setZen(false);
     else if ((e.key === 'z' || e.key === 'Z') && !e.ctrlKey && !e.metaKey && !e.altKey) setZen(!isZen());
   });
@@ -1457,6 +1457,47 @@
       }).catch(() => {});
     }
   } catch {}
+
+  // ---------- Ruedita de opciones ----------
+  // Todo lo que no es el reloj ni el plan de hoy vive en un panel con pestañas.
+  const opts = $('#opts'), optsBtn = $('#opts-btn');
+  const TABS = [...opts.querySelectorAll('[data-tab]')].map((b) => b.dataset.tab);
+  let optsReturn = null;
+  function showTab(tab) {
+    if (!TABS.includes(tab)) tab = TABS[0];
+    opts.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+    opts.querySelectorAll('[data-pane]').forEach((p) => p.classList.toggle('on', p.dataset.pane === tab));
+    opts.querySelector('.opts-body').scrollTop = 0;
+    opts.querySelector(`[data-tab="${tab}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    store.set('optsTab', tab);
+  }
+  function openOpts(tab) {
+    optsReturn = document.activeElement;
+    showTab(tab || store.get('optsTab', TABS[0]));
+    opts.hidden = false; document.body.classList.add('opts-open');
+    opts.querySelector('[aria-selected=true]')?.focus({ preventScroll: true });
+  }
+  function closeOpts() {
+    if (opts.hidden) return;
+    opts.hidden = true; document.body.classList.remove('opts-open');
+    optsReturn?.focus?.({ preventScroll: true });
+  }
+  window.__focoOpts = (tab) => (tab === false ? closeOpts() : openOpts(tab));
+  optsBtn.addEventListener('click', () => openOpts());
+  opts.addEventListener('click', (e) => {
+    if (e.target === opts || e.target.closest('[data-opts-close]')) return closeOpts();
+    const t = e.target.closest('[data-tab]'); if (t) showTab(t.dataset.tab);
+  });
+  opts.querySelector('.opts-tabs').addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const cur = TABS.indexOf(store.get('optsTab', TABS[0]));
+    const next = TABS[(cur + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length];
+    showTab(next); opts.querySelector(`[data-tab="${next}"]`).focus();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !opts.hidden && $('#dialog').hidden && $('#sheet').hidden) closeOpts(); });
+  document.addEventListener('click', (e) => { const go = e.target.closest('[data-open-tab]'); if (go) openOpts(go.dataset.openTab); });
+  // Link de invitación a una sala: abre directo la pestaña Amigos
+  if (location.hash.includes('sala=')) setTimeout(() => openOpts('amigos'), 300);
 
   fillForm(); renderPresets(); renderSkins(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
 }

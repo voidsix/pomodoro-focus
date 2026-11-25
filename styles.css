@@ -653,3 +653,52 @@ body.sheet-open { overflow: hidden; }
   border: 1px solid color-mix(in srgb, #f5b041 55%, transparent); background: color-mix(in srgb, #f5b041 12%, transparent); }
 .acct-warn b { word-break: break-all; }
 .acct-warn .add { margin-top: 10px; }
+
+/* ---------- Ruedita de opciones ---------- */
+.top { display: grid; grid-template-columns: auto 1fr auto auto; grid-template-areas: "brand . modes gear"; align-items: center; }
+.top .brand { grid-area: brand; } .top .modes { grid-area: modes; } .top .gear-btn { grid-area: gear; }
+.gear-btn { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface);
+  transition: background-color .3s var(--ease), transform .5s var(--ease); }
+.gear-btn svg { width: 21px; height: 21px; fill: none; stroke: var(--text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .6s var(--ease); }
+.gear-btn:hover { background: var(--surface-2); }
+.gear-btn:hover svg { transform: rotate(60deg); }
+@media (max-width: 560px) {
+  .top { grid-template-columns: 1fr auto; grid-template-areas: "brand gear" "modes modes"; row-gap: 12px; }
+  .top .modes { justify-self: center; }
+}
+
+.opts { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; padding: 16px; background: rgba(5,6,10,.55);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: opts-fade .25s var(--ease); }
+.opts[hidden] { display: none; }
+@keyframes opts-fade { from { opacity: 0; } }
+.opts-box { position: relative; display: flex; flex-direction: column; width: min(820px, 100%); height: min(86vh, 900px); overflow: hidden;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 26px; box-shadow: 0 40px 120px rgba(0,0,0,.55); animation: opts-in .35s var(--ease); }
+@keyframes opts-in { from { opacity: 0; transform: translateY(14px) scale(.985); } }
+.opts-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 6px 24px; }
+.opts-head h2 { margin: 0; font-size: 22px; }
+.opts-head .sheet-x { position: static; }
+.opts-tabs { display: flex; gap: 6px; padding: 8px 16px 12px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); }
+.opts-tabs::-webkit-scrollbar { display: none; }
+.opts-tabs button { flex: 0 0 auto; display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 12px; border-radius: 999px;
+  color: var(--muted); font-size: 14px; font-weight: 700; border: 1px solid transparent; transition: background-color .3s var(--ease), color .3s var(--ease); }
+.opts-tabs button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.opts-tabs button:hover { color: var(--text); background: var(--surface); }
+.opts-tabs button[aria-selected=true] { color: var(--bg); background: var(--text); }
+.opts-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.opts .panel.band { width: auto; margin: 0; padding: 22px clamp(18px, 4vw, 30px) 34px; background: none; border: 0; border-radius: 0; animation: none; }
+.opts .panel > h2 { display: none; }
+.opts [data-pane]:not(.on) { display: none; }
+body.opts-open { overflow: hidden; }
+@media (max-width: 560px) {
+  .opts { padding: 0; place-items: end stretch; }
+  .opts-box { width: 100%; height: calc(100dvh - max(env(safe-area-inset-top), 12px)); border-radius: 24px 24px 0 0; border-bottom: 0; }
+  .opts-tabs { padding: 6px 12px 10px; }
+  .opts-tabs button { padding: 0 12px; font-size: 13.5px; }
+}
+.plan-empty-btn { margin-top: 12px; }
+@media (max-width: 560px) {
+  .opts-tabs { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 4px 6px 8px; overflow: visible; }
+  .opts-tabs button { flex-direction: column; justify-content: center; gap: 4px; min-height: 54px; padding: 6px 0; border-radius: 14px; font-size: 10.5px; letter-spacing: -.01em; }
+  .opts-tabs button svg { width: 20px; height: 20px; }
+  .opts-tabs button[aria-selected=true] { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+}

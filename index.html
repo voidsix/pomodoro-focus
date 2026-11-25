@@ -24,6 +24,9 @@
     <button data-mode-btn="short" aria-pressed="false">Descanso</button>
     <button data-mode-btn="long" aria-pressed="false">Largo</button>
   </nav>
+  <button id="opts-btn" class="gear-btn" aria-haspopup="dialog" aria-label="Opciones" title="Opciones">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+  </button>
 </header>
 
 <main>
@@ -86,21 +89,47 @@
     </div>
   </section>
 
-  <section class="panel band" id="room-sec">
-    <h2>Estudiar con amigos</h2>
-    <div id="room" class="room"></div>
-  </section>
 
   <section class="panel band" id="plan-sec">
     <h2>Plan de estudio</h2>
-    <p class="hint">Cargá los temas de cada materia y te digo cuántos pomodoros hacer hoy para llegar al final. El día antes queda libre para repasar.</p>
+    <p class="hint">Te digo cuántos pomodoros hacer hoy para llegar a cada final (el día antes queda libre para repasar). Tus materias se cargan en <button class="link" data-open-tab="materias">⚙ Opciones › Materias</button>.</p>
     <div id="plan-today" class="plan-total"></div>
     <div id="plan" class="plan-list"></div>
   </section>
 
-  <section class="panel band" id="subjects-sec">
+
+
+
+
+
+
+</main>
+
+<footer class="band foot">
+  <span>Atajo: barra espaciadora para empezar o pausar.</span>
+  <span class="foot-links"><a class="link" href="/privacidad/">Privacidad</a> · <a class="link" href="/terminos/">Términos</a></span>
+  <button id="clear" class="link">Borrar historial</button>
+</footer>
+
+<div id="opts" class="opts" hidden role="dialog" aria-modal="true" aria-labelledby="opts-title">
+  <div class="opts-box">
+    <header class="opts-head">
+      <h2 id="opts-title">Opciones</h2>
+      <button class="sheet-x" data-opts-close aria-label="Cerrar opciones">×</button>
+    </header>
+    <nav class="opts-tabs" role="tablist" aria-label="Secciones">
+      <button role="tab" data-tab="materias" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span>Materias</span></button>
+      <button role="tab" data-tab="sonidos" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4M7 7v10M11 4v16M15 8v8M19 11v2"/></svg><span>Sonidos</span></button>
+      <button role="tab" data-tab="ritmo" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg><span>Ritmo</span></button>
+      <button role="tab" data-tab="amigos" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg><span>Amigos</span></button>
+      <button role="tab" data-tab="progreso" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Progreso</span></button>
+      <button role="tab" data-tab="estilo" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18c1.5 0 2-1 2-2s-1-1.5-1-2.5S14 15 15 15h2a4 4 0 0 0 4-4"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg><span>Estilo</span></button>
+      <button role="tab" data-tab="notas" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5zM14 3v5h5M8.5 13h7M8.5 17h5"/></svg><span>Notas</span></button>
+    </nav>
+    <div class="opts-body">
+  <section class="panel band" id="subjects-sec" data-pane="materias">
     <h2>Materias</h2>
-    <p class="hint">Cargá tus materias y la fecha del final. Cada pomodoro se guarda en la materia que elijas arriba. Si la materia está en el catálogo (probá "Física 03"), te la separo en unidades y temas del programa oficial.</p>
+    <p class="hint">Cargá tus materias y la fecha del final. Cada pomodoro se guarda en la materia que elijas debajo del reloj. Si la materia está en el catálogo (probá "Física 03"), te la separo en unidades y temas del programa oficial.</p>
     <form id="subject-form" class="subj-form">
       <input id="subject-name" type="text" maxlength="40" placeholder="Ej: Análisis II" autocomplete="off" aria-label="Nombre de la materia" required>
       <label class="date-field">Fecha del final (opcional)<input id="subject-date" type="date" aria-label="Fecha del final"></label>
@@ -110,24 +139,7 @@
     <ul id="subjects" class="subjects"></ul>
   </section>
 
-  <section class="panel band" id="presets-sec">
-    <h2>Ritmo</h2>
-    <div id="presets" class="chips"></div>
-    <details class="custom">
-      <summary>Personalizar tiempos</summary>
-      <form id="settings" class="grid">
-        <label>Foco (min)<input type="number" name="focus" min="1" max="180" inputmode="numeric"></label>
-        <label>Descanso (min)<input type="number" name="short" min="1" max="60" inputmode="numeric"></label>
-        <label>Descanso largo (min)<input type="number" name="long" min="1" max="90" inputmode="numeric"></label>
-        <label>Largo cada (pomodoros)<input type="number" name="every" min="1" max="12" inputmode="numeric"></label>
-        <label class="check"><input type="checkbox" name="autoStart"> Encadenar automáticamente</label>
-        <label class="check"><input type="checkbox" name="sound"> Sonido al terminar</label>
-        <label class="check"><input type="checkbox" name="notify"> Notificaciones</label>
-      </form>
-    </details>
-  </section>
-
-  <section class="panel band" id="sounds-sec">
+  <section class="panel band" id="sounds-sec" data-pane="sonidos">
     <h2>Sonidos</h2>
     <p class="hint">Un fondo constante tapa los ruidos de alrededor y ayuda a entrar en foco. Suena mientras corre el pomodoro; tocá uno para escucharlo.</p>
     <div id="ambients" class="chips sound-chips" role="group" aria-label="Sonido de fondo"></div>
@@ -152,23 +164,29 @@
     <div id="alarms" class="chips sound-chips" role="group" aria-label="Sonido de aviso"></div>
   </section>
 
-  <section class="panel band" id="skins-sec">
-    <h2>Estilo</h2>
-    <p class="hint">Elegí el ambiente que más te relaje.</p>
-    <div id="skins" class="chips skin-chips" role="group" aria-label="Estilo de la app"></div>
+  <section class="panel band" id="presets-sec" data-pane="ritmo">
+    <h2>Ritmo</h2>
+    <div id="presets" class="chips"></div>
+    <details class="custom">
+      <summary>Personalizar tiempos</summary>
+      <form id="settings" class="grid">
+        <label>Foco (min)<input type="number" name="focus" min="1" max="180" inputmode="numeric"></label>
+        <label>Descanso (min)<input type="number" name="short" min="1" max="60" inputmode="numeric"></label>
+        <label>Descanso largo (min)<input type="number" name="long" min="1" max="90" inputmode="numeric"></label>
+        <label>Largo cada (pomodoros)<input type="number" name="every" min="1" max="12" inputmode="numeric"></label>
+        <label class="check"><input type="checkbox" name="autoStart"> Encadenar automáticamente</label>
+        <label class="check"><input type="checkbox" name="sound"> Sonido al terminar</label>
+        <label class="check"><input type="checkbox" name="notify"> Notificaciones</label>
+      </form>
+    </details>
   </section>
 
-  <section class="panel band">
-    <h2>Distracciones</h2>
-    <p class="hint">¿Se te cruzó algo? Anotalo y seguí. Lo revisás en el descanso.</p>
-    <form id="note-form" class="row">
-      <input id="note" type="text" maxlength="120" placeholder="Ej: responder a Juli" autocomplete="off" aria-label="Nueva distracción">
-      <button class="add" type="submit">Anotar</button>
-    </form>
-    <ul id="notes" class="notes"></ul>
+  <section class="panel band" id="room-sec" data-pane="amigos">
+    <h2>Estudiar con amigos</h2>
+    <div id="room" class="room"></div>
   </section>
 
-  <section class="panel band">
+  <section class="panel band" id="stats-sec" data-pane="progreso">
     <h2>Tu progreso</h2>
     <div class="stats">
       <div><b id="s-today">0</b><span>pomodoros hoy</span></div>
@@ -183,13 +201,25 @@
     <h3>Estadísticas <span class="pro-tag">PRO</span></h3>
     <div id="pro-stats" class="pro-stats"></div>
   </section>
-</main>
 
-<footer class="band foot">
-  <span>Atajo: barra espaciadora para empezar o pausar.</span>
-  <span class="foot-links"><a class="link" href="/privacidad/">Privacidad</a> · <a class="link" href="/terminos/">Términos</a></span>
-  <button id="clear" class="link">Borrar historial</button>
-</footer>
+  <section class="panel band" id="skins-sec" data-pane="estilo">
+    <h2>Estilo</h2>
+    <p class="hint">Elegí el ambiente que más te relaje.</p>
+    <div id="skins" class="chips skin-chips" role="group" aria-label="Estilo de la app"></div>
+  </section>
+
+  <section class="panel band" id="notes-sec" data-pane="notas">
+    <h2>Distracciones</h2>
+    <p class="hint">¿Se te cruzó algo? Anotalo y seguí. Lo revisás en el descanso.</p>
+    <form id="note-form" class="row">
+      <input id="note" type="text" maxlength="120" placeholder="Ej: responder a Juli" autocomplete="off" aria-label="Nueva distracción">
+      <button class="add" type="submit">Anotar</button>
+    </form>
+    <ul id="notes" class="notes"></ul>
+  </section>
+    </div>
+  </div>
+</div>
 
 <div id="dialog" class="dialog" hidden>
   <div class="box">
