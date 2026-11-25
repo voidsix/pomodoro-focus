@@ -43,7 +43,7 @@
         ".read": "auth != null && auth.uid === $uid",
         "pro": { ".write": false },
         "data": {
-          ".write": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous' && root.child('users').child($uid).child('pro').exists()",
+          ".write": "auth != null && auth.uid === $uid && auth.token.firebase.sign_in_provider !== 'anonymous'",
           "$k": {
             ".validate": "($k === 'settings' || $k === 'log' || $k === 'subjects' || $k === 'notes') && newData.hasChildren(['v', 't'])",
             "v": { ".validate": "newData.isString() && newData.val().length <= 900000" },

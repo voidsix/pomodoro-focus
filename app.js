@@ -34,7 +34,13 @@
   const SKINS = [
     { id: 'mar', name: 'Mar', desc: 'verde agua', bg: '#04141a', a: ['#1fcab5', '#2a9fd8'] },
     { id: 'noche', name: 'Noche', desc: 'azul violeta', bg: '#0a0b10', a: ['#5b7cfa', '#9b6cf6'] },
-    { id: 'bosque', name: 'Bosque', desc: 'verdes suaves', bg: '#08120c', a: ['#4fc27c', '#2aa89a'] }
+    { id: 'bosque', name: 'Bosque', desc: 'verdes suaves', bg: '#08120c', a: ['#4fc27c', '#2aa89a'] },
+    { id: 'atardecer', name: 'Atardecer', desc: 'ámbar y durazno', bg: '#140d0a', a: ['#f0a35e', '#e57f8a'], pro: true },
+    { id: 'lavanda', name: 'Lavanda', desc: 'lila sereno', bg: '#0f0c16', a: ['#b49cf5', '#7fa6f0'], pro: true },
+    { id: 'grafito', name: 'Grafito', desc: 'blanco y negro', bg: '#0b0b0c', a: ['#d9dde3', '#8f97a3'], pro: true },
+    { id: 'arena', name: 'Arena', desc: 'cálido y suave', bg: '#13110c', a: ['#e2c48a', '#b9a06a'], pro: true },
+    { id: 'oceano', name: 'Océano', desc: 'azul profundo', bg: '#050b18', a: ['#3d8bfd', '#22c3e6'], pro: true },
+    { id: 'aurora', name: 'Aurora', desc: 'verde y violeta', bg: '#070d12', a: ['#3ee0a1', '#9b6cf6'], pro: true }
   ];
 
   const settings = Object.assign({}, DEFAULTS, store.get('settings', {}));
@@ -51,6 +57,7 @@
   let remaining = saved.remaining ?? settings[mode] * 60000;
   let endAt = null;
   let timer = null;
+  let curTopic = store.get('topic', ''); // "materia|tema" que se está estudiando (lo pone el botón Estudiar)
 
   const $ = (s) => document.querySelector(s);
   const el = {
@@ -136,7 +143,10 @@
     clearInterval(timer); timer = null;
     const wasFocus = mode === 'focus';
     if (wasFocus) {
-      log.push({ ts: Date.now(), min: settings.focus, task: el.task.value.trim(), sub: currentSub });
+      const { s: ts, t: tt } = curTopic ? findTopic(curTopic) : {};
+      const onTopic = tt && ts && ts.id === currentSub;
+      log.push({ ts: Date.now(), min: settings.focus, task: el.task.value.trim(), sub: currentSub, ...(onTopic ? { topic: tt.id } : {}) });
+      if (onTopic) { tt.pomos = (tt.pomos || 0) + 1; saveSubjects(); setTimeout(() => askRate(curTopic), 600); }
       if (log.length > 2000) log = log.slice(-2000);
       store.set('log', log);
       cycle += 1;
@@ -751,17 +761,25 @@
   });
 
   // ---------- Estilo ----------
+  let skinPeek = null;
   function renderSkins() {
-    if (!SKINS.some((s) => s.id === settings.skin)) settings.skin = 'mar';
+    if (!SKINS.some((s) => s.id === settings.skin) || (!pro && SKINS.find((s) => s.id === settings.skin).pro)) settings.skin = 'mar';
     document.documentElement.dataset.skin = settings.skin;
     $('#skins').innerHTML = SKINS.map((s) => `
-      <button class="chip" data-skin="${s.id}" aria-pressed="${s.id === settings.skin}">
+      <button class="chip${s.pro ? ' pro' : ''}${s.pro && !pro ? ' locked' : ''}" data-skin="${s.id}" aria-pressed="${s.id === settings.skin}">
         <span class="swatch" style="background:radial-gradient(120% 140% at 20% 0%, ${s.a[0]}, transparent 60%), linear-gradient(135deg, ${s.a[0]}66, ${s.a[1]}), ${s.bg}"></span>
-        <b>${s.name}</b><span>${s.desc}</span>
+        <b>${s.name}${s.pro ? '<i class="pro-tag">PRO</i>' : ''}</b><span>${s.desc}</span>
       </button>`).join('');
   }
   $('#skins').addEventListener('click', (e) => {
     const b = e.target.closest('[data-skin]'); if (!b) return;
+    const sk = SKINS.find((x) => x.id === b.dataset.skin);
+    if (sk?.pro && !pro) {
+      // Vista previa de 4 segundos y después el cartel de Pro
+      document.documentElement.dataset.skin = sk.id;
+      clearTimeout(skinPeek); skinPeek = setTimeout(() => { document.documentElement.dataset.skin = settings.skin; }, 4000);
+      paywall('skins'); return;
+    }
     settings.skin = b.dataset.skin; store.set('settings', settings);
     renderSkins(); render();
   });
@@ -844,7 +862,11 @@
     if (timer && endAt) endAt += 5 * 60000;
     persist(); render();
   });
-  el.task.addEventListener('input', () => { store.set('task', el.task.value); emitState(); });
+  el.task.addEventListener('input', () => {
+    store.set('task', el.task.value); emitState();
+    // Si cambiás la tarea a mano, el pomodoro deja de contar para el tema
+    if (curTopic) { const { t } = findTopic(curTopic); if (!t || t.name !== el.task.value.trim()) { curTopic = ''; store.set('topic', ''); } }
+  });
 
   // ---------- Estado público para las salas de estudio (rooms.js) ----------
   // Se publica en window.__focoState y como evento; rooms.js decide cuándo subirlo.
@@ -961,7 +983,7 @@
     return out.sort((a, b) => b.score - a.score).slice(0, 4);
   }
   // Sin Pro, la primera materia del catálogo es gratis (y se le pueden sumar unidades); para más, Pro
-  const catFree = (c) => pro || !subjects.some((x) => x.cat && x.cat !== c.id);
+  const catFree = () => true; // el catálogo es gratis para todos
   const catBox = $('#cat-pick');
   let catResults = [];
   function renderCatPick() {
@@ -992,7 +1014,6 @@
     const b = catBox.querySelector(`[data-cat-add="${k}"]`);
     b.classList.toggle('locked', !catFree(c));
     if (!catFree(c)) { b.textContent = n ? `Agregar ${n} temas · Pro` : 'Elegí al menos una unidad'; b.disabled = !n; return; }
-    if (!pro) { b.textContent = n ? `Agregar ${n} temas · gratis` : 'Elegí al menos una unidad'; b.disabled = !n; return; }
     b.textContent = n ? `Agregar ${n} temas` : 'Elegí al menos una unidad';
     b.disabled = !n;
   }
@@ -1065,20 +1086,22 @@
     const d = daysUntil(s.exam);
     const topics = topicsOf(s), total = topics.length, left = topics.filter((t) => !t.done).length;
     const done = doneToday(s.id);
-    const base = { d, total, left, done, next: topics.find((t) => !t.done) || null };
+    const weak = topics.filter((t) => t.level === 'hard' || t.level === 'meh').sort((a, b) => (a.level === 'hard' ? 0 : 1) - (b.level === 'hard' ? 0 : 1));
+    const base = { d, total, left, done, weak, next: topics.find((t) => !t.done) || weak[0] || null };
     if (d === null) return { ...base, kind: 'nodate', target: 0 };
     if (d < 0) return { ...base, kind: 'past', target: 0 };
     if (d === 0) return { ...base, kind: 'exam', target: 0 };
     if (!total) return { ...base, kind: 'notopics', target: 0 };
-    if (!left) return { ...base, kind: 'ready', target: 0 };
+    if (!left) return weak.length ? { ...base, kind: 'review', target: Math.ceil(weak.length / Math.max(1, d)) } : { ...base, kind: 'ready', target: 0 };
     const studyDays = d >= 3 ? d - 1 : d;
-    const target = Math.ceil((left * perTopicOf(s)) / studyDays);
+    // Cada tema flojo suma un pomodoro de repaso
+    const target = Math.ceil((left * perTopicOf(s) + weak.length) / studyDays);
     const kind = target <= 6 ? 'ok' : target <= 10 ? 'warn' : 'bad';
     return { ...base, kind, target, studyDays };
   }
   const STATUS = {
     ok: ['ok', 'En ritmo'], warn: ['warn', 'Exigente'], bad: ['bad', 'Muy ajustado'],
-    ready: ['ok', 'Temas listos · repasá'],
+    ready: ['ok', 'Temas listos · repasá'], review: ['warn', 'Repasá los flojos'],
     exam: ['ok', '¡Hoy es el final!'], notopics: ['muted', 'Faltan los temas'], nodate: ['muted', 'Sin fecha'], past: ['muted', 'Final pasado']
   };
 
@@ -1126,6 +1149,7 @@
         return `${head}
         <li class="${t.done ? 'done' : ''}">
           <label><input type="checkbox" data-toggle="${s.id}|${t.id}" ${t.done ? 'checked' : ''}><span>${esc(t.name)}</span></label>
+          ${t.level ? `<i class="lv-dot lv-${t.level}" title="${LEVELS[t.level]}"></i>` : ''}${t.pomos ? `<small class="t-pomos">${t.pomos} 🍅</small>` : ''}
           <button class="del" data-del-topic="${s.id}|${t.id}" aria-label="Quitar tema">×</button>
         </li>`;
       }).join('');
@@ -1145,6 +1169,9 @@
           ${todayLine}
           ${p.total ? `<div class="plan-progress"><span class="track-h"><i style="width:${pct}%;background:${color}"></i></span><small>${p.total - p.left} de ${p.total} temas listos</small></div>` : ''}
           ${next}
+          ${all.length ? `<div class="topic-map" aria-label="Mapa de la materia">${all.map((t) => `<i class="lv-${t.level || (t.done ? 'ok' : 'new')}" title="${esc(t.name)}"></i>`).join('')}</div>
+            <div class="map-legend"><span class="lv-ok">Lo tengo</span><span class="lv-meh">Más o menos</span><span class="lv-hard">Me cuesta</span><span class="lv-new">Sin ver</span></div>` : ''}
+          ${p.weak.length && p.kind !== 'past' ? `<div class="review"><span>Para repasar · ${p.weak.length}</span>${p.weak.slice(0, 5).map((t) => `<div class="review-row"><i class="lv-${t.level}"></i><b>${esc(t.name)}</b><button class="chip-sm" data-study="${s.id}|${t.id}">Repasar</button></div>`).join('')}</div>` : ''}
           <details ${open ? 'open' : ''} data-details="${s.id}">
             <summary>Temas y ajustes</summary>
             <ul class="topics">${topics || '<li class="empty">Sin temas todavía.</li>'}</ul>
@@ -1165,6 +1192,38 @@
     }).join('');
   }
 
+  const LEVELS = { ok: 'Lo tengo', meh: 'Más o menos', hard: 'Me cuesta' };
+  // "¿Cómo te fue?" al terminar un pomodoro de un tema: así Foco sabe qué repasar
+  function askRate(ref) {
+    const { s, t } = findTopic(ref); if (!s || !t) return;
+    document.querySelector('.rate')?.remove();
+    const box = document.createElement('div');
+    box.className = 'rate'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Cómo te fue con el tema');
+    box.innerHTML = `<button class="rate-x" aria-label="Cerrar">×</button>
+      <p>¿Cómo te fue con <b>${esc(t.name)}</b>?</p>
+      <div class="rate-btns">
+        <button data-rate="ok"><i class="lv-ok"></i>Lo entendí</button>
+        <button data-rate="meh"><i class="lv-meh"></i>Más o menos</button>
+        <button data-rate="hard"><i class="lv-hard"></i>Me cuesta</button>
+      </div>`;
+    document.body.appendChild(box);
+    requestAnimationFrame(() => box.classList.add('on'));
+    const close = () => { box.classList.remove('on'); setTimeout(() => box.remove(), 350); };
+    box.addEventListener('click', (e) => {
+      if (e.target.closest('.rate-x')) return close();
+      const b = e.target.closest('[data-rate]'); if (!b) return;
+      const lv = b.dataset.rate;
+      t.level = lv; t.done = lv !== 'hard'; t.rated = Date.now();
+      // Si lo entendiste (o más o menos), el próximo pomodoro va al tema siguiente
+      if (t.done) {
+        const nx = topicsOf(s).find((x) => !x.done);
+        if (nx) { el.task.value = nx.name; store.set('task', nx.name); curTopic = s.id + '|' + nx.id; store.set('topic', curTopic); }
+        else { curTopic = ''; store.set('topic', ''); }
+      }
+      saveSubjects(); renderPlan(); render(); close();
+    });
+    setTimeout(() => { if (box.isConnected) close(); }, 120000);
+  }
   function findTopic(ref) {
     const [sid, tid] = ref.split('|'); const s = subById(sid);
     return s ? { s, t: topicsOf(s).find((x) => x.id === tid) } : {};
@@ -1227,6 +1286,7 @@
     const study = e.target.closest('[data-study]'); if (!study) return;
     const { s, t } = findTopic(study.dataset.study); if (!s || !t) return;
     el.task.value = t.name; store.set('task', t.name);
+    curTopic = study.dataset.study; store.set('topic', curTopic);
     setSubject(s.id);
     if (mode !== 'focus') setMode('focus');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1357,7 +1417,7 @@
   // ---------- Estadísticas Pro ----------
   function renderProStats(byDay, hm) {
     const box = $('#pro-stats'); if (!box) return;
-    if (!pro) {
+    if (false) {
       const fake = Array.from({ length: 26 * 7 }, (_, i) => `<i class="l${(i * 7 + (i % 5) * 3) % 5}"></i>`).join('');
       box.innerHTML = `
         <div class="pro-lock">

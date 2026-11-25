@@ -23,17 +23,18 @@ let reason = '', busy = '', note = '', sync = { state: '', at: 0 };
 let promo = null, promoOpen = false; // { code, price } validado por el servidor
 
 const REASONS = {
-  catalog: 'Tu primera materia del catálogo es gratis · para sumar más, Pro',
   sounds: 'Ese sonido es Pro · escuchaste una muestra',
   freqs: 'Esa frecuencia es Pro · escuchaste una muestra',
-  stats: 'Las estadísticas avanzadas son Pro',
-  music: 'Esa música es Pro · escuchaste una muestra'
+  music: 'Esa música es Pro · escuchaste una muestra',
+  skins: 'Ese estilo es Pro · lo viste unos segundos'
 };
+// Todas las funciones son gratis; Pro es personalización (y bancar el proyecto)
 const PERKS = [
-  ['Sincronización', 'Materias, plan e historial iguales en el celu y la compu.'],
-  ['Catálogo de materias', 'La primera es gratis. Con Pro, todas: programas oficiales separados en unidades y temas, 39 materias del CBC, UBA, UTN, UNC y UNS (y vamos sumando).'],
-  ['Estadísticas', 'Mapa de tus últimos 6 meses, tu mejor horario y horas por materia.'],
-  ['Más música y sonidos', 'Lo-fi y jazz suave para estudiar, grabaciones reales de café, tormenta, arroyo y noche de campo, y 3 frecuencias nuevas.']
+  ['Grabaciones reales', 'Café, tormenta, arroyo y noche de campo, grabados de verdad.'],
+  ['Más música', 'Lo-fi y jazz suave para estudiar, además del piano clásico.'],
+  ['Más frecuencias', 'SMR 12 Hz, beta alta 18 Hz y binaural gamma 40 Hz.'],
+  ['6 estilos nuevos', 'Atardecer, Lavanda, Grafito, Arena, Océano y Aurora.'],
+  ['Bancás a Foco', 'Todo lo demás (plan, catálogo, estadísticas, sincronización) es gratis para todos gracias a los que pagan Pro.']
 ];
 
 const GOOGLE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>';
@@ -102,7 +103,7 @@ function render() {
   } else {
     body = `${head}
       <h2 id="sheet-title">${reason ? REASONS[reason] || 'Foco Pro' : 'Foco Pro'}</h2>
-      <p class="sheet-sub">Todo lo que ya usás sigue gratis. Pro suma esto:</p>
+      <p class="sheet-sub">Foco es gratis: plan, catálogo, estadísticas y sincronización. Pro es para personalizarlo:</p>
       ${known ? `<div class="acct-warn">Ya sos Pro con <b>${esc(known)}</b>. Entrá con esa cuenta para recuperarla.<button class="add wide" data-act="signin" ${dis}>Entrar con Google</button></div>`
         : `<p class="sheet-fine already-pro">¿Ya sos Pro? <button class="link" data-act="signin" ${dis}>Entrá con tu cuenta de Google</button></p>`}
       ${perks}
@@ -174,7 +175,7 @@ function setPro(p) {
   if (pro && user?.email) store.set('proEmail', user.email);
   window.dispatchEvent(new CustomEvent('foco:pro', { detail: !!pro }));
   updateBtn();
-  if (pro && user && !user.isAnonymous) startSync(); else stopSync();
+  if (user && !user.isAnonymous) startSync(); else stopSync(); // sincronizar es gratis con tu cuenta
   render();
 }
 
