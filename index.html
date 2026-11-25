@@ -18,7 +18,7 @@
 <body data-mode="focus">
 
 <header class="top band">
-  <div class="brand"><h1>Foco</h1><button id="pro-btn" class="pro-btn" aria-haspopup="dialog">Pro</button></div>
+  <div class="brand"><h1><button id="brand-btn" class="brand-btn" aria-haspopup="dialog" aria-label="Tu cuenta" title="Tu cuenta">Foco<span id="brand-avatar" class="brand-avatar" hidden></span></button></h1><button id="pro-btn" class="pro-btn" aria-haspopup="dialog">Pro</button></div>
   <nav class="modes" aria-label="Modo">
     <button data-mode-btn="focus" aria-pressed="true">Foco</button>
     <button data-mode-btn="short" aria-pressed="false">Descanso</button>
@@ -111,7 +111,7 @@
 
 <footer class="band foot">
   <span>Atajo: barra espaciadora para empezar o pausar.</span>
-  <span class="foot-links"><a class="link" href="/privacidad/">Privacidad</a> · <a class="link" href="/terminos/">Términos</a></span>
+  <span class="foot-links"><button class="link" data-guide>Guía rápida</button> · <a class="link" href="/privacidad/">Privacidad</a> · <a class="link" href="/terminos/">Términos</a></span>
   <button id="clear" class="link">Borrar historial</button>
 </footer>
 
@@ -119,6 +119,7 @@
   <div class="opts-box">
     <header class="opts-head">
       <h2 id="opts-title">Opciones</h2>
+      <button class="link opts-guide" data-guide>Guía rápida</button>
       <button class="sheet-x" data-opts-close aria-label="Cerrar opciones">×</button>
     </header>
     <nav class="opts-tabs" role="tablist" aria-label="Secciones">

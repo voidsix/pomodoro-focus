@@ -1574,7 +1574,7 @@
     const next = TABS[(cur + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length];
     showTab(next); opts.querySelector(`[data-tab="${next}"]`).focus();
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !opts.hidden && $('#dialog').hidden && $('#sheet').hidden) closeOpts(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !opts.hidden && $('#dialog').hidden && $('#sheet').hidden && !document.querySelector('.guide')) closeOpts(); });
   document.addEventListener('click', (e) => { const go = e.target.closest('[data-open-tab]'); if (go) openOpts(go.dataset.openTab); });
   // Link de invitación a una sala: abre directo la pestaña Amigos
   if (location.hash.includes('sala=')) setTimeout(() => openOpts('amigos'), 300);
@@ -1628,6 +1628,40 @@
   }
   if (!store.get('onb', 0) && !subjects.length && !location.hash.includes('sala=') && !new URLSearchParams(location.search).has('pro')) setTimeout(showOnboarding, 400);
   else if (!store.get('onb', 0)) store.set('onb', Date.now());
+
+
+  // ---------- Guía rápida ----------
+  const GUIDE = [
+    ['1', 'Cargá tu materia', 'Escribí la materia y la fecha del final o parcial. Si está en el catálogo (probá "Física 03"), Foco la separa en unidades y temas del programa oficial. Está en ⚙ › Materias.'],
+    ['2', 'Mirá tu plan de hoy', 'Foco reparte los temas hasta el final y te dice cuántos pomodoros hacer hoy. El día antes queda libre para repasar.'],
+    ['3', 'Tocá «Estudiar»', 'En «Próximo tema» tocá Estudiar y después Empezar: arranca un pomodoro de 25 minutos con ese tema.'],
+    ['4', 'Contá cómo te fue', 'Al terminar elegí Lo entendí, Más o menos o Me cuesta. Lo que te cuesta vuelve en «Para repasar» y suma pomodoros al plan.'],
+    ['5', 'Descansá', 'Después de cada pomodoro viene un descanso corto, y cada 4 uno largo. Si necesitás más, tocá +5 min.'],
+    ['6', 'Concentrate', 'En ⚙ › Sonidos elegí un fondo (lluvia, olas…), música para estudiar o frecuencias suaves. El botón de pantalla completa activa el modo zen.'],
+    ['7', 'Estudiá con amigos', 'En ⚙ › Amigos creá una sala y pasales el código: ven en qué está cada uno y se mandan aplausos.'],
+    ['8', 'Guardá todo en tu cuenta', 'Tocá «Foco» arriba a la izquierda para ver con qué cuenta de Google entraste. Con la misma cuenta tenés todo en el celu y en la compu.']
+  ];
+  function openGuide() {
+    document.querySelector('.guide')?.remove();
+    const wrap = document.createElement('div');
+    wrap.className = 'dialog sheet guide'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-labelledby', 'guide-title');
+    wrap.innerHTML = `<div class="box sheet-box">
+        <button class="sheet-x" data-guide-close aria-label="Cerrar">×</button>
+        <span class="cat-badge">Guía rápida</span>
+        <h2 id="guide-title">Cómo usar Foco</h2>
+        <ol class="guide-steps">${GUIDE.map(([n, t, d]) => `<li><b class="gs-n">${n}</b><div><b>${t}</b><span>${d}</span></div></li>`).join('')}</ol>
+        <p class="sheet-fine">Atajos en la compu: <b>barra espaciadora</b> empieza o pausa · <b>Z</b> modo zen · <b>Esc</b> cierra.</p>
+        <div class="sheet-actions"><button class="add" data-guide-close>¡Listo!</button></div>
+      </div>`;
+    document.body.appendChild(wrap); document.body.classList.add('sheet-open');
+    const close = () => { wrap.remove(); if (!document.querySelector('#sheet:not([hidden])')) document.body.classList.remove('sheet-open'); };
+    wrap.addEventListener('click', (e) => { if (e.target === wrap || e.target.closest('[data-guide-close]')) close(); });
+    wrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+    wrap.querySelector('.sheet-x').focus({ preventScroll: true });
+  }
+  window.__focoGuide = openGuide;
+  window.addEventListener('foco:guide', openGuide);
+  document.addEventListener('click', (e) => { if (e.target.closest('[data-guide]')) openGuide(); });
 
   fillForm(); renderPresets(); renderSkins(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
 }

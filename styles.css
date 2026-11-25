@@ -816,3 +816,27 @@ body.zen.idle .plus5, body.zen.idle .break-kind { opacity: 0; pointer-events: no
 .rate-btns button:hover { border-color: var(--lv); }
 .rate-btns button:active { transform: scale(.96); }
 .rate-btns i { width: 14px; height: 14px; border-radius: 50%; background: var(--lv); box-shadow: 0 0 12px var(--lv); }
+
+/* ---------- Cuenta (tocar "Foco") y guía rápida ---------- */
+.brand-btn { display: inline-flex; align-items: center; gap: 8px; font: inherit; color: inherit; letter-spacing: inherit; padding: 4px 6px; margin: -4px -6px; border-radius: 12px; transition: background-color .3s var(--ease); }
+.brand-btn:hover { background: var(--surface); }
+.brand-avatar { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: var(--bg);
+  background: linear-gradient(135deg, var(--a1), var(--a2)) center / cover no-repeat; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent); }
+.brand-avatar[hidden] { display: none; }
+.acct-card { display: flex; align-items: center; gap: 14px; margin: 14px 0 10px; padding: 14px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--border); }
+.acct-card > div { display: grid; min-width: 0; }
+.acct-card b { font-size: 17px; }
+.acct-card span:not(.acct-photo) { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.acct-photo { flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; font-weight: 800; color: var(--bg);
+  background: linear-gradient(135deg, var(--a1), var(--a2)) center / cover no-repeat; }
+.acct-status { display: flex; align-items: center; gap: 8px; margin: 0 0 4px !important; font-size: 14px !important; font-weight: 600 !important; color: var(--muted); }
+.acct-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.guide .sheet-box { max-height: 92vh; overflow-y: auto; }
+.guide-steps { list-style: none; margin: 14px 0 6px; padding: 0; display: grid; gap: 12px; }
+.guide-steps li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.gs-n { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; font-size: 14px; color: var(--bg); background: linear-gradient(135deg, var(--a1), var(--a2)); }
+.guide-steps li div { display: grid; gap: 2px; }
+.guide-steps li div b { font-size: 15.5px; }
+.guide-steps li div span { color: var(--muted); font-size: 14px; line-height: 1.45; }
+.opts-head { gap: 12px; }
+.opts-head .opts-guide { margin-left: auto; font-size: 14px; }

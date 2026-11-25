@@ -5,6 +5,8 @@ import { firebaseConfig, proConfig } from './firebase-config.js';
 import { firebase } from './fb.js';
 
 const btn = document.getElementById('pro-btn');
+const brandBtn = document.getElementById('brand-btn');
+const brandAvatar = document.getElementById('brand-avatar');
 const sheet = document.getElementById('sheet');
 const box = document.getElementById('sheet-box');
 const SYNC = ['settings', 'log', 'subjects', 'notes'];
@@ -47,6 +49,23 @@ function updateBtn() {
   btn.textContent = pro ? 'Pro ✓' : signed ? 'Pro' : 'Pro · Entrar';
   btn.setAttribute('aria-label', pro ? 'Tu cuenta Foco Pro' : signed ? 'Conocé Foco Pro' : 'Entrar con tu cuenta o conocer Foco Pro');
 }
+// Tocar "Foco" muestra con qué cuenta de Google entraste (y la foto chiquita al lado del nombre)
+function updateBrand() {
+  if (!brandAvatar) return;
+  const signed = user && !user.isAnonymous;
+  brandAvatar.hidden = !signed;
+  if (signed) {
+    const photo = user.photoURL;
+    brandAvatar.textContent = photo ? '' : (user.displayName || user.email || '?').trim().charAt(0).toUpperCase();
+    brandAvatar.style.backgroundImage = photo ? `url("${photo.replace(/"/g, '')}")` : '';
+  }
+  brandBtn.title = signed ? `Entraste como ${user.email || user.displayName}` : 'No entraste con tu cuenta';
+}
+function avatarHtml(u) {
+  const photo = u.photoURL;
+  return photo ? `<span class="acct-photo" style="background-image:url('${esc(photo)}')"></span>`
+    : `<span class="acct-photo">${esc((u.displayName || u.email || '?').trim().charAt(0).toUpperCase())}</span>`;
+}
 function open(why = '') {
   reason = why; note = '';
   sheet.hidden = false; document.body.classList.add('sheet-open');
@@ -68,6 +87,24 @@ function render() {
   const me = signed ? (user.email || '') : '';
   const dis = busy || (!f && booting) ? 'disabled' : '';
   let body;
+  if (reason === 'account') {
+    const st = { ok: 'sincronizado', busy: 'sincronizando…', error: 'sin conexión, se reintenta solo', '': 'conectando…' }[sync.state];
+    body = signed ? `${head.replace('Foco Pro</span>', 'Tu cuenta</span>')}
+      <div class="acct-card">${avatarHtml(user)}<div><b>${esc(user.displayName || 'Tu cuenta')}</b><span>${esc(me)}</span></div></div>
+      <p class="acct-status"><span class="sync-dot ${sync.state}"></span>${pro ? '<b>Foco Pro ✓</b>' : 'Plan gratis'} · ${st}</p>
+      <p class="sheet-fine">Tus materias, tu plan y tu historial están guardados en esta cuenta. En otro celu o compu, entrá con <b>${esc(me)}</b> y aparecen solos.</p>${msg}
+      <div class="acct-actions">
+        <button class="ghost" data-act="signin" ${dis}>Usar otra cuenta</button>
+        <button class="ghost" data-act="signout" ${dis}>Cerrar sesión</button>
+      </div>
+      <div class="sheet-actions"><button class="link" data-act="guide">Guía rápida</button>${pro ? '' : ' · <button class="link" data-act="pro">Conocé Foco Pro</button>'}</div>`
+    : `${head.replace('Foco Pro</span>', 'Tu cuenta</span>')}
+      <h2 id="sheet-title">No entraste con ninguna cuenta</h2>
+      <p class="sheet-sub">Tus materias y tu plan quedan solo en este dispositivo. Entrá con Google para tenerlos en el celu y en la compu.</p>${msg}
+      <button class="add wide google" data-act="signin" ${dis}>${GOOGLE_SVG} ${busy === 'signin' ? 'Entrando…' : 'Entrar con Google'}</button>
+      <div class="sheet-actions"><button class="link" data-act="guide">Guía rápida</button></div>`;
+    box.innerHTML = body; return;
+  }
   if (pro && signed) {
     const when = pro.at ? new Date(pro.at).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     const st = { ok: `Sincronizado${sync.at ? ' · ' + new Date(sync.at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : ''}`, busy: 'Sincronizando…', error: 'No se pudo sincronizar. Se reintenta solo.', '': 'Conectando…' }[sync.state];
@@ -128,6 +165,8 @@ sheet.addEventListener('click', async (e) => {
       if (reason === 'welcome' && user && !user.isAnonymous) { busy = ''; close(); return; }
     }
     else if (act === 'signout') { busy = 'signout'; render(); await signOut(); }
+    else if (act === 'guide') { close(); window.dispatchEvent(new CustomEvent('foco:guide')); return; }
+    else if (act === 'pro') { reason = ''; note = ''; }
     else if (act === 'buy') { busy = 'buy'; render(); await buy(); return; }
     else if (act === 'promo-open') { promoOpen = true; render(); box.querySelector('[data-promo] input')?.focus(); return; }
     else if (act === 'promo-clear') { promo = null; promoOpen = true; }
@@ -145,6 +184,7 @@ sheet.addEventListener('submit', async (e) => {
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) close(); });
 btn.addEventListener('click', () => open());
+brandBtn?.addEventListener('click', () => open('account'));
 window.addEventListener('foco:paywall', (e) => { if (!pro) open(e.detail || ''); });
 
 // ---------- Cuenta ----------
@@ -158,6 +198,7 @@ function boot() {
   })());
 }
 function onUser(u) {
+  queueMicrotask(updateBrand);
   if (u?.uid === user?.uid && !!u?.isAnonymous === !!user?.isAnonymous && proUnsub) return;
   user = u;
   proUnsub?.(); proUnsub = null;
