@@ -47,6 +47,7 @@
   const saved = store.get('state', {});
   let mode = saved.mode || 'focus';
   let cycle = saved.cycle || 0;         // pomodoros completados en el ciclo actual
+  let bonus = saved.bonus || 0;        // minutos extra sumados al descanso actual (en ms)
   let remaining = saved.remaining ?? settings[mode] * 60000;
   let endAt = null;
   let timer = null;
@@ -76,7 +77,7 @@
     const s = Math.max(0, Math.ceil(ms / 1000));
     return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
   };
-  const total = () => settings[mode] * 60000;
+  const total = () => settings[mode] * 60000 + (mode === 'focus' ? 0 : bonus);
 
   function render() {
     const t = fmt(remaining);
@@ -94,14 +95,16 @@
     const zs = subById(currentSub);
     $('#zen-caption').textContent = [zs ? zs.name : '', el.task.value.trim()].filter(Boolean).join(' · ');
     emitState();
-    document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modeBtn === mode));
+    document.querySelectorAll('[data-mode-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modeBtn === 'focus' ? mode === 'focus' : mode !== 'focus')));
+    document.querySelectorAll('[data-break]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.break === mode)));
+    $('#bk-short').textContent = settings.short; $('#bk-long').textContent = settings.long;
     el.dots.innerHTML = Array.from({ length: settings.every }, (_, i) => `<i class="${i < cycle ? 'on' : ''}"></i>`).join('');
     const meta = document.querySelector('meta[name=theme-color]');
     if (meta) meta.content = (SKINS.find((s) => s.id === settings.skin) || SKINS[0]).bg;
   }
 
   function persist() {
-    store.set('state', { mode, cycle, remaining });
+    store.set('state', { mode, cycle, remaining, bonus });
   }
 
   // ---------- Temporizador (basado en hora de fin, sobrevive a pestañas en segundo plano) ----------
@@ -124,7 +127,7 @@
   }
   function setMode(m, keepCycle = true) {
     clearInterval(timer); timer = null;
-    mode = m; remaining = total();
+    mode = m; bonus = 0; remaining = total();
     if (!keepCycle) cycle = 0;
     persist(); render(); updateAmbient();
   }
@@ -142,7 +145,7 @@
     if (wasFocus) next = cycle >= settings.every ? 'long' : 'short';
     else { next = 'focus'; if (mode === 'long') cycle = 0; }
     alertDone(wasFocus ? '¡Pomodoro completo! Tomate un descanso.' : 'Fin del descanso. A enfocarse.');
-    mode = next; remaining = total();
+    mode = next; bonus = 0; remaining = total();
     persist(); render(); renderStats();
     document.body.classList.add('done');
     setTimeout(() => document.body.classList.remove('done'), 2000);
@@ -821,13 +824,26 @@
 
   // ---------- Controles ----------
   el.toggle.addEventListener('click', () => (timer ? pause() : start()));
-  el.reset.addEventListener('click', () => { pause(); remaining = total(); persist(); render(); });
+  el.reset.addEventListener('click', () => { pause(); bonus = 0; remaining = total(); persist(); render(); });
   el.skip.addEventListener('click', () => {
     const wasFocus = mode === 'focus';
     if (wasFocus) setMode('short');
     else { if (mode === 'long') cycle = 0; setMode('focus'); }
   });
-  document.querySelectorAll('[data-mode-btn]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.modeBtn)));
+  // Arriba solo "Foco" y "Descanso"; adentro del descanso se elige corto o largo
+  document.querySelectorAll('[data-mode-btn]').forEach((b) => b.addEventListener('click', () => {
+    const m = b.dataset.modeBtn;
+    if (m === 'focus' ? mode === 'focus' : mode !== 'focus') return;
+    setMode(m === 'focus' ? 'focus' : (cycle >= settings.every ? 'long' : 'short'));
+  }));
+  document.querySelectorAll('[data-break]').forEach((b) => b.addEventListener('click', () => { if (mode !== b.dataset.break) setMode(b.dataset.break); }));
+  // +5 min: alarga el descanso actual (corriendo o en pausa)
+  $('#plus5').addEventListener('click', () => {
+    if (mode === 'focus') return;
+    bonus += 5 * 60000; remaining += 5 * 60000;
+    if (timer && endAt) endAt += 5 * 60000;
+    persist(); render();
+  });
   el.task.addEventListener('input', () => { store.set('task', el.task.value); emitState(); });
 
   // ---------- Estado público para las salas de estudio (rooms.js) ----------

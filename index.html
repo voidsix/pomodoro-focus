@@ -22,7 +22,6 @@
   <nav class="modes" aria-label="Modo">
     <button data-mode-btn="focus" aria-pressed="true">Foco</button>
     <button data-mode-btn="short" aria-pressed="false">Descanso</button>
-    <button data-mode-btn="long" aria-pressed="false">Largo</button>
   </nav>
   <button id="opts-btn" class="gear-btn" aria-haspopup="dialog" aria-label="Opciones" title="Opciones">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
@@ -56,7 +55,12 @@
       <div class="readout">
         <div id="time" class="time" role="timer" aria-live="off">25:00</div>
         <div id="label" class="label">Tiempo de foco</div>
+        <div class="break-kind" role="group" aria-label="Tipo de descanso">
+          <button data-break="short" aria-pressed="true">Corto <span id="bk-short">5</span>′</button>
+          <button data-break="long" aria-pressed="false">Largo <span id="bk-long">15</span>′</button>
+        </div>
         <div id="dots" class="dots" aria-label="Progreso del ciclo"></div>
+        <button id="plus5" class="plus5" aria-label="Sumar 5 minutos al descanso" title="Sumar 5 minutos al descanso">+5 min</button>
       </div>
     </div>
 
