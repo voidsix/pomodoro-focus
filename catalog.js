@@ -2164,6 +2164,1730 @@ window.FOCO_CATALOG = [
     ]
   },
 
+  // ======================= UNSL · Lic. en Biotecnología (plan 7/17) =======================
+  {
+    "id": "unsl-biotec-biologia-general",
+    "name": "Biología General",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "biologia general 1 primer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "La Biología y los seres vivos",
+        "topics": [
+          "El método científico",
+          "Características de los seres vivos",
+          "Niveles de organización",
+          "La evolución como principio unificador"
+        ]
+      },
+      {
+        "name": "Química de la vida",
+        "topics": [
+          "Elementos esenciales y enlaces",
+          "Propiedades del agua y pH",
+          "El carbono y las biomoléculas"
+        ]
+      },
+      {
+        "name": "Origen de la vida",
+        "topics": [
+          "Teorías del origen de la vida",
+          "Evolución química y prebiológica",
+          "Teoría endosimbiótica"
+        ]
+      },
+      {
+        "name": "Organización celular",
+        "topics": [
+          "Teoría celular",
+          "Procariotas y eucariotas",
+          "Virus, viroides y priones"
+        ]
+      },
+      {
+        "name": "Biomoléculas",
+        "topics": [
+          "Lípidos",
+          "Carbohidratos",
+          "Proteínas y enzimas"
+        ]
+      },
+      {
+        "name": "Membrana plasmática",
+        "topics": [
+          "Estructura y componentes",
+          "Transporte activo y pasivo",
+          "Ósmosis y bomba Na+/K+"
+        ]
+      },
+      {
+        "name": "Dominios y procariotas",
+        "topics": [
+          "Los tres dominios",
+          "Bacterias: estructura y variación genética",
+          "Biofilms",
+          "Arqueas"
+        ]
+      },
+      {
+        "name": "Célula eucariota",
+        "topics": [
+          "Sistema de endomembranas",
+          "Ribosomas y citoesqueleto",
+          "Mitocondrias y cloroplastos",
+          "Células animales, vegetales, hongos y protistas"
+        ]
+      },
+      {
+        "name": "Metabolismo",
+        "topics": [
+          "Anabolismo y catabolismo",
+          "ATP y enzimas",
+          "Fotosíntesis",
+          "Respiración celular y fermentación"
+        ]
+      },
+      {
+        "name": "Ácidos nucleicos y reproducción",
+        "topics": [
+          "ADN y ARN",
+          "Replicación, transcripción y traducción",
+          "Ciclo celular",
+          "Mitosis y meiosis"
+        ]
+      },
+      {
+        "name": "Genética y herencia",
+        "topics": [
+          "Leyes de Mendel",
+          "Teoría cromosómica",
+          "Herencia ligada al sexo",
+          "Mutaciones"
+        ]
+      },
+      {
+        "name": "Evolución",
+        "topics": [
+          "Evidencias de la evolución",
+          "Selección natural",
+          "Mecanismos evolutivos",
+          "Especie y especiación"
+        ]
+      },
+      {
+        "name": "Clasificación y diversidad",
+        "topics": [
+          "Sistemática y taxonomía",
+          "Clasificación filogenética",
+          "Biodiversidad y conservación"
+        ]
+      },
+      {
+        "name": "Fundamentos de Ecología",
+        "topics": [
+          "Poblaciones y comunidades",
+          "Flujo de energía y redes tróficas",
+          "Ciclos biogeoquímicos"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-matematica-1",
+    "name": "Matemática I",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "matematica 1 i calculo primer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Funciones",
+        "topics": [
+          "Dominio, gráficas y operaciones",
+          "Lineales y cuadráticas",
+          "Exponenciales y logarítmicas",
+          "Trigonométricas",
+          "Problemas de aplicación"
+        ]
+      },
+      {
+        "name": "Cálculo diferencial",
+        "topics": [
+          "Razón de cambio y límite",
+          "Continuidad",
+          "Derivada y recta tangente",
+          "Reglas de derivación y regla de la cadena",
+          "Extremos y teorema del valor medio"
+        ]
+      },
+      {
+        "name": "Cálculo integral",
+        "topics": [
+          "Antiderivada e integral indefinida",
+          "Métodos de integración",
+          "Integral definida y teorema fundamental",
+          "Áreas entre curvas y valor promedio"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-quimica-general-1",
+    "name": "Química General e Inorgánica I",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "quimica general inorganica 1 i primer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Reacciones químicas y estequiometría",
+        "topics": [
+          "Sistemas materiales",
+          "Precipitación, neutralización y redox",
+          "Estequiometría y reactivo limitante"
+        ]
+      },
+      {
+        "name": "Gases",
+        "topics": [
+          "Teoría cinética molecular",
+          "Leyes de los gases",
+          "Gases reales"
+        ]
+      },
+      {
+        "name": "Teoría cuántica",
+        "topics": [
+          "Estructura atómica",
+          "Números cuánticos y orbitales",
+          "Configuración electrónica"
+        ]
+      },
+      {
+        "name": "Tabla periódica",
+        "topics": [
+          "Radio atómico e iónico",
+          "Energía de ionización y afinidad electrónica",
+          "Electronegatividad y carácter metálico"
+        ]
+      },
+      {
+        "name": "Enlace en moléculas diatómicas",
+        "topics": [
+          "Enlace iónico y covalente",
+          "Teoría del enlace valencia",
+          "Teoría del orbital molecular"
+        ]
+      },
+      {
+        "name": "Moléculas poliatómicas",
+        "topics": [
+          "Estructuras de Lewis",
+          "TRPECV",
+          "Hibridación y enlaces múltiples"
+        ]
+      },
+      {
+        "name": "Energías de interacción",
+        "topics": [
+          "Interacciones con iones",
+          "Fuerzas de Van der Waals y puente de hidrógeno"
+        ]
+      },
+      {
+        "name": "Soluciones",
+        "topics": [
+          "Tipos de soluciones",
+          "Solubilidad",
+          "Unidades de concentración y dilución"
+        ]
+      },
+      {
+        "name": "Energética química",
+        "topics": [
+          "Primera ley",
+          "Entalpía y termoquímica",
+          "Calorimetría"
+        ]
+      },
+      {
+        "name": "Espontaneidad",
+        "topics": [
+          "Entropía y segunda ley",
+          "Energía libre"
+        ]
+      },
+      {
+        "name": "Cinética química",
+        "topics": [
+          "Ley de velocidad",
+          "Ecuación de Arrhenius",
+          "Mecanismos y catálisis"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-intro-biotecnologia",
+    "name": "Introducción a la Biotecnología",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "introduccion a la biotecnologia primer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Conceptos básicos",
+        "topics": [
+          "Qué es la biotecnología",
+          "Rol y campo de trabajo del biotecnólogo"
+        ]
+      },
+      {
+        "name": "Historia de la biotecnología",
+        "topics": [
+          "Biotecnología tradicional, microbiana y moderna",
+          "Biotecnología en Argentina",
+          "Impactos económicos, sociales y legales"
+        ]
+      },
+      {
+        "name": "Tecnologías de la biotecnología",
+        "topics": [
+          "Ingeniería genética y moléculas recombinantes",
+          "Organismos genéticamente modificados",
+          "Operaciones unitarias y escalado"
+        ]
+      },
+      {
+        "name": "Agrobiotecnología",
+        "topics": [
+          "Revolución verde",
+          "Micropropagación",
+          "Plantas transgénicas"
+        ]
+      },
+      {
+        "name": "Proyecto genoma",
+        "topics": [
+          "Genomas modelo y bases de datos",
+          "Bases moleculares de enfermedades",
+          "Reproducción asistida"
+        ]
+      },
+      {
+        "name": "Inmunología y biotecnología",
+        "topics": [
+          "Anticuerpos y sus usos",
+          "Técnicas inmunoquímicas"
+        ]
+      },
+      {
+        "name": "Bioética",
+        "topics": [
+          "Ética y bioética",
+          "Dilemas morales",
+          "Bioseguridad y regulación"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-quimica-general-2",
+    "name": "Química General e Inorgánica II",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "quimica general inorganica 2 ii primer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Equilibrio químico",
+        "topics": [
+          "Constante de equilibrio",
+          "Energía libre y equilibrio",
+          "Factores que afectan el equilibrio"
+        ]
+      },
+      {
+        "name": "Equilibrio iónico",
+        "topics": [
+          "Kps y solubilidad",
+          "Ácidos y bases: Ka, Kb, Kw",
+          "pH e hidrólisis",
+          "Soluciones reguladoras"
+        ]
+      },
+      {
+        "name": "Equilibrio físico",
+        "topics": [
+          "Regla de las fases",
+          "Clausius-Clapeyron",
+          "Leyes de Henry y Raoult",
+          "Diagramas de fases"
+        ]
+      },
+      {
+        "name": "Equilibrio redox",
+        "topics": [
+          "Celdas galvánicas",
+          "Potenciales estándar",
+          "Ecuación de Nernst"
+        ]
+      },
+      {
+        "name": "Compuestos de coordinación",
+        "topics": [
+          "Nomenclatura e isomería",
+          "Teoría del campo cristalino",
+          "Quelatos y complejos de interés biológico"
+        ]
+      },
+      {
+        "name": "Sistema periódico",
+        "topics": [
+          "Tendencias periódicas",
+          "Hidrógeno y gases nobles"
+        ]
+      },
+      {
+        "name": "Elementos de transición",
+        "topics": [
+          "Primera serie de transición",
+          "Segunda y tercera serie",
+          "Lantánidos y actínidos"
+        ]
+      },
+      {
+        "name": "Elementos representativos",
+        "topics": [
+          "Grupos 1, 2, 13 y 14",
+          "Grupos 15, 16 y 17"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-matematica-2",
+    "name": "Matemática II",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "matematica 2 ii calculo primer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Vectores y geometría del espacio",
+        "topics": [
+          "Vectores en 2D y 3D",
+          "Producto escalar",
+          "Planos"
+        ]
+      },
+      {
+        "name": "Funciones de varias variables",
+        "topics": [
+          "Derivadas parciales",
+          "Regla de la cadena",
+          "Gradiente y derivadas direccionales",
+          "Máximos y mínimos"
+        ]
+      },
+      {
+        "name": "Integración",
+        "topics": [
+          "Integrales dobles",
+          "Área y volumen"
+        ]
+      },
+      {
+        "name": "Ecuaciones diferenciales",
+        "topics": [
+          "Separables",
+          "Autónomas y equilibrios",
+          "Lineales y exactas"
+        ]
+      },
+      {
+        "name": "Álgebra lineal",
+        "topics": [
+          "Sistemas de ecuaciones",
+          "Matrices"
+        ]
+      },
+      {
+        "name": "Análisis vectorial",
+        "topics": [
+          "Funciones vectoriales",
+          "Campos vectoriales",
+          "Integral de línea"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-fisica-1",
+    "name": "Física I",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "fisica 1 i mecanica primer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Mediciones y unidades",
+        "topics": [
+          "Errores e incertezas",
+          "Sistema internacional",
+          "Magnitudes escalares y vectoriales"
+        ]
+      },
+      {
+        "name": "Cinemática en una dimensión",
+        "topics": [
+          "Velocidad y aceleración",
+          "MRU y MRUV",
+          "Caída libre y tiro vertical"
+        ]
+      },
+      {
+        "name": "Cinemática en dos dimensiones",
+        "topics": [
+          "Tiro oblicuo",
+          "Movimiento relativo"
+        ]
+      },
+      {
+        "name": "Dinámica",
+        "topics": [
+          "Leyes de Newton",
+          "Peso, normal, rozamiento y fuerza elástica"
+        ]
+      },
+      {
+        "name": "Trabajo y energía",
+        "topics": [
+          "Trabajo y energía cinética",
+          "Energía potencial",
+          "Conservación de la energía"
+        ]
+      },
+      {
+        "name": "Sistemas de partículas",
+        "topics": [
+          "Impulso y momento lineal",
+          "Colisiones",
+          "Centro de masa"
+        ]
+      },
+      {
+        "name": "Cinemática rotacional",
+        "topics": [
+          "Variables rotacionales",
+          "Ley de gravitación"
+        ]
+      },
+      {
+        "name": "Dinámica rotacional",
+        "topics": [
+          "Torque e inercia rotacional",
+          "Momento angular"
+        ]
+      },
+      {
+        "name": "Movimiento oscilatorio",
+        "topics": [
+          "Movimiento armónico simple",
+          "Péndulo",
+          "Ondas"
+        ]
+      },
+      {
+        "name": "Fluidos en reposo",
+        "topics": [
+          "Presión y Pascal",
+          "Arquímedes",
+          "Tensión superficial y capilaridad"
+        ]
+      },
+      {
+        "name": "Fluidos en movimiento",
+        "topics": [
+          "Continuidad y Bernoulli",
+          "Viscosidad y Poiseuille",
+          "Número de Reynolds"
+        ]
+      },
+      {
+        "name": "Termodinámica",
+        "topics": [
+          "Temperatura y calor",
+          "Calorimetría",
+          "Leyes de la termodinámica"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-quimica-analitica-1",
+    "name": "Química Analítica I",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "quimica analitica 1 i segundo año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Introducción a la química analítica",
+        "topics": [
+          "El problema analítico",
+          "Etapas del proceso analítico"
+        ]
+      },
+      {
+        "name": "Análisis cualitativo",
+        "topics": [
+          "Identificación cualitativa",
+          "Disolución y disgregación de muestras",
+          "Investigación de cationes y aniones"
+        ]
+      },
+      {
+        "name": "Análisis cuantitativo",
+        "topics": [
+          "Metodologías de cuantificación",
+          "Muestreo",
+          "Expresión de resultados"
+        ]
+      },
+      {
+        "name": "Volumetría ácido-base",
+        "topics": [
+          "Equilibrio ácido-base",
+          "Curvas de titulación",
+          "Indicadores"
+        ]
+      },
+      {
+        "name": "Volumetría de precipitación",
+        "topics": [
+          "Producto de solubilidad",
+          "Precipitación fraccionada",
+          "Determinación de haluros"
+        ]
+      },
+      {
+        "name": "Volumetría de complejos",
+        "topics": [
+          "Constantes de formación",
+          "Influencia del pH",
+          "Quelatometría"
+        ]
+      },
+      {
+        "name": "Volumetría redox",
+        "topics": [
+          "Potenciales redox",
+          "Oxidantes y reductores",
+          "Indicadores redox"
+        ]
+      },
+      {
+        "name": "Gravimetría",
+        "topics": [
+          "Formación de precipitados",
+          "Métodos gravimétricos"
+        ]
+      },
+      {
+        "name": "Calidad en química analítica",
+        "topics": [
+          "Trazabilidad",
+          "Exactitud, incertidumbre y veracidad"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-fisica-2",
+    "name": "Física II",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "fisica 2 ii electricidad optica segundo año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Electrostática",
+        "topics": [
+          "Ley de Coulomb",
+          "Campo y potencial eléctrico",
+          "Dipolos",
+          "Capacidad y dieléctricos"
+        ]
+      },
+      {
+        "name": "Corriente eléctrica",
+        "topics": [
+          "Ley de Ohm",
+          "Circuitos y leyes de Kirchhoff",
+          "Potencia eléctrica"
+        ]
+      },
+      {
+        "name": "Magnetismo",
+        "topics": [
+          "Campo magnético",
+          "Fuerza sobre cargas y corrientes",
+          "Campos producidos por corrientes"
+        ]
+      },
+      {
+        "name": "Faraday y ondas electromagnéticas",
+        "topics": [
+          "Inducción y ley de Lenz",
+          "Ecuaciones de Maxwell",
+          "Espectro electromagnético"
+        ]
+      },
+      {
+        "name": "Óptica geométrica",
+        "topics": [
+          "Reflexión y refracción",
+          "Espejos y lentes",
+          "Lupa y microscopio"
+        ]
+      },
+      {
+        "name": "Óptica física",
+        "topics": [
+          "Interferencia",
+          "Difracción",
+          "Polarización",
+          "Espectrometría"
+        ]
+      },
+      {
+        "name": "Teoría cuántica temprana",
+        "topics": [
+          "Cuerpo negro y Planck",
+          "Efecto fotoeléctrico y Compton",
+          "Modelo de Bohr y de Broglie"
+        ]
+      },
+      {
+        "name": "Mecánica cuántica de los átomos",
+        "topics": [
+          "Función de onda",
+          "Principio de incertidumbre",
+          "Números cuánticos y exclusión"
+        ]
+      },
+      {
+        "name": "Física nuclear",
+        "topics": [
+          "Núcleo y energía de enlace",
+          "Decaimientos alfa y beta",
+          "Semivida y datación"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-quimica-organica",
+    "name": "Química Orgánica",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "quimica organica segundo año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Fundamentos de química orgánica",
+        "topics": [
+          "Estructura electrónica e hibridación",
+          "Polaridad",
+          "Grupos funcionales y nomenclatura"
+        ]
+      },
+      {
+        "name": "Estereoisomería",
+        "topics": [
+          "Quiralidad y actividad óptica",
+          "Configuración R y S",
+          "Diasteroisómeros"
+        ]
+      },
+      {
+        "name": "Hidrocarburos alifáticos y derivados",
+        "topics": [
+          "Alcanos y cicloalcanos",
+          "Análisis conformacional",
+          "Sustitución y eliminación"
+        ]
+      },
+      {
+        "name": "Sistemas conjugados y aromáticos",
+        "topics": [
+          "Alquenos y alquinos",
+          "Adición 1,2 y 1,4",
+          "Aromaticidad y benceno"
+        ]
+      },
+      {
+        "name": "Alcoholes, éteres, azufre y aminas",
+        "topics": [
+          "Alcoholes y fenoles",
+          "Éteres y epóxidos",
+          "Tioles",
+          "Aminas"
+        ]
+      },
+      {
+        "name": "Compuestos carbonílicos y carboxílicos",
+        "topics": [
+          "Aldehídos y cetonas",
+          "Tautomería ceto-enólica",
+          "Ácidos carboxílicos y derivados"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-quimica-biomoleculas",
+    "name": "Química de Biomoléculas",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "quimica de biomoleculas segundo año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Métodos espectrométricos",
+        "topics": [
+          "Resonancia magnética nuclear",
+          "Espectrometría de masas"
+        ]
+      },
+      {
+        "name": "Heterocíclicos aromáticos",
+        "topics": [
+          "Pentatómicos y hexatómicos",
+          "Acidez, basicidad y reactividad"
+        ]
+      },
+      {
+        "name": "Carbohidratos",
+        "topics": [
+          "Monosacáridos e isomería",
+          "Mutarrotación",
+          "Glicósidos"
+        ]
+      },
+      {
+        "name": "Lípidos",
+        "topics": [
+          "Ácidos grasos",
+          "Lípidos complejos",
+          "Terpenos y esteroides"
+        ]
+      },
+      {
+        "name": "Aminoácidos y proteínas",
+        "topics": [
+          "Propiedades de los aminoácidos",
+          "Enlace peptídico",
+          "Estructura de proteínas"
+        ]
+      },
+      {
+        "name": "Nucleótidos y ácidos nucleicos",
+        "topics": [
+          "Nucleósidos y nucleótidos",
+          "Bioenergética",
+          "Estructura de ADN y ARN"
+        ]
+      },
+      {
+        "name": "Mecanismos de reacciones enzimáticas",
+        "topics": [
+          "Enzimas hidrolíticas",
+          "Coenzimas redox"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-biologia-celular",
+    "name": "Biología Celular",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "biologia celular segundo año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Métodos y la célula como objeto de estudio",
+        "topics": [
+          "Membrana plasmática: modelos",
+          "Microscopía",
+          "Cultivo y fraccionamiento celular",
+          "Anticuerpos, PCR y CRISPR"
+        ]
+      },
+      {
+        "name": "Arquitectura del genoma",
+        "topics": [
+          "Cromosomas y cromatina",
+          "Replicación del ADN",
+          "Daño, mutaciones y reparación",
+          "Elementos genéticos móviles"
+        ]
+      },
+      {
+        "name": "Transcripción y traducción",
+        "topics": [
+          "Transcripción y maduración del ARN",
+          "Traducción y ribosomas",
+          "Direccionamiento y degradación proteica"
+        ]
+      },
+      {
+        "name": "Regulación de la expresión génica",
+        "topics": [
+          "Operones lac y trp",
+          "Regulación eucariota y epigenética",
+          "Expresión génica en el desarrollo"
+        ]
+      },
+      {
+        "name": "Compartimentalización y tráfico vesicular",
+        "topics": [
+          "Orgánulos membranosos",
+          "Ruta secretora",
+          "Endocitosis"
+        ]
+      },
+      {
+        "name": "Comunicación celular",
+        "topics": [
+          "Receptores y segundos mensajeros",
+          "Proteínas G",
+          "Receptores con actividad enzimática"
+        ]
+      },
+      {
+        "name": "Ciclo celular, diferenciación y muerte",
+        "topics": [
+          "Ciclinas y puntos de control",
+          "Diferenciación celular",
+          "Apoptosis"
+        ]
+      },
+      {
+        "name": "Tejidos y patología",
+        "topics": [
+          "Matriz extracelular",
+          "Uniones celulares",
+          "Células madre",
+          "Bases celulares del cáncer"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-fisicoquimica",
+    "name": "Fisicoquímica",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "fisicoquimica segundo año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Primera ley de la termodinámica",
+        "topics": [
+          "Trabajo y calor",
+          "Capacidad calorífica",
+          "Termoquímica"
+        ]
+      },
+      {
+        "name": "Segunda y tercera ley",
+        "topics": [
+          "Entropía",
+          "Procesos espontáneos"
+        ]
+      },
+      {
+        "name": "Energía libre y potencial químico",
+        "topics": [
+          "Energía libre de Gibbs",
+          "Potencial químico y actividad"
+        ]
+      },
+      {
+        "name": "Equilibrio químico",
+        "topics": [
+          "Constante termodinámica",
+          "Isoterma de reacción"
+        ]
+      },
+      {
+        "name": "Equilibrio físico",
+        "topics": [
+          "Regla de las fases",
+          "Clausius-Clapeyron",
+          "Propiedades coligativas"
+        ]
+      },
+      {
+        "name": "Equilibrio iónico",
+        "topics": [
+          "Ácidos y bases",
+          "Soluciones buffer"
+        ]
+      },
+      {
+        "name": "Electrolitos en solución",
+        "topics": [
+          "Conductividad",
+          "Teoría de Debye-Hückel"
+        ]
+      },
+      {
+        "name": "Celdas electroquímicas",
+        "topics": [
+          "Potencial de electrodo",
+          "Termodinámica de celdas"
+        ]
+      },
+      {
+        "name": "Cinética química",
+        "topics": [
+          "Orden y molecularidad",
+          "Ecuaciones de velocidad"
+        ]
+      },
+      {
+        "name": "Cinética enzimática",
+        "topics": [
+          "Michaelis-Menten",
+          "Inhibición enzimática",
+          "Efecto del pH y la temperatura"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-quimica-biologica",
+    "name": "Química Biológica",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "quimica biologica bioquimica tercer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Catálisis y regulación",
+        "topics": [
+          "Introducción al metabolismo",
+          "Enzimas",
+          "Enzimas alostéricas y modulación covalente"
+        ]
+      },
+      {
+        "name": "Bioenergética",
+        "topics": [
+          "Cadena respiratoria",
+          "Fosforilación oxidativa",
+          "Fotofosforilación"
+        ]
+      },
+      {
+        "name": "Metabolismo de carbohidratos",
+        "topics": [
+          "Glucólisis y fermentaciones",
+          "Ciclo de Krebs",
+          "Gluconeogénesis y glucógeno",
+          "Vía de las pentosas",
+          "Ciclo de Calvin y fotorrespiración"
+        ]
+      },
+      {
+        "name": "Metabolismo de lípidos",
+        "topics": [
+          "Beta-oxidación",
+          "Cuerpos cetónicos",
+          "Biosíntesis de ácidos grasos"
+        ]
+      },
+      {
+        "name": "Metabolismo de aminoácidos",
+        "topics": [
+          "Transaminación y desaminación",
+          "Ciclo de la urea"
+        ]
+      },
+      {
+        "name": "Metabolismo de nucleótidos",
+        "topics": [
+          "Síntesis de purinas y pirimidinas",
+          "Degradación"
+        ]
+      },
+      {
+        "name": "Integración metabólica",
+        "topics": [
+          "Interrelaciones entre vías",
+          "Metabolismo por órganos",
+          "Adaptaciones metabólicas"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-microbiologia",
+    "name": "Microbiología",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "microbiologia tercer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Introducción a la microbiología",
+        "topics": [
+          "Microorganismos como células",
+          "Diversidad microbiana"
+        ]
+      },
+      {
+        "name": "Esterilización y desinfección",
+        "topics": [
+          "Agentes físicos",
+          "Agentes químicos",
+          "Curva de muerte celular"
+        ]
+      },
+      {
+        "name": "Estructura bacteriana",
+        "topics": [
+          "Pared celular y membrana",
+          "Nucleoide y estructuras externas"
+        ]
+      },
+      {
+        "name": "Fisiología bacteriana",
+        "topics": [
+          "Nutrición y fuentes de energía",
+          "Condiciones de crecimiento"
+        ]
+      },
+      {
+        "name": "Métodos de estudio",
+        "topics": [
+          "Medios de cultivo",
+          "Técnicas de laboratorio",
+          "Identificación fenotípica y genotípica"
+        ]
+      },
+      {
+        "name": "Genética bacteriana",
+        "topics": [
+          "Operones",
+          "Mutaciones",
+          "Transferencia genética"
+        ]
+      },
+      {
+        "name": "Crecimiento microbiano",
+        "topics": [
+          "Curva de crecimiento en batch",
+          "Quimiostato"
+        ]
+      },
+      {
+        "name": "Filogenia y sistemática microbiana",
+        "topics": [
+          "ARN ribosómico",
+          "Árboles filogenéticos"
+        ]
+      },
+      {
+        "name": "Virología",
+        "topics": [
+          "Estructura y clasificación de virus",
+          "Ciclo de vida",
+          "Cultivo y detección"
+        ]
+      },
+      {
+        "name": "Microorganismos y humanos",
+        "topics": [
+          "Microbiota",
+          "Patogenia y factores de virulencia"
+        ]
+      },
+      {
+        "name": "Agentes antimicrobianos",
+        "topics": [
+          "Mecanismos de acción",
+          "Resistencia antimicrobiana"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-quimica-analitica-2",
+    "name": "Química Analítica II",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "quimica analitica 2 ii instrumental tercer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Métodos instrumentales",
+        "topics": [
+          "Tipos de métodos",
+          "Señales y detectores"
+        ]
+      },
+      {
+        "name": "Espectrometría UV-Visible",
+        "topics": [
+          "Radiación electromagnética",
+          "Ley de Lambert-Beer"
+        ]
+      },
+      {
+        "name": "Emisión molecular y otros métodos ópticos",
+        "topics": [
+          "Fluorescencia y fosforescencia",
+          "Refractometría",
+          "Polarimetría"
+        ]
+      },
+      {
+        "name": "Espectroscopias atómicas",
+        "topics": [
+          "Absorción atómica",
+          "ICP-AES"
+        ]
+      },
+      {
+        "name": "Métodos electroanalíticos",
+        "topics": [
+          "Ecuación de Nernst",
+          "Potenciometría",
+          "Conductimetría"
+        ]
+      },
+      {
+        "name": "Extracción y ultracentrifugación",
+        "topics": [
+          "Extracción líquido-líquido",
+          "Ultracentrifugación"
+        ]
+      },
+      {
+        "name": "Cromatografía",
+        "topics": [
+          "Fundamentos",
+          "Cromatografía planar",
+          "Cromatografía en columna y HPLC"
+        ]
+      },
+      {
+        "name": "Electroforesis",
+        "topics": [
+          "Electroforesis sobre soporte",
+          "Electroforesis capilar"
+        ]
+      },
+      {
+        "name": "Misceláneos",
+        "topics": [
+          "Métodos radioquímicos",
+          "Análisis automatizado",
+          "Inmunoanálisis"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-inmunologia",
+    "name": "Inmunología",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "inmunologia cuarto año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Células y órganos del sistema inmune",
+        "topics": [
+          "Fagocitos",
+          "Linfocitos B y T",
+          "Órganos linfoides"
+        ]
+      },
+      {
+        "name": "Anticuerpos y complemento",
+        "topics": [
+          "Clases de inmunoglobulinas",
+          "Anticuerpos monoclonales",
+          "Vías del complemento"
+        ]
+      },
+      {
+        "name": "TCR y complejo mayor de histocompatibilidad",
+        "topics": [
+          "Receptor de linfocitos T",
+          "Moléculas del CMH"
+        ]
+      },
+      {
+        "name": "Inmunidad innata e inflamación",
+        "topics": [
+          "Citocinas",
+          "Migración leucocitaria"
+        ]
+      },
+      {
+        "name": "Presentación antigénica",
+        "topics": [
+          "Procesamiento de antígenos",
+          "Activación de linfocitos B"
+        ]
+      },
+      {
+        "name": "Citotoxicidad celular",
+        "topics": [
+          "Linfocitos T CD8+",
+          "Células NK"
+        ]
+      },
+      {
+        "name": "Regulación de la respuesta inmune",
+        "topics": [
+          "Factores reguladores",
+          "Sistema neuroinmunoendocrino"
+        ]
+      },
+      {
+        "name": "Inmunidad frente a infecciones",
+        "topics": [
+          "Virus",
+          "Bacterias",
+          "Hongos y parásitos"
+        ]
+      },
+      {
+        "name": "Inmunodeficiencias",
+        "topics": [
+          "Inmunodeficiencias primarias",
+          "Estrategias terapéuticas"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-biorreactores",
+    "name": "Biorreactores y Fermentaciones Industriales",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "biorreactores fermentaciones industriales cuarto año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Microorganismos y biotecnología",
+        "topics": [
+          "Bioprocesos y sus etapas",
+          "Biotransformaciones"
+        ]
+      },
+      {
+        "name": "Microorganismos de uso industrial",
+        "topics": [
+          "Fuentes y selección",
+          "Mejoramiento y conservación de cepas"
+        ]
+      },
+      {
+        "name": "Medios de cultivo",
+        "topics": [
+          "Requerimientos nutricionales",
+          "Diseño de medios"
+        ]
+      },
+      {
+        "name": "Esterilización en fermentaciones",
+        "topics": [
+          "Esterilización de medios",
+          "Esterilización de aire"
+        ]
+      },
+      {
+        "name": "Cinética del crecimiento",
+        "topics": [
+          "Estequiometría del crecimiento",
+          "Cultivo batch, continuo y alimentado"
+        ]
+      },
+      {
+        "name": "Transferencia de oxígeno",
+        "topics": [
+          "Consumo de oxígeno",
+          "Coeficiente kLa"
+        ]
+      },
+      {
+        "name": "Biorreactores",
+        "topics": [
+          "Tanque agitado y neumáticos",
+          "Instrumentación y control",
+          "Escalado"
+        ]
+      },
+      {
+        "name": "Recuperación de productos",
+        "topics": [
+          "Separación de biomasa",
+          "Purificación de productos"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-biotecnologia-animal",
+    "name": "Biotecnología Animal",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "biotecnologia animal fisiologia cuarto año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Introducción a la biotecnología animal",
+        "topics": [
+          "Historia y desarrollos recientes"
+        ]
+      },
+      {
+        "name": "Modelos animales",
+        "topics": [
+          "Metazoos y filogenia",
+          "Organismos modelo"
+        ]
+      },
+      {
+        "name": "Fisiología nerviosa",
+        "topics": [
+          "Homeostasis",
+          "Sistema nervioso autónomo",
+          "Control motor y sensitivo"
+        ]
+      },
+      {
+        "name": "Fisiología endocrina",
+        "topics": [
+          "Eje hipotálamo-hipófisis",
+          "Tiroides y adrenales",
+          "Páncreas endocrino"
+        ]
+      },
+      {
+        "name": "Relaciones térmicas",
+        "topics": [
+          "Ectotermia",
+          "Homeotermia"
+        ]
+      },
+      {
+        "name": "Fisiología cardíaca",
+        "topics": [
+          "Contracción cardíaca",
+          "Sistemas circulatorios"
+        ]
+      },
+      {
+        "name": "Fisiología respiratoria",
+        "topics": [
+          "Ventilación",
+          "Intercambio de gases"
+        ]
+      },
+      {
+        "name": "Fisiología renal",
+        "topics": [
+          "Formación de orina",
+          "Hormona antidiurética"
+        ]
+      },
+      {
+        "name": "Cultivo de células animales",
+        "topics": [
+          "Líneas celulares",
+          "Métodos de transfección"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-biotecnologia-ambiental",
+    "name": "Biotecnología Ambiental",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "biotecnologia ambiental cuarto año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Introducción",
+        "topics": [
+          "Contaminación y monitoreo ambiental",
+          "DBO e indicadores"
+        ]
+      },
+      {
+        "name": "Ciclos biogeoquímicos",
+        "topics": [
+          "Carbono",
+          "Nitrógeno",
+          "Azufre"
+        ]
+      },
+      {
+        "name": "Tratamiento de aguas residuales",
+        "topics": [
+          "Lagunas de oxidación",
+          "Lodos activados"
+        ]
+      },
+      {
+        "name": "Residuos sólidos",
+        "topics": [
+          "Compostaje",
+          "Digestión anaeróbica"
+        ]
+      },
+      {
+        "name": "Microorganismos en agricultura",
+        "topics": [
+          "Fijadores de nitrógeno y biofertilizantes",
+          "PGPR y control biológico"
+        ]
+      },
+      {
+        "name": "Biorremediación",
+        "topics": [
+          "Bioacumulación",
+          "Fitorremediación",
+          "Hidrocarburos y contaminantes orgánicos"
+        ]
+      },
+      {
+        "name": "Biorrecuperación de recursos",
+        "topics": [
+          "Biominería y lixiviación",
+          "Recuperación de petróleo"
+        ]
+      },
+      {
+        "name": "Energía y biocombustibles",
+        "topics": [
+          "Biogás",
+          "Biodiésel",
+          "Bioetanol"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-biotecnologia-vegetal",
+    "name": "Biotecnología Vegetal",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "biotecnologia vegetal plantas cuarto año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Introducción y morfogénesis",
+        "topics": [
+          "Embriofitas",
+          "Embriogénesis vegetal"
+        ]
+      },
+      {
+        "name": "Histología vegetal",
+        "topics": [
+          "Sistemas de tejidos",
+          "Tejidos de conducción"
+        ]
+      },
+      {
+        "name": "Raíz, tallo y nutrición",
+        "topics": [
+          "Anatomía de raíz y tallo",
+          "Transporte de agua",
+          "Nutrición mineral"
+        ]
+      },
+      {
+        "name": "Hoja y fotosíntesis",
+        "topics": [
+          "Anatomía de la hoja",
+          "Pigmentos y fotosíntesis"
+        ]
+      },
+      {
+        "name": "Flor y desarrollo",
+        "topics": [
+          "Morfología floral",
+          "Fotomorfogénesis y fitocromo"
+        ]
+      },
+      {
+        "name": "Fruto, semilla y fitohormonas",
+        "topics": [
+          "Frutos",
+          "Germinación y dormición",
+          "Fitohormonas"
+        ]
+      },
+      {
+        "name": "Cultivo in vitro",
+        "topics": [
+          "Cultivo de células y tejidos",
+          "Micropropagación"
+        ]
+      },
+      {
+        "name": "Metabolismo secundario",
+        "topics": [
+          "Producción de metabolitos in vitro"
+        ]
+      },
+      {
+        "name": "Herramientas moleculares",
+        "topics": [
+          "Genoma vegetal",
+          "Marcadores moleculares"
+        ]
+      },
+      {
+        "name": "Plantas transgénicas",
+        "topics": [
+          "Transformación con Agrobacterium",
+          "Biobalística",
+          "Análisis de transgénicos"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-bioinformatica",
+    "name": "Bioinformática",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "bioinformatica quinto año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Introducción y técnicas de alto rendimiento",
+        "topics": [
+          "Genes, genomas y transcriptomas",
+          "Secuenciación"
+        ]
+      },
+      {
+        "name": "Evolución y bioinformática",
+        "topics": [
+          "Mecanismos evolutivos",
+          "Homología"
+        ]
+      },
+      {
+        "name": "Alineamiento y bases de datos",
+        "topics": [
+          "Alineamientos locales y globales",
+          "BLAST y bases de datos"
+        ]
+      },
+      {
+        "name": "Filogenia molecular",
+        "topics": [
+          "Árboles filogenéticos",
+          "Métodos de inferencia"
+        ]
+      },
+      {
+        "name": "Ensamblado y anotación de genomas",
+        "topics": [
+          "Control de calidad de reads",
+          "Ensamblado",
+          "Anotación"
+        ]
+      },
+      {
+        "name": "Filogenómica",
+        "topics": [
+          "Pangenoma y core genoma"
+        ]
+      },
+      {
+        "name": "Análisis de RNA-seq",
+        "topics": [
+          "Datos públicos",
+          "Expresión diferencial"
+        ]
+      },
+      {
+        "name": "Análisis de proteínas",
+        "topics": [
+          "Expasy",
+          "Estructura de proteínas"
+        ]
+      },
+      {
+        "name": "Proteómica",
+        "topics": [
+          "Espectrometría de masas en proteómica"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unsl-biotec-estadistica",
+    "name": "Estadística",
+    "inst": "UNSL · Biotecnología (FQByF)",
+    "keys": "estadistica probabilidad tercer año unsl san luis fqbyf fqbf biotecnologia licenciatura",
+    "source": "Programa oficial UNSL (cargaprogramas.unsl.edu.ar), Lic. en Biotecnología plan 7/17",
+    "units": [
+      {
+        "name": "Estadística descriptiva",
+        "topics": [
+          "Población y muestra",
+          "Gráficos",
+          "Medidas de posición y dispersión"
+        ]
+      },
+      {
+        "name": "Probabilidad",
+        "topics": [
+          "Espacios muestrales y eventos",
+          "Axiomas y propiedades"
+        ]
+      },
+      {
+        "name": "Distribuciones de probabilidad",
+        "topics": [
+          "Esperanza y varianza",
+          "Binomial y Poisson",
+          "Distribución normal"
+        ]
+      },
+      {
+        "name": "Inferencia estadística",
+        "topics": [
+          "Intervalos de confianza"
+        ]
+      },
+      {
+        "name": "Prueba de hipótesis",
+        "topics": [
+          "Errores tipo I y II y p-valor",
+          "Pruebas t y F"
+        ]
+      },
+      {
+        "name": "Análisis de varianza",
+        "topics": [
+          "ANOVA de un factor"
+        ]
+      },
+      {
+        "name": "Diseño factorial",
+        "topics": [
+          "Factorial completo",
+          "Central compuesto y Box-Behnken"
+        ]
+      },
+      {
+        "name": "Control de calidad",
+        "topics": [
+          "Gráficos de control de Shewhart"
+        ]
+      }
+    ]
+  },
+
   // ======================= UNS (Bahía Blanca) =======================
   {
     id: 'uns-algebra-geometria-5539',
