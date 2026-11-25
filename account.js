@@ -23,7 +23,7 @@ let reason = '', busy = '', note = '', sync = { state: '', at: 0 };
 let promo = null, promoOpen = false; // { code, price } validado por el servidor
 
 const REASONS = {
-  catalog: 'El catálogo de materias es Pro',
+  catalog: 'Tu primera materia del catálogo es gratis · para sumar más, Pro',
   sounds: 'Ese sonido es Pro · escuchaste una muestra',
   freqs: 'Esa frecuencia es Pro · escuchaste una muestra',
   stats: 'Las estadísticas avanzadas son Pro',
@@ -31,7 +31,7 @@ const REASONS = {
 };
 const PERKS = [
   ['Sincronización', 'Materias, plan e historial iguales en el celu y la compu.'],
-  ['Catálogo de materias', 'Programas oficiales separados en unidades y temas: 39 materias del CBC, UBA, UTN, UNC y UNS (y vamos sumando).'],
+  ['Catálogo de materias', 'La primera es gratis. Con Pro, todas: programas oficiales separados en unidades y temas, 39 materias del CBC, UBA, UTN, UNC y UNS (y vamos sumando).'],
   ['Estadísticas', 'Mapa de tus últimos 6 meses, tu mejor horario y horas por materia.'],
   ['Más música y sonidos', 'Lo-fi y jazz suave para estudiar, grabaciones reales de café, tormenta, arroyo y noche de campo, y 3 frecuencias nuevas.']
 ];
@@ -94,7 +94,7 @@ function render() {
       <div class="sheet-actions"><button class="link" data-act="signout">Cerrar sesión</button></div>`;
   } else if (reason === 'welcome') {
     body = `${head.replace('Foco Pro</span>', 'Tu cuenta</span>')}
-      <h2 id="sheet-title">Entrá con tu cuenta de Google</h2>
+      <h2 id="sheet-title">${(store.get('subjects', []) || []).length ? 'Guardá tu plan en tu cuenta' : 'Entrá con tu cuenta de Google'}</h2>
       <p class="sheet-sub">Así tus materias, tu plan y tu Pro (si la comprás) quedan guardados en tu cuenta, y los usás en el celu y en la compu.</p>${msg}
       <button class="add wide google" data-act="signin" ${dis}>${GOOGLE_SVG} ${busy === 'signin' ? 'Entrando…' : 'Entrar con Google'}</button>
       <div class="sheet-actions"><button class="link" data-act="close">Seguir sin cuenta</button></div>
@@ -355,9 +355,14 @@ else {
   if (store.get('acct', false) || new URLSearchParams(location.search).has('pro')) boot().catch(() => {});
   returnFromPayment();
   // Primera vez: invitamos a entrar con Google (se puede seguir sin cuenta)
+  // Si está la pantalla de arranque, esperamos a que arme su plan (así le ofrecemos guardarlo)
   if (!store.get('acct', false) && !store.get('welcomed', false) && !new URLSearchParams(location.search).has('pro')) {
-    store.set('welcomed', Date.now());
-    setTimeout(() => { if (sheet.hidden && !store.get('acct', false)) open('welcome'); }, 1800);
+    const show = (ms) => setTimeout(() => {
+      if (!sheet.hidden || store.get('acct', false) || document.querySelector('.onb')) return;
+      store.set('welcomed', Date.now()); open('welcome');
+    }, ms);
+    if (!store.get('onb', 0)) window.addEventListener('foco:onboarded', () => show(1600), { once: true });
+    else show(1800);
   }
   const paying = store.get('paying', null);
   if (paying && Date.now() - paying < 7 * 864e5 && !new URLSearchParams(location.search).has('pro')) {

@@ -960,6 +960,8 @@
     }
     return out.sort((a, b) => b.score - a.score).slice(0, 4);
   }
+  // Sin Pro, la primera materia del catálogo es gratis (y se le pueden sumar unidades); para más, Pro
+  const catFree = (c) => pro || !subjects.some((x) => x.cat && x.cat !== c.id);
   const catBox = $('#cat-pick');
   let catResults = [];
   function renderCatPick() {
@@ -988,7 +990,9 @@
     const { c } = catResults[k]; const idx = catChecked(k);
     const n = idx.reduce((sum, i) => sum + c.units[i].topics.length, 0);
     const b = catBox.querySelector(`[data-cat-add="${k}"]`);
-    if (!pro) { b.textContent = n ? `Agregar ${n} temas · Pro` : 'Elegí al menos una unidad'; b.disabled = !n; b.classList.add('locked'); return; }
+    b.classList.toggle('locked', !catFree(c));
+    if (!catFree(c)) { b.textContent = n ? `Agregar ${n} temas · Pro` : 'Elegí al menos una unidad'; b.disabled = !n; return; }
+    if (!pro) { b.textContent = n ? `Agregar ${n} temas · gratis` : 'Elegí al menos una unidad'; b.disabled = !n; return; }
     b.textContent = n ? `Agregar ${n} temas` : 'Elegí al menos una unidad';
     b.disabled = !n;
   }
@@ -1027,7 +1031,7 @@
     if (all) { const k = all.dataset.catAll; catBox.querySelectorAll(`[data-cat-unit^="${k}|"]`).forEach((x) => (x.checked = true)); updateCatButton(Number(k)); return; }
     const add = e.target.closest('[data-cat-add]'); if (!add) return;
     const k = Number(add.dataset.catAdd), idx = catChecked(k);
-    if (!pro) { paywall('catalog'); return; }
+    if (!catFree(catResults[k].c)) { paywall('catalog'); return; }
     if (idx.length) addFromCatalog(catResults[k].c, idx);
   });
 
@@ -1207,8 +1211,8 @@
   $('#plan').addEventListener('click', (e) => {
     const addU = e.target.closest('[data-add-unit]');
     if (addU) {
-      if (!pro) { paywall('catalog'); return; }
       const [sid, i] = addU.dataset.addUnit.split('|'); const s = subById(sid); const c = s && catById(s.cat);
+      if (c && !catFree(c)) { paywall('catalog'); return; }
       if (c) { const keep = el.subDate.value; el.subDate.value = ''; addFromCatalog(c, [Number(i)], { scroll: false }); el.subDate.value = keep; }
       return;
     }
@@ -1514,6 +1518,56 @@
   document.addEventListener('click', (e) => { const go = e.target.closest('[data-open-tab]'); if (go) openOpts(go.dataset.openTab); });
   // Link de invitación a una sala: abre directo la pestaña Amigos
   if (location.hash.includes('sala=')) setTimeout(() => openOpts('amigos'), 300);
+
+
+  // ---------- Arranque: "¿Qué rendís y cuándo?" ----------
+  // La primera vez (sin materias) te arma el plan en un paso. Después avisa a account.js para invitar a guardar en la cuenta.
+  function onboarded() { store.set('onb', Date.now()); window.dispatchEvent(new CustomEvent('foco:onboarded')); }
+  function showOnboarding() {
+    const wrap = document.createElement('div');
+    wrap.className = 'onb'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-labelledby', 'onb-title');
+    wrap.innerHTML = `<div class="onb-box">
+        <span class="cat-badge">Empezá acá</span>
+        <h2 id="onb-title">¿Qué rendís y cuándo?</h2>
+        <p class="hint">Te armo el plan día por día con los temas del programa oficial. Gratis, sin registrarte.</p>
+        <input id="onb-q" type="text" maxlength="40" autocomplete="off" placeholder="Ej: Física 03, Análisis 66, Álgebra UTN" aria-label="Materia">
+        <div id="onb-res" class="onb-res" role="radiogroup" aria-label="Elegí tu materia"></div>
+        <label class="date-field">Fecha del final o parcial<input id="onb-date" type="date" min="${isoToday()}"></label>
+        <button id="onb-go" class="add wide" disabled>Armar mi plan</button>
+        <button id="onb-skip" class="link onb-skip">Ahora no, solo quiero el reloj</button>
+      </div>`;
+    document.body.appendChild(wrap); document.body.classList.add('opts-open');
+    const q = wrap.querySelector('#onb-q'), res = wrap.querySelector('#onb-res'), go = wrap.querySelector('#onb-go'), date = wrap.querySelector('#onb-date');
+    let found = [], pick = -1;
+    const draw = () => {
+      const txt = q.value.trim();
+      res.innerHTML = found.map(({ c }, k) => `<button type="button" role="radio" aria-checked="${k === pick}" data-k="${k}"><b>${esc(c.name)}</b><small>${esc(c.inst)} · ${c.units.length} unidades</small></button>`).join('')
+        + (txt.length >= 2 ? `<button type="button" role="radio" aria-checked="${pick === -2}" data-k="-2"><b>${esc(txt)}</b><small>${found.length ? 'Otra materia: cargás tus temas a mano' : 'No está en el catálogo: cargás tus temas a mano'}</small></button>` : '');
+      go.disabled = pick === -1;
+      go.textContent = pick >= 0 ? `Armar mi plan con ${found[pick].c.units.reduce((n, u) => n + u.topics.length, 0)} temas` : 'Armar mi plan';
+    };
+    q.addEventListener('input', () => { found = searchCatalog(q.value); pick = found.length ? 0 : (q.value.trim().length >= 2 ? -2 : -1); draw(); });
+    res.addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) { pick = Number(b.dataset.k); draw(); } });
+    const close = () => { wrap.remove(); document.body.classList.remove('opts-open'); onboarded(); };
+    wrap.querySelector('#onb-skip').addEventListener('click', close);
+    go.addEventListener('click', () => {
+      if (pick >= 0) {
+        const c = found[pick].c;
+        el.subDate.value = date.value;
+        addFromCatalog(c, c.units.map((_, i) => i));
+      } else if (pick === -2) {
+        let id;
+        do { id = 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); } while (subById(id));
+        subjects.push({ id, name: q.value.trim().slice(0, 40), exam: date.value || '' });
+        openPlans.add(id); setSubject(id); renderStats();
+      }
+      close();
+      setTimeout(() => document.getElementById('plan-sec').scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    });
+    setTimeout(() => q.focus(), 300);
+  }
+  if (!store.get('onb', 0) && !subjects.length && !location.hash.includes('sala=') && !new URLSearchParams(location.search).has('pro')) setTimeout(showOnboarding, 400);
+  else if (!store.get('onb', 0)) store.set('onb', Date.now());
 
   fillForm(); renderPresets(); renderSkins(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
 }

@@ -717,3 +717,20 @@ body:not([data-mode=focus]) .break-kind { display: inline-flex; }
 .plus5:active { transform: scale(.95); }
 body:not([data-mode=focus]) .plus5 { display: block; }
 body.zen.idle .plus5, body.zen.idle .break-kind { opacity: 0; pointer-events: none; }
+
+/* ---------- Arranque ---------- */
+.onb { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; padding: 16px; overflow-y: auto;
+  background: radial-gradient(90% 70% at 50% 10%, color-mix(in srgb, var(--a1) 22%, var(--bg)) 0%, var(--bg) 70%); animation: opts-fade .35s var(--ease); }
+.onb-box { width: min(480px, 100%); display: grid; gap: 12px; animation: opts-in .5s var(--ease); }
+.onb-box .cat-badge { justify-self: start; }
+.onb-box h2 { margin: 2px 0 0; font-size: clamp(28px, 8vw, 38px); }
+.onb-box .hint { margin: 0 0 4px; }
+.onb-box input[type=text] { width: 100%; min-height: 54px; padding: 0 16px; border-radius: 16px; font-size: 17px; background: var(--surface); border: 1px solid var(--border-2, var(--border)); }
+.onb-res { display: grid; gap: 8px; }
+.onb-res:empty { display: none; }
+.onb-res button { display: grid; gap: 2px; text-align: left; padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); transition: border-color .25s var(--ease), background-color .25s var(--ease); }
+.onb-res button b { font-size: 15.5px; }
+.onb-res button small { color: var(--muted); font-size: 13px; }
+.onb-res button[aria-checked=true] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); box-shadow: 0 0 0 1px var(--accent) inset; }
+.onb-box .date-field { display: grid; gap: 6px; }
+.onb-skip { justify-self: center; margin-top: 2px; }
