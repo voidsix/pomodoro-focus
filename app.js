@@ -868,7 +868,7 @@
   el.task.addEventListener('input', () => {
     store.set('task', el.task.value); emitState();
     // Si cambiás la tarea a mano, el pomodoro deja de contar para el tema
-    if (curTopic) { const { t } = findTopic(curTopic); if (!t || t.name !== el.task.value.trim()) { curTopic = ''; store.set('topic', ''); } }
+    if (curTopic) { const { t } = findTopic(curTopic); if (!t || t.name !== el.task.value.trim()) { curTopic = ''; store.set('topic', ''); renderTopicSel(); } }
   });
 
   // ---------- Estado público para las salas de estudio (rooms.js) ----------
@@ -926,7 +926,37 @@
     }
     el.countdown.innerHTML = msg;
     el.countdown.hidden = !msg;
+    renderTopicSel();
   }
+  // Elegí cualquier tema sin pasar por "Estudiar": el pomodoro cuenta para ese tema
+  const LV_MARK = { ok: '✓ ', meh: '◐ ', hard: '● ' };
+  function renderTopicSel() {
+    const sel = $('#topic-sel'); if (!sel) return;
+    const s = subById(currentSub); const all = s ? topicsOf(s) : [];
+    sel.hidden = !all.length;
+    if (!all.length) { sel.innerHTML = ''; el.task.hidden = false; return; }
+    const [csub, ctid] = (curTopic || '').split('|');
+    const units = [];
+    for (const t of all) { const u = t.unit || 'Temas'; let g = units.find((x) => x.u === u); if (!g) units.push(g = { u, ts: [] }); g.ts.push(t); }
+    const opt = (t) => `<option value="${t.id}">${(LV_MARK[t.level] || (t.done ? '✓ ' : ''))}${esc(t.name)}</option>`;
+    sel.innerHTML = '<option value="">Elegí el tema… (o escribí otra cosa)</option>' +
+      (units.length > 1 ? units.map((g) => `<optgroup label="${esc(g.u)}">${g.ts.map(opt).join('')}</optgroup>`).join('') : all.map(opt).join(''));
+    sel.value = csub === s.id && all.some((t) => t.id === ctid) ? ctid : '';
+    // Con un tema elegido no hace falta el campo de texto (sería el mismo nombre repetido)
+    el.task.hidden = !!sel.value;
+  }
+  function useTopic(ref) {
+    const { s, t } = findTopic(ref); if (!s || !t) return;
+    el.task.value = t.name; store.set('task', t.name);
+    curTopic = ref; store.set('topic', ref);
+    if (currentSub !== s.id) setSubject(s.id); else renderTopicSel();
+    render();
+  }
+  $('#topic-sel').addEventListener('change', (e) => {
+    const v = e.target.value;
+    if (v) useTopic(currentSub + '|' + v);
+    else { curTopic = ''; store.set('topic', ''); }
+  });
 
   function renderSubjects() {
     const order = (s) => { const d = daysUntil(s.exam); return d === null ? 1e6 : d < 0 ? 2e6 - d : d; };
@@ -1110,6 +1140,7 @@
 
   function renderPlan() {
     const box = $('#plan'), top = $('#plan-today'); if (!box) return;
+    queueMicrotask(renderTopicSel);
     if (!subjects.length) {
       top.innerHTML = '';
       box.innerHTML = '<p class="empty">Primero cargá tus materias con la fecha del final.</p><button class="add plan-empty-btn" data-open-tab="materias">Cargar materias</button>';
@@ -1152,7 +1183,9 @@
         return `${head}
         <li class="${t.done ? 'done' : ''}">
           <label><input type="checkbox" data-toggle="${s.id}|${t.id}" ${t.done ? 'checked' : ''}><span>${esc(t.name)}</span></label>
-          ${t.level ? `<i class="lv-dot lv-${t.level}" title="${LEVELS[t.level]}"></i>` : ''}${t.pomos ? `<small class="t-pomos">${t.pomos} 🍅</small>` : ''}
+          ${t.pomos ? `<small class="t-pomos">${t.pomos} 🍅</small>` : ''}
+          <button class="lv-btn lv-${t.level || 'new'}" data-level="${s.id}|${t.id}" title="${t.level ? LEVELS[t.level] : 'Sin ver'} · tocá para cambiar" aria-label="Estado: ${t.level ? LEVELS[t.level] : 'sin ver'}. Tocá para cambiar"></button>
+          <button class="t-play" data-study="${s.id}|${t.id}" title="Estudiar este tema" aria-label="Estudiar ${esc(t.name)}"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></button>
           <button class="del" data-del-topic="${s.id}|${t.id}" aria-label="Quitar tema">×</button>
         </li>`;
       }).join('');
@@ -1172,8 +1205,8 @@
           ${todayLine}
           ${p.total ? `<div class="plan-progress"><span class="track-h"><i style="width:${pct}%;background:${color}"></i></span><small>${p.total - p.left} de ${p.total} temas listos</small></div>` : ''}
           ${next}
-          ${all.length ? `<div class="topic-map" aria-label="Mapa de la materia">${all.map((t) => `<i class="lv-${t.level || (t.done ? 'ok' : 'new')}" title="${esc(t.name)}"></i>`).join('')}</div>
-            <div class="map-legend"><span class="lv-ok">Lo tengo</span><span class="lv-meh">Más o menos</span><span class="lv-hard">Me cuesta</span><span class="lv-new">Sin ver</span></div>` : ''}
+          ${all.length ? `${topicPanel(s, all)}
+            <div class="map-legend"><span class="lv-ok">Lo tengo</span><span class="lv-meh">Más o menos</span><span class="lv-hard">Me cuesta</span><span class="lv-new">Sin ver</span><button class="link" data-how>¿Cómo funciona?</button></div>` : ''}
           ${p.weak.length && p.kind !== 'past' ? `<div class="review"><span>Para repasar · ${p.weak.length}</span>${p.weak.slice(0, 5).map((t) => `<div class="review-row"><i class="lv-${t.level}"></i><b>${esc(t.name)}</b><button class="chip-sm" data-study="${s.id}|${t.id}">Repasar</button></div>`).join('')}</div>` : ''}
           <details ${open ? 'open' : ''} data-details="${s.id}">
             <summary>Temas y ajustes</summary>
@@ -1196,6 +1229,28 @@
   }
 
   const LEVELS = { ok: 'Lo tengo', meh: 'Más o menos', hard: 'Me cuesta' };
+  // Panel de temas de la materia: un cuadradito por tema, agrupados por unidad. Tocás uno y ves qué tema es.
+  const mapSel = new Map(); // materia → tema elegido en el panel
+  const lvOf = (t) => t.level || (t.done ? 'ok' : 'new');
+  function topicPanel(s, all) {
+    const units = [];
+    all.forEach((t, i) => { const u = t.unit || 'Temas'; let g = units.find((x) => x.u === u); if (!g) units.push(g = { u, ts: [] }); g.ts.push({ t, i }); });
+    const selId = mapSel.get(s.id); const sel = all.find((t) => t.id === selId);
+    const rows = units.map((g, k) => `<div class="tp-row" data-u="${k}"><span class="tp-unit" title="${esc(g.u)}">${units.length > 1 ? (k + 1) + '. ' : ''}${esc(g.u)}</span>
+        <div class="tp-cells">${g.ts.map(({ t, i }) => `<button class="tp-cell lv-${lvOf(t)}${t.id === selId ? ' sel' : ''}" data-map="${s.id}|${t.id}" title="${esc(t.name)}" aria-label="Tema ${i + 1}: ${esc(t.name)} · ${t.level ? LEVELS[t.level] : t.done ? 'Listo' : 'Sin ver'}">${i + 1}</button>`).join('')}</div></div>`).join('');
+    const detail = sel ? `<div class="tp-detail">
+        <small>${esc(sel.unit || 'Tema')}</small>
+        <b>${esc(sel.name)}</b>
+        <span class="tp-meta">${sel.pomos ? sel.pomos + ' pomodoro' + (sel.pomos > 1 ? 's' : '') : 'Todavía sin pomodoros'}</span>
+        <div class="tp-lv">${['ok', 'meh', 'hard'].map((lv) => `<button class="lv-${lv}${sel.level === lv ? ' on' : ''}" data-setlv="${s.id}|${sel.id}|${lv}"><i></i>${LEVELS[lv]}</button>`).join('')}</div>
+        <button class="add sm" data-study="${s.id}|${sel.id}">Estudiar este tema</button>
+      </div>` : '<p class="tp-hint">Tocá un cuadradito para ver qué tema es.</p>';
+    // El detalle aparece justo debajo de la fila (unidad) del tema que tocaste
+    const k = sel ? units.findIndex((g) => g.ts.some(({ t }) => t.id === sel.id)) : -1;
+    const parts = rows.split('<div class="tp-row" data-u=');
+    const out = sel ? parts.map((p, i) => (i === 0 ? p : '<div class="tp-row" data-u=' + p) + (i - 1 === k ? detail : '')).join('') : rows + detail;
+    return `<div class="topic-panel"><span class="tp-title">Panel de temas de la materia</span>${out}</div>`;
+  }
   // "¿Cómo te fue?" al terminar un pomodoro de un tema: así Foco sabe qué repasar
   function askRate(ref) {
     const { s, t } = findTopic(ref); if (!s || !t) return;
@@ -1205,10 +1260,11 @@
     box.innerHTML = `<button class="rate-x" aria-label="Cerrar">×</button>
       <p>¿Cómo te fue con <b>${esc(t.name)}</b>?</p>
       <div class="rate-btns">
-        <button data-rate="ok"><i class="lv-ok"></i>Lo entendí</button>
-        <button data-rate="meh"><i class="lv-meh"></i>Más o menos</button>
-        <button data-rate="hard"><i class="lv-hard"></i>Me cuesta</button>
-      </div>`;
+        <button data-rate="ok"><i class="lv-ok"></i>Lo entendí<small>listo, seguís con el próximo</small></button>
+        <button data-rate="meh"><i class="lv-meh"></i>Más o menos<small>seguís, pero vuelve a repaso</small></button>
+        <button data-rate="hard"><i class="lv-hard"></i>Me cuesta<small>le das otro pomodoro</small></button>
+      </div>
+      <button class="link rate-how" data-how>¿Cómo funciona?</button>`;
     document.body.appendChild(box);
     requestAnimationFrame(() => box.classList.add('on'));
     const close = () => { box.classList.remove('on'); setTimeout(() => box.remove(), 350); };
@@ -1223,7 +1279,7 @@
         if (nx) { el.task.value = nx.name; store.set('task', nx.name); curTopic = s.id + '|' + nx.id; store.set('topic', curTopic); }
         else { curTopic = ''; store.set('topic', ''); }
       }
-      saveSubjects(); renderPlan(); render(); close();
+      saveSubjects(); renderPlan(); renderTopicSel(); render(); close();
     });
     setTimeout(() => { if (box.isConnected) close(); }, 120000);
   }
@@ -1278,6 +1334,22 @@
       if (c) { const keep = el.subDate.value; el.subDate.value = ''; addFromCatalog(c, [Number(i)], { scroll: false }); el.subDate.value = keep; }
       return;
     }
+    const mp = e.target.closest('[data-map]');
+    if (mp) { const [sid, tid] = mp.dataset.map.split('|'); mapSel.get(sid) === tid ? mapSel.delete(sid) : mapSel.set(sid, tid); renderPlan(); return; }
+    const sl = e.target.closest('[data-setlv]');
+    if (sl) {
+      const [sid, tid, lv] = sl.dataset.setlv.split('|'); const { t } = findTopic(sid + '|' + tid); if (!t) return;
+      if (t.level === lv) { delete t.level; t.done = false; } else { t.level = lv; t.done = lv !== 'hard'; }
+      saveSubjects(); renderPlan(); return;
+    }
+    const lvb = e.target.closest('[data-level]');
+    if (lvb) {
+      const { t } = findTopic(lvb.dataset.level); if (!t) return;
+      const order = [undefined, 'ok', 'meh', 'hard'];
+      const nx = order[(order.indexOf(t.level) + 1) % order.length];
+      if (nx) { t.level = nx; t.done = nx !== 'hard'; } else { delete t.level; t.done = false; }
+      saveSubjects(); renderPlan(); renderTopicSel(); return;
+    }
     const delPlan = e.target.closest('[data-del-plan]');
     if (delPlan) { deleteSubject(delPlan.dataset.delPlan); return; }
     const del = e.target.closest('[data-del-topic]');
@@ -1288,9 +1360,7 @@
     }
     const study = e.target.closest('[data-study]'); if (!study) return;
     const { s, t } = findTopic(study.dataset.study); if (!s || !t) return;
-    el.task.value = t.name; store.set('task', t.name);
-    curTopic = study.dataset.study; store.set('topic', curTopic);
-    setSubject(s.id);
+    useTopic(study.dataset.study);
     if (mode !== 'focus') setMode('focus');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
@@ -1637,8 +1707,8 @@
   const GUIDE = [
     ['1', 'Cargá tu materia', 'Escribí la materia y la fecha del final o parcial. Si está en el catálogo (probá "Física 03"), Foco la separa en unidades y temas del programa oficial. Está en ⚙ › Materias.'],
     ['2', 'Mirá tu plan de hoy', 'Foco reparte los temas hasta el final y te dice cuántos pomodoros hacer hoy. El día antes queda libre para repasar.'],
-    ['3', 'Tocá «Estudiar»', 'En «Próximo tema» tocá Estudiar y después Empezar: arranca un pomodoro de 25 minutos con ese tema.'],
-    ['4', 'Contá cómo te fue', 'Al terminar elegí Lo entendí, Más o menos o Me cuesta. Lo que te cuesta vuelve en «Para repasar» y suma pomodoros al plan.'],
+    ['3', 'Elegí el tema y empezá', 'Tocá Estudiar en «Próximo tema», o elegí cualquier tema en el selector debajo del reloj (o con ▶ en la lista). Después tocá Empezar.'],
+    ['4', 'Contá cómo te fue', 'Al terminar elegí Lo entendí (pasás al siguiente), Más o menos (avanzás pero vuelve a repaso) o Me cuesta (le das otro pomodoro). Lo flojo aparece en «Para repasar».'],
     ['5', 'Descansá', 'Después de cada pomodoro viene un descanso corto, y cada 4 uno largo. Si necesitás más, tocá +5 min.'],
     ['6', 'Concentrate', 'En ⚙ › Sonidos elegí un fondo (lluvia, olas…), música para estudiar o frecuencias suaves. El botón de pantalla completa activa el modo zen.'],
     ['7', 'Estudiá con amigos', 'En ⚙ › Amigos creá una sala y pasales el código: ven en qué está cada uno y se mandan aplausos.'],
@@ -1653,6 +1723,7 @@
         <span class="cat-badge">Guía rápida</span>
         <h2 id="guide-title">Cómo usar Foco</h2>
         <ol class="guide-steps">${GUIDE.map(([n, t, d]) => `<li><b class="gs-n">${n}</b><div><b>${t}</b><span>${d}</span></div></li>`).join('')}</ol>
+        <p class="sheet-fine"><button class="link" data-how>Ver cómo funciona el repaso</button></p>
         <p class="sheet-fine">Atajos en la compu: <b>barra espaciadora</b> empieza o pausa · <b>Z</b> modo zen · <b>Esc</b> cierra.</p>
         <div class="sheet-actions"><button class="add" data-guide-close>¡Listo!</button></div>
       </div>`;
@@ -1662,6 +1733,37 @@
     wrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
     wrap.querySelector('.sheet-x').focus({ preventScroll: true });
   }
+
+  // ---------- Cómo funciona el repaso ----------
+  function openHow() {
+    document.querySelector('.guide')?.remove();
+    const wrap = document.createElement('div');
+    wrap.className = 'dialog sheet guide'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-labelledby', 'how-title');
+    const row = (lv, t, d) => `<li><i class="how-dot lv-${lv}"></i><div><b>${t}</b><span>${d}</span></div></li>`;
+    wrap.innerHTML = `<div class="box sheet-box">
+        <button class="sheet-x" data-guide-close aria-label="Cerrar">×</button>
+        <span class="cat-badge">Cómo funciona</span>
+        <h2 id="how-title">Lo que te cuesta, vuelve</h2>
+        <p class="sheet-sub">Cuando terminás un pomodoro de un tema, Foco te pregunta <b>¿cómo te fue?</b> Con tu respuesta decide qué hacés después:</p>
+        <ol class="guide-steps how">
+          ${row('ok', 'Lo entendí', 'El tema queda verde y tachado. El próximo pomodoro pasa solo al tema siguiente.')}
+          ${row('meh', 'Más o menos', 'Se tacha igual para que avances, pero queda amarillo: aparece en «Para repasar» y le suma 1 pomodoro al plan.')}
+          ${row('hard', 'Me cuesta', 'Queda naranja y sin tachar: el próximo pomodoro sigue en ese tema hasta que te salga.')}
+          ${row('new', 'Sin ver', 'Gris: todavía no lo estudiaste.')}
+        </ol>
+        <h3>Para repasar</h3>
+        <p class="how-p">Cada materia junta sus temas amarillos y naranjas, primero los que más te cuestan. Tocás <b>Repasar</b>, hacés el pomodoro y, si esta vez decís «Lo entendí», sale de la lista. Cuando terminás todos los temas, el plan pasa a <b>«Repasá los flojos»</b> hasta el final.</p>
+        <h3>Vos elegís el tema</h3>
+        <p class="how-p">No hace falta seguir el orden: elegí cualquier tema en el selector de abajo del reloj, o tocá ▶ al lado de un tema en la lista. Y si ya sabés cómo estás con un tema, tocá su puntito de color para cambiarlo a mano.</p>
+        <div class="sheet-actions"><button class="add" data-guide-close>Entendido</button></div>
+      </div>`;
+    document.body.appendChild(wrap); document.body.classList.add('sheet-open');
+    const close = () => { wrap.remove(); if (!document.querySelector('#sheet:not([hidden])')) document.body.classList.remove('sheet-open'); };
+    wrap.addEventListener('click', (e) => { if (e.target === wrap || e.target.closest('[data-guide-close]')) close(); });
+    wrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+    wrap.querySelector('.sheet-x').focus({ preventScroll: true });
+  }
+  document.addEventListener('click', (e) => { if (e.target.closest('[data-how]')) openHow(); });
   window.__focoGuide = openGuide;
   window.addEventListener('foco:guide', openGuide);
   document.addEventListener('click', (e) => { if (e.target.closest('[data-guide]')) openGuide(); });

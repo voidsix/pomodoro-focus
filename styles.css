@@ -845,3 +845,44 @@ body.zen.idle .plus5, body.zen.idle .break-kind { opacity: 0; pointer-events: no
   font-size: 14px; font-weight: 600; text-align: center; color: var(--text); background: var(--surface); border: 1px solid color-mix(in srgb, var(--lv-ok, #4fd18b) 45%, transparent);
   box-shadow: 0 20px 60px rgba(0,0,0,.5); transform: translate(-50%, -16px); opacity: 0; transition: transform .45s var(--ease), opacity .35s var(--ease); }
 .resume-note.on { transform: translate(-50%, 0); opacity: 1; }
+
+/* ---------- Tema elegido, estado a mano y explicación ---------- */
+.topic-sel { width: 100%; max-width: 100%; text-overflow: ellipsis; font-weight: 600; font-size: 14px; color: var(--muted); }
+.topic-sel[hidden] { display: none; }
+.lv-btn { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; }
+.lv-btn::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--lv); box-shadow: 0 0 0 2px color-mix(in srgb, var(--lv) 30%, transparent); transition: transform .2s var(--ease); }
+.lv-btn:hover::before { transform: scale(1.25); }
+.t-play { flex: none; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; color: var(--accent); }
+.t-play svg { width: 15px; height: 15px; fill: currentColor; }
+.t-play:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.topics .del { width: 30px; }
+.rate-btns button small { display: block; color: var(--muted); font-size: 11px; font-weight: 600; line-height: 1.25; text-align: center; }
+.rate-how { display: block; margin: 10px auto 0; font-size: 13px; }
+.map-legend .link { margin-left: auto; font-size: 12px; }
+.how-dot { width: 16px; height: 16px; margin-top: 3px; border-radius: 50%; background: var(--lv); box-shadow: 0 0 10px var(--lv); }
+.guide-steps.how li { gap: 14px; }
+.how-p { margin: 0 0 8px; color: var(--muted); font-size: 14.5px; line-height: 1.5; }
+.guide h3 { margin: 18px 0 6px; }
+.task[hidden] { display: none; }
+
+/* ---------- Panel de temas de la materia ---------- */
+.topic-panel { display: grid; gap: 8px; margin: 12px 0 4px; padding: 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); }
+.tp-title { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.tp-row { display: grid; grid-template-columns: minmax(0, 34%) minmax(0, 1fr); gap: 10px; align-items: start; }
+.tp-unit { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.3; padding-top: 4px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.tp-cells { display: flex; flex-wrap: wrap; gap: 5px; }
+.tp-cell { width: 26px; height: 26px; border-radius: 7px; background: var(--lv); color: color-mix(in srgb, var(--bg) 75%, transparent); font-size: 10.5px; font-weight: 800;
+  display: grid; place-items: center; transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+.tp-cell.lv-new { color: var(--muted); }
+.tp-cell:hover { transform: scale(1.12); }
+.tp-cell.sel { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text); transform: scale(1.08); }
+.tp-hint { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.tp-detail { display: grid; gap: 4px; margin-top: 4px; padding: 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border-2); }
+.tp-detail small { color: var(--muted); font-size: 11.5px; font-weight: 700; letter-spacing: .04em; }
+.tp-detail b { font-size: 15.5px; line-height: 1.3; }
+.tp-meta { color: var(--muted); font-size: 13px; }
+.tp-lv { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 4px; }
+.tp-lv button { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 700; color: var(--muted); border: 1px solid var(--border-2); }
+.tp-lv button i { width: 9px; height: 9px; border-radius: 50%; background: var(--lv); }
+.tp-lv button.on { color: var(--text); border-color: var(--lv); background: color-mix(in srgb, var(--lv) 14%, transparent); }
+.tp-detail .add { justify-self: start; margin-top: 2px; }
