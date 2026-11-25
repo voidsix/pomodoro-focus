@@ -111,7 +111,8 @@
   }
 
   function persist() {
-    store.set('state', { mode, cycle, remaining, bonus });
+    // endAt se guarda mientras corre: si cerrás la app, al volver el pomodoro sigue (o se cuenta si ya terminó)
+    store.set('state', { mode, cycle, remaining, bonus, endAt: timer ? endAt : null });
   }
 
   // ---------- Temporizador (basado en hora de fin, sobrevive a pestañas en segundo plano) ----------
@@ -125,7 +126,7 @@
     endAt = Date.now() + remaining;
     clearInterval(timer);
     timer = setInterval(tick, 250);
-    render(); updateAmbient();
+    persist(); render(); updateAmbient();
   }
   function pause() {
     clearInterval(timer); timer = null;
@@ -139,13 +140,14 @@
     persist(); render(); updateAmbient();
   }
 
-  function finish() {
+  // quiet: terminó mientras la app estaba cerrada (se cuenta igual, sin alarma ni arranque automático)
+  function finish(at = Date.now(), quiet = false) {
     clearInterval(timer); timer = null;
     const wasFocus = mode === 'focus';
     if (wasFocus) {
       const { s: ts, t: tt } = curTopic ? findTopic(curTopic) : {};
       const onTopic = tt && ts && ts.id === currentSub;
-      log.push({ ts: Date.now(), min: settings.focus, task: el.task.value.trim(), sub: currentSub, ...(onTopic ? { topic: tt.id } : {}) });
+      log.push({ ts: at, min: settings.focus, task: el.task.value.trim(), sub: currentSub, ...(onTopic ? { topic: tt.id } : {}) });
       if (onTopic) { tt.pomos = (tt.pomos || 0) + 1; saveSubjects(); setTimeout(() => askRate(curTopic), 600); }
       if (log.length > 2000) log = log.slice(-2000);
       store.set('log', log);
@@ -154,12 +156,13 @@
     let next;
     if (wasFocus) next = cycle >= settings.every ? 'long' : 'short';
     else { next = 'focus'; if (mode === 'long') cycle = 0; }
-    alertDone(wasFocus ? '¡Pomodoro completo! Tomate un descanso.' : 'Fin del descanso. A enfocarse.');
+    if (!quiet) alertDone(wasFocus ? '¡Pomodoro completo! Tomate un descanso.' : 'Fin del descanso. A enfocarse.');
     mode = next; bonus = 0; remaining = total();
     persist(); render(); renderStats();
     document.body.classList.add('done');
     setTimeout(() => document.body.classList.remove('done'), 2000);
-    if (settings.autoStart) start(); else updateAmbient();
+    if (settings.autoStart && !quiet) start(); else updateAmbient();
+    if (quiet && wasFocus) showResumeNote();
   }
 
   // ---------- Sonido: todo se genera con Web Audio (sin archivos, funciona offline) ----------
@@ -1663,5 +1666,18 @@
   window.addEventListener('foco:guide', openGuide);
   document.addEventListener('click', (e) => { if (e.target.closest('[data-guide]')) openGuide(); });
 
+  // ---------- Retomar el pomodoro si cerraste la app ----------
+  function showResumeNote() {
+    const n = document.createElement('div');
+    n.className = 'resume-note'; n.setAttribute('role', 'status');
+    n.textContent = '✓ Terminaste un pomodoro mientras Foco estaba cerrado: ya quedó contado.';
+    document.body.appendChild(n);
+    requestAnimationFrame(() => n.classList.add('on'));
+    setTimeout(() => { n.classList.remove('on'); setTimeout(() => n.remove(), 500); }, 6000);
+  }
   fillForm(); renderPresets(); renderSkins(); renderSounds(); renderNotes(); renderSubjects(); renderStats(); render();
+  if (saved.endAt) {
+    if (saved.endAt > Date.now()) { remaining = saved.endAt - Date.now(); start(); }
+    else { remaining = 0; finish(saved.endAt, true); }
+  }
 }
